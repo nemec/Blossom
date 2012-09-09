@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5473145F-1ED7-477D-A9FE-8F938D5C55D1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Blossom.Deployment</RootNamespace>
+    <AssemblyName>Blossom.Deployment</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CommandLine">
+      <HintPath>..\packages\CommandLineParser.1.9.3.19\lib\CommandLine.dll</HintPath>
+    </Reference>
+    <Reference Include="DiffieHellman">
+      <HintPath>..\packages\DiffieHellman.1.0.0\lib\net40\DiffieHellman.dll</HintPath>
+    </Reference>
+    <Reference Include="Org.Mentalis.Security">
+      <HintPath>..\packages\Org.Mentalis.Security.1.0.0\lib\net40\Org.Mentalis.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Tamir.SharpSSH">
+      <HintPath>..\packages\Tamir.SharpSSH.1.1.1.13\lib\Tamir.SharpSSH.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CommandLineOptions.cs" />
+    <Compile Include="ContextManagers\Cd.cs" />
+    <Compile Include="ContextManagers\ContextManager.cs" />
+    <Compile Include="ContextManagers\Lcd.cs" />
+    <Compile Include="ContextManagers\Prefix.cs" />
+    <Compile Include="DeploymentContext.cs" />
+    <Compile Include="Env.cs" />
+    <Compile Include="Environments\BaseEnvironment.cs" />
+    <Compile Include="Environments\EnvironmentFinder.cs" />
+    <Compile Include="Environments\IEnvironment.cs" />
+    <Compile Include="Environments\Linux.cs" />
+    <Compile Include="Environments\CustomEnvironment.cs" />
+    <Compile Include="Environments\Windows.cs" />
+    <Compile Include="Host.cs" />
+    <Compile Include="InteractionType.cs" />
+    <Compile Include="Logging\ConsoleLogger.cs" />
+    <Compile Include="Logging\ILogger.cs" />
+    <Compile Include="Operations.cs" />
+    <Compile Include="PathSeparator.cs" />
+    <Compile Include="ProgressMonitor.cs" />
+    <Compile Include="Exceptions\NonInteractiveSessionException.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ConsoleSessionUserInfo.cs" />
+    <Compile Include="Static.cs" />
+    <Compile Include="Summary.cs" />
+    <Compile Include="TaskAttribute.cs" />
+    <Compile Include="Utils.cs" />
+    <Compile Include="AutoResponse.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

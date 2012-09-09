@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Deployment>
+  <Hosts>
+    <Host username="dan" password="something">192.168.1.1</Host>
+  </Hosts>
+  <InputDirs>
+    <InputDir path="C:\Users\dan\tmp\">
+      <OutputDirs>
+        <OutputDir path="/home/dan/testout/">
+          <Files>
+            <File>AutomatedDeployment.exe</File>
+            <File>AutomatedDeployment.exe.config</File>
+            <File>deployment.config</File>
+          </Files>
+        </OutputDir>
+      </OutputDirs>
+    </InputDir>
+  </InputDirs>
+</Deployment>
