@@ -19,7 +19,7 @@ namespace Blossom.Deployment
             Config = config;
         }
 
-        //[Task]
+        [Task]
         public void CopyFiles()
         {
             foreach (var input in Config.InputDirs)
@@ -38,7 +38,7 @@ namespace Blossom.Deployment
             }
         }
 
-        [Task]
+        //[Task]
         public void Test()
         {
             Console.WriteLine(Context.Operations.Prompt("What?"));
@@ -46,8 +46,8 @@ namespace Blossom.Deployment
             Console.WriteLine(Context.Operations.Prompt("Valid.",
                 validateCallable: (r => r == "hello"),
                 validationFailedMessage: "Please enter hello."));
-            Console.WriteLine(Context.Operations.Prompt("Regex.",
-                validateRegex: @"\d+", validationFailedMessage: "Please enter a number."));
+            /*Console.WriteLine(Context.Operations.Prompt("Regex.",
+                validateRegex: @"\d+", validationFailedMessage: "Please enter a number."));*/
         }
     }
 }

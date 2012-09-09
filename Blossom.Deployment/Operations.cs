@@ -208,13 +208,17 @@ namespace Blossom.Deployment
                 inputStream = Console.In;
             }
 
-            if (!validateRegex.StartsWith("^"))
+            if (validateRegex != null)
             {
-                validateRegex = "^" + validateRegex;
-            }
-            if (!validateRegex.EndsWith("$"))
-            {
-                validateRegex = validateRegex + "$";
+                throw new NotImplementedException("Regex not implemented.");
+                if (!validateRegex.StartsWith("^"))
+                {
+                    validateRegex = "^" + validateRegex;
+                }
+                if (!validateRegex.EndsWith("$"))
+                {
+                    validateRegex = validateRegex + "$";
+                }
             }
 
             displayStream.Write(message);
@@ -231,10 +235,15 @@ namespace Blossom.Deployment
                 while (true)
                 {
                     response = inputStream.ReadLine();
-                    if (validateCallable != null &&
-                        validateCallable(response))
+                    if ((validateCallable == null && validateRegex == null) ||
+                        (validateCallable != null && validateCallable(response)))
                     {
                         break;
+                    }
+                    else
+                    {
+                        displayStream.WriteLine(validationFailedMessage ??
+                            "Response did not pass validation. Please try again.");
                     }
                 }
             }

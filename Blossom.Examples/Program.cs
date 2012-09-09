@@ -7,14 +7,18 @@ using System.Collections.Generic;
 namespace Blossom.Deployment
 {
     //http://docs.fabfile.org/en/1.4.3/#api-documentation
-    //Rhyble
     public class Program
     {
         static void Main(string[] args)
         {
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Need to provide config file as argument.");
+                Environment.Exit(1);
+            }
             var serializer = new XmlSerializer(typeof(Config));
 
-            var config = (Config)serializer.Deserialize(XmlReader.Create("testdeploy.config"));
+            var config = (Config)serializer.Deserialize(XmlReader.Create(args[0]));
 
             var sessionConfig = new Dictionary<string, string>
                 {
