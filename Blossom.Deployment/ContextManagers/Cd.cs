@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace Blossom.Deployment.ContextManagers
 {
     public class Cd : ContextManager
     {
-        readonly string NewPath;
+        private readonly string NewPath;
 
         public Cd(DeploymentContext context, string path)
             : base(context)

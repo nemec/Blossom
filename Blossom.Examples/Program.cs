@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Xml.Serialization;
-using System.IO;
-using System.Xml;
 using System.Collections.Generic;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace Blossom.Deployment
 {
     //http://docs.fabfile.org/en/1.4.3/#api-documentation
     public class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             if (args.Length == 0)
             {

@@ -1,29 +1,32 @@
 ﻿using Blossom.Deployment.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tamir.SharpSsh.jsch;
 
 namespace Blossom.Deployment
 {
-    public class ProgressMonitor : SftpProgressMonitor, IDisposable
+    public class FileProgressMonitor : SftpProgressMonitor, IDisposable
     {
+        private string Filename { get; set; }
+
         private ILogger Logger { get; set; }
+
         private long Max { get; set; }
+
         private long Count { get; set; }
+
         private long Percent { get; set; }
+
         private int ElapsedTime { get; set; }
 
-        System.Timers.Timer Timer;
+        private System.Timers.Timer Timer;
 
-        public ProgressMonitor(ILogger logger)
+        public FileProgressMonitor(ILogger logger, string filename)
         {
+            Filename = filename;
             Logger = logger;
         }
 
-        ~ProgressMonitor()
+        ~FileProgressMonitor()
         {
             Dispose(false);
         }
@@ -43,8 +46,9 @@ namespace Blossom.Deployment
             {
                 Percent = Count * 100 / Max;
 
-                Logger.Tick(String.Format("Transferring... {0}/{1}b [{2}s]",
-                    Count, Max, ElapsedTime));
+                Logger.Tick(String.Format("Transferring {0}... {1}/{2} [{3}s]",
+                    Filename, Utils.HumanizeBytes(Count),
+                    Utils.HumanizeBytes(Max), ElapsedTime));
             }
             return true;
         }
@@ -53,8 +57,8 @@ namespace Blossom.Deployment
         {
             Timer.Stop();
             Timer.Dispose();
-            Logger.Info(String.Format("Completed...... {0}b [{1}s]",
-                Max, ElapsedTime));
+            Logger.Info(String.Format("Completed {0}...... {1} [{2}s]",
+                Filename, Utils.HumanizeBytes(Max), ElapsedTime));
             Logger.ClearTicker();
         }
 

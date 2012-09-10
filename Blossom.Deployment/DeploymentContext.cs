@@ -1,22 +1,20 @@
-﻿using CommandLine;
-using Blossom.Deployment.ContextManagers;
-using Blossom.Deployment.Environments;
+﻿using Blossom.Deployment.Environments;
 using Blossom.Deployment.Logging;
+using Blossom.Deployment.Ssh;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using Tamir.SharpSsh;
-using Tamir.SharpSsh.jsch;
 
 namespace Blossom.Deployment
 {
-    public class DeploymentContext
+    public class DeploymentContext : IDeploymentContext
     {
         public ILogger Logger { get; set; }
+
         public Env Environment { get; set; }
+
         public Operations Operations { get; private set; }
 
         public DeploymentContext()
@@ -28,7 +26,7 @@ namespace Blossom.Deployment
         public DeploymentContext(IEnvironment remoteEnvironment)
         {
             Logger = new ConsoleLogger();
-            this.Environment = new Env();
+            this.Environment = new Env(remoteEnvironment);
         }
 
         private static IEnumerable<MethodInfo> SortTasksInObjectByPriority(object obj)
@@ -45,48 +43,41 @@ namespace Blossom.Deployment
                 .Select(k => k.Method);
         }
 
-        private Session SetupHostSession(JSch jsch, Host host, Dictionary<string, string> sessionConfig)
-        {
-            var session = jsch.getSession(
-                    host.Username ?? System.Environment.UserName,
-                    host.Hostname,
-                    host.Port != 0 ? host.Port : 22);
-
-            session.setUserInfo(new ConsoleSessionUserInfo(host.Password,
-                autoRespondYN: AutoResponse.Yes));
-            session.setConfig(new Hashtable(sessionConfig));
-            session.connect();
-
-            this.Environment.CurrentHost = host;
-            this.Environment.CurrentSession = session;
-            return session;
-        }
-
-        public void BeginDeployment(string[] args, object tasks,
+        public void BeginDeployment(string[] args, object taskInstance,
             Dictionary<string, string> sessionConfig = null)
         {
             // http://www.tamirgal.com/blog/page/SharpSSH.aspx
-            var jsch = new JSch();
+            
 
             foreach (var host in this.Environment.Hosts)
             {
                 Logger.Info(String.Format("Beginning deployment for {0}.", host));
-                var session = SetupHostSession(jsch, host, sessionConfig);
+                var session = new SessionWrapper(host);
 
-                Operations = new Operations(this);
-                
-                foreach (var method in SortTasksInObjectByPriority(tasks))
+                session.UserInfo = new ConsoleSessionUserInfo(this)
+                {
+                    Password = host.Password,
+                    AutoRespondYN = AutoResponse.Yes
+                };
+                session.SetConfig(sessionConfig);
+
+                this.Environment.CurrentHost = host;
+                session.Connect();
+
+                Operations = new Operations(this, session);
+
+                foreach (var method in SortTasksInObjectByPriority(taskInstance))
                 {
                     var parameters = method.GetParameters();
 
                     if (parameters.Length == 0)
                     {
-                        method.Invoke(tasks, null);
+                        method.Invoke(taskInstance, null);
                     }
                     else if (parameters.Length == 1 &&
                         parameters.First().ParameterType == typeof(DeploymentContext))
                     {
-                        method.Invoke(tasks, new[] { this });
+                        method.Invoke(taskInstance, new[] { this });
                     }
                     else
                     {
@@ -96,8 +87,7 @@ namespace Blossom.Deployment
                 }
 
                 this.Environment.CurrentHost = null;
-                this.Environment.CurrentSession = null;
-                session.disconnect();
+                session.Disconnect();
             }
         }
     }

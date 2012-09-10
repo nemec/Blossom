@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blossom.Deployment.Environments
 {
     public abstract class BaseEnvironment : IEnvironment
     {
         internal Stack<string> Directories { get; set; }
+
         internal Stack<string> Prefixes { get; set; }
 
         public abstract string LineEnding { get; }
+
         public abstract PathSeparator PathSeparator { get; }
+
         public abstract string ExpandUser(string path, string username);
 
         public BaseEnvironment()
@@ -21,8 +20,8 @@ namespace Blossom.Deployment.Environments
         {
         }
 
-        public BaseEnvironment(string initialDirectory){
-
+        public BaseEnvironment(string initialDirectory)
+        {
             Directories = new Stack<string>();
             Prefixes = new Stack<string>();
             Pushd(initialDirectory ?? "");
@@ -42,13 +41,11 @@ namespace Blossom.Deployment.Environments
 
         public string CurrentDirectory { get { return Directories.Peek(); } }
 
-
         public string CombinePath(params string[] paths)
         {
             return Utils.NormalizePathSeparators(
                 Path.Combine(paths), PathSeparator);
         }
-
 
         public void PushPrefix(string prefix)
         {

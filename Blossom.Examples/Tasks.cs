@@ -1,13 +1,10 @@
 ﻿using Blossom.Deployment.ContextManagers;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Blossom.Deployment
 {
-    class Tasks
+    internal class Tasks
     {
         private DeploymentContext Context { get; set; }
 
@@ -19,7 +16,7 @@ namespace Blossom.Deployment
             Config = config;
         }
 
-        [Task]
+        //[Task]
         public void CopyFiles()
         {
             foreach (var input in Config.InputDirs)
@@ -38,7 +35,7 @@ namespace Blossom.Deployment
             }
         }
 
-        //[Task]
+        [Task]
         public void Test()
         {
             Console.WriteLine(Context.Operations.Prompt("What?"));
@@ -46,8 +43,8 @@ namespace Blossom.Deployment
             Console.WriteLine(Context.Operations.Prompt("Valid.",
                 validateCallable: (r => r == "hello"),
                 validationFailedMessage: "Please enter hello."));
-            /*Console.WriteLine(Context.Operations.Prompt("Regex.",
-                validateRegex: @"\d+", validationFailedMessage: "Please enter a number."));*/
+            Console.WriteLine(Context.Operations.Prompt("Regex.",
+                validateRegex: @"\d+", validationFailedMessage: "Please enter a number."));
         }
     }
 }

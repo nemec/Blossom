@@ -1,25 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tamir.SharpSsh.jsch;
 
 namespace Blossom.Deployment
 {
     internal class ConsoleSessionUserInfo : UserInfo
     {
-        private string Password { get; set; }
-        private string Passphrase { get; set; }
-        private AutoResponse AutoRespondYN { get; set; }
+        private IDeploymentContext Context { get; set; }
 
-        public ConsoleSessionUserInfo(
-            string password = null,
-            string passphrase = null,
-            AutoResponse autoRespondYN = AutoResponse.AlwaysAsk)
+        public string Password { get; set; }
+
+        public string Passphrase { get; set; }
+
+        public AutoResponse AutoRespondYN { get; set; }
+
+        public ConsoleSessionUserInfo(IDeploymentContext context)
         {
-            Password = password;
-            Passphrase = passphrase;
+            AutoRespondYN = AutoResponse.AlwaysAsk;
         }
 
         public string getPassphrase()
@@ -46,7 +42,12 @@ namespace Blossom.Deployment
         {
             if (Password == null)
             {
-                Console.Write(message);
+                Console.Write(message + " ");
+                if (Context.Environment.InteractionType == InteractionType.NonInteractive)
+                {
+                    throw new NonInteractiveSessionException(
+                        "Task asked for prompt during non-interactive session.");
+                }
                 Password = Console.ReadLine().TrimEnd('\n');
             }
             return true;
@@ -54,14 +55,21 @@ namespace Blossom.Deployment
 
         public bool promptYesNo(string message)
         {
+            Console.Write(message + " ");
             switch (AutoRespondYN)
             {
                 case AutoResponse.Yes:
+                    Console.WriteLine("[AutoResponse: Y]");
                     return true;
                 case AutoResponse.No:
+                    Console.WriteLine("[AutoResponse: N]");
                     return false;
                 default:
-                    Console.Write(message);
+                    if (Context.Environment.InteractionType == InteractionType.NonInteractive)
+                    {
+                        throw new NonInteractiveSessionException(
+                            "Task asked for prompt during non-interactive session.");
+                    }
                     return Console.ReadLine().ToLower().StartsWith("y");
             }
         }

@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Blossom.Deployment.Ssh;
+using System;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Tamir.SharpSsh.jsch;
+using System.Text.RegularExpressions;
 
 namespace Blossom.Deployment
 {
@@ -16,16 +14,14 @@ namespace Blossom.Deployment
     public class Operations : IDisposable
     {
         private DeploymentContext Context { get; set; }
-        private ChannelSftp Sftp { get; set; }
-        private ChannelShell Shell { get; set; }
 
-        public Operations(DeploymentContext context)
+        private ISftp Sftp { get; set; }
+
+        public Operations(DeploymentContext context, ISession session)
         {
             Context = context;
-            Sftp = (ChannelSftp)Context.Environment.CurrentSession.openChannel("sftp");
-            Sftp.connect();
-            /*Shell = (ChannelShell)Context.Environment.CurrentSession.openChannel("shell");
-            Shell.connect();*/
+            Sftp = new SftpWrapper(session);
+            Sftp.Connect();
         }
 
         ~Operations()
@@ -40,17 +36,6 @@ namespace Blossom.Deployment
         public void Run(string command)
         {
             throw new NotImplementedException("Running a command not implemented.");
-            /*command = Utils.NormalizePathSeparators(
-                command, Context.Environment.Remote.PathSeparator);
-
-            using (var writer = new StreamWriter(Shell.getInputStream()))
-            {
-                writer.Write(command);
-            }
-            using (var reader = new StreamReader(Shell.getOutputStream()))
-            {
-                //Shell.
-            }*/
         }
 
         /// <summary>
@@ -65,7 +50,7 @@ namespace Blossom.Deployment
                 Context,
                 Context.Environment.Local.CurrentDirectory,
                 sourcePath);
-            var dest= Utils.CombineRemotePath(
+            var dest = Utils.CombineRemotePath(
                 Context,
                 Context.Environment.Remote.CurrentDirectory,
                 destinationPath);
@@ -74,8 +59,8 @@ namespace Blossom.Deployment
             {
                 dest = Utils.CombineRemotePath(Context, dest, filename);
             }
-            
-            Sftp.put(source, dest, new ProgressMonitor(Context.Logger), ChannelSftp.OVERWRITE);
+
+            Sftp.Put(source, dest, new FileProgressMonitor(Context.Logger, filename));
         }
 
         /// <summary>
@@ -103,18 +88,11 @@ namespace Blossom.Deployment
                     var pathToCheck = currentPath.ToString();
                     try
                     {
-                        Sftp.stat(pathToCheck);
+                        Sftp.Stat(pathToCheck);
                     }
-                    catch (SftpException exception)
+                    catch (FileNotFoundException)
                     {
-                        if (exception.id == ChannelSftp.SSH_FX_NO_SUCH_FILE)
-                        {
-                            Sftp.mkdir(pathToCheck);
-                        }
-                        else
-                        {
-                            throw;
-                        }
+                        Sftp.Mkdir(pathToCheck);
                     }
                 }
             }
@@ -122,18 +100,11 @@ namespace Blossom.Deployment
             {
                 try
                 {
-                    Sftp.stat(path);
+                    Sftp.Stat(path);
                 }
-                catch (SftpException exception)
+                catch (FileNotFoundException)
                 {
-                    if (exception.id == ChannelSftp.SSH_FX_NO_SUCH_FILE)
-                    {
-                        Sftp.mkdir(path);
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    Sftp.Mkdir(path);
                 }
             }
         }
@@ -143,17 +114,17 @@ namespace Blossom.Deployment
         /// </summary>
         /// <param name="message">Prompt message to display.</param>
         /// <param name="defaultResponse">
-        /// If the user does not enter in a value (or just enters whitespace),
-        /// this string will be substituted in the response.
+        /// This string will be substituted in the response if the user
+        /// does not enter in a value (or just enters whitespace).
         /// </param>
         /// <param name="validateCallable">
         /// This callable will be provided with the user's output and must
-        /// provide a boolean return value indicating whether or not the 
+        /// provide a boolean return value indicating whether or not the
         /// output passes validation.
         /// If validation fails, the validationFailedMessage will be displayed
         /// and the prompt repeated until the user passes validation or
         /// presses Ctrl-C.
-        /// 
+        ///
         /// If both Regex and Callable matching are provided, only the Callable
         /// will be compared with the output.
         /// </param>
@@ -163,7 +134,7 @@ namespace Blossom.Deployment
         /// and the prompt repeated until the user passes validation or
         /// presses Ctrl-C. The regular expression must match the input
         /// *exactly* (eg. the rx will be bounded by `^` and `$` if necessary).
-        /// 
+        ///
         /// If both Regex and Callable matching are provided, only the Callable
         /// will be compared with the output.
         /// </param>
@@ -210,7 +181,6 @@ namespace Blossom.Deployment
 
             if (validateRegex != null)
             {
-                throw new NotImplementedException("Regex not implemented.");
                 if (!validateRegex.StartsWith("^"))
                 {
                     validateRegex = "^" + validateRegex;
@@ -221,8 +191,7 @@ namespace Blossom.Deployment
                 }
             }
 
-            displayStream.Write(message);
-            displayStream.Write(" ");
+            displayStream.Write(message + " ");
 
             if (defaultResponse != null)
             {
@@ -236,7 +205,8 @@ namespace Blossom.Deployment
                 {
                     response = inputStream.ReadLine();
                     if ((validateCallable == null && validateRegex == null) ||
-                        (validateCallable != null && validateCallable(response)))
+                        (validateCallable != null && validateCallable(response)) ||
+                        validateRegex != null && Regex.IsMatch(response, validateRegex))
                     {
                         break;
                     }
@@ -257,19 +227,13 @@ namespace Blossom.Deployment
 
         protected virtual void Dispose(bool freeManagedObjects)
         {
-            if (Sftp != null && Sftp.isConnected())
+            if (Sftp != null && Sftp.Connected)
             {
-                Sftp.disconnect();
+                Sftp.Disconnect();
                 Sftp = null;
             }
-            if (Shell != null && Shell.isConnected())
-            {
-                Shell.disconnect();
-                Shell = null;
-            }
-
         }
-    
+
         public void Dispose()
         {
             Dispose(true);

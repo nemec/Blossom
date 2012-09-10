@@ -1,18 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blossom.Deployment.Environments
 {
     public class CustomEnvironment : BaseEnvironment, IEnvironment
     {
         private string _lineEnding;
+
         public override string LineEnding { get { return _lineEnding; } }
 
         private PathSeparator _pathSeparator;
+
         public override PathSeparator PathSeparator { get { return _pathSeparator; } }
 
         public CustomEnvironment(

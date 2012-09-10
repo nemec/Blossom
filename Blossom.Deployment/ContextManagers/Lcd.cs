@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace Blossom.Deployment.ContextManagers
 {
     public class Lcd : ContextManager
     {
-        readonly string NewPath;
+        private readonly string NewPath;
 
         public Lcd(DeploymentContext context, string path)
             : base(context)
@@ -24,7 +19,6 @@ namespace Blossom.Deployment.ContextManagers
             {
                 Context.Environment.Local.Pushd(
                     Path.Combine(Context.Environment.Local.CurrentDirectory, NewPath));
-
             }
         }
 

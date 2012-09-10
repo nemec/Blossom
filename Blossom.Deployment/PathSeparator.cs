@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blossom.Deployment
 {
-    class StringValueAttribute : Attribute
+    internal class StringValueAttribute : Attribute
     {
         public string Value { get; set; }
 
