@@ -1,22 +1,23 @@
-﻿using Blossom.Deployment.ContextManagers;
+﻿using Blossom.Deployment;
+using Blossom.Deployment.ContextManagers;
 using System;
 using System.Threading.Tasks;
 
-namespace Blossom.Deployment
+namespace Blossom.Examples
 {
     internal class Tasks
     {
-        private DeploymentContext Context { get; set; }
+        private IDeploymentContext Context { get; set; }
 
         private Config Config { get; set; }
 
-        public Tasks(DeploymentContext context, Config config)
+        public Tasks(IDeploymentContext context, Config config)
         {
             Context = context;
             Config = config;
         }
 
-        //[Task]
+        [Task]
         public void CopyFiles()
         {
             foreach (var input in Config.InputDirs)
@@ -33,18 +34,6 @@ namespace Blossom.Deployment
                     }
                 }
             }
-        }
-
-        [Task]
-        public void Test()
-        {
-            Console.WriteLine(Context.Operations.Prompt("What?"));
-            Console.WriteLine(Context.Operations.Prompt("Okay.", "Nothing."));
-            Console.WriteLine(Context.Operations.Prompt("Valid.",
-                validateCallable: (r => r == "hello"),
-                validationFailedMessage: "Please enter hello."));
-            Console.WriteLine(Context.Operations.Prompt("Regex.",
-                validateRegex: @"\d+", validationFailedMessage: "Please enter a number."));
         }
     }
 }

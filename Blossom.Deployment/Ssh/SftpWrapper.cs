@@ -1,56 +1,48 @@
-﻿using System.IO;
-using Tamir.SharpSsh.jsch;
+﻿using Renci.SshNet;
+using System;
+using System.IO;
 
 namespace Blossom.Deployment.Ssh
 {
     public class SftpWrapper : ISftp
     {
-        private ChannelSftp Sftp { get; set; }
+        private SftpClient Sftp { get; set; }
 
-        public bool Connected { get { return Sftp != null && Sftp.isConnected(); } }
+        public bool IsConnected { get { return Sftp != null && Sftp.IsConnected; } }
 
-        public SftpWrapper(ISession session)
+        public SftpWrapper(Host host)
         {
-            Sftp = session.GetChannel<ChannelSftp>();
+            Sftp = new SftpClient(host.Hostname, host.Username, host.Password);
+            Sftp.OperationTimeout = TimeSpan.FromMinutes(8);
+            Sftp.ConnectionInfo.Timeout = TimeSpan.FromMinutes(2);
         }
 
         public void Connect()
         {
-            Sftp.connect();
+            Sftp.Connect();
         }
 
         public void Disconnect()
         {
-            Sftp.disconnect();
+            Sftp.Disconnect();
         }
 
         public void Mkdir(string path)
         {
-            Sftp.mkdir(path);
+            Sftp.CreateDirectory(path);
         }
 
-        public SftpATTRS Stat(string path)
+        public bool Exists(string path)
         {
-            try
-            {
-                return Sftp.stat(path);
-            }
-            catch (SftpException exception)
-            {
-                if (exception.id == ChannelSftp.SSH_FX_NO_SUCH_FILE)
-                {
-                    throw new FileNotFoundException(path, exception);
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            return Sftp.Exists(path);
         }
 
-        public void Put(string source, string destination, FileProgressMonitor monitor)
+        public void Put(string source, string destination)
         {
-            Sftp.put(source, destination, monitor, ChannelSftp.OVERWRITE);
+            using (var file = File.OpenRead(source))
+            {
+                Sftp.UploadFile(file, destination, true);
+            }
         }
     }
 }

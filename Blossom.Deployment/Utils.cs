@@ -38,14 +38,14 @@ namespace Blossom.Deployment
             return path;
         }
 
-        public static string CombineLocalPath(DeploymentContext context, params string[] paths)
+        public static string CombineLocalPath(IDeploymentContext context, params string[] paths)
         {
             return NormalizePathSeparators(
                 Path.Combine(paths),
                 context.Environment.Local.PathSeparator);
         }
 
-        public static string CombineRemotePath(DeploymentContext context, params string[] paths)
+        public static string CombineRemotePath(IDeploymentContext context, params string[] paths)
         {
             return NormalizePathSeparators(
                 Path.Combine(paths),

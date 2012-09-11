@@ -9,7 +9,7 @@ namespace Blossom.Deployment
 
         Env Environment { get; set; }
 
-        Operations Operations { get; }
+        IOperations Operations { get; }
 
         void BeginDeployment(string[] args, object taskInstance,
             Dictionary<string, string> sessionConfig = null);

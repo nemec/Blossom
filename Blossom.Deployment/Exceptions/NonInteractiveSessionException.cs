@@ -2,7 +2,7 @@
 
 namespace Blossom.Deployment
 {
-    internal class NonInteractiveSessionException : Exception
+    public class NonInteractiveSessionException : Exception
     {
         public NonInteractiveSessionException()
             : base() { }

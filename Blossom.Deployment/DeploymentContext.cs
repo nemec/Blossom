@@ -15,7 +15,7 @@ namespace Blossom.Deployment
 
         public Env Environment { get; set; }
 
-        public Operations Operations { get; private set; }
+        public IOperations Operations { get; private set; }
 
         public DeploymentContext()
         {
@@ -52,42 +52,45 @@ namespace Blossom.Deployment
             foreach (var host in this.Environment.Hosts)
             {
                 Logger.Info(String.Format("Beginning deployment for {0}.", host));
-                var session = new SessionWrapper(host);
+                //var session = new SessionWrapper(host);
 
-                session.UserInfo = new ConsoleSessionUserInfo(this)
+
+                /*session.UserInfo = new ConsoleSessionUserInfo(this)
                 {
                     Password = host.Password,
                     AutoRespondYN = AutoResponse.Yes
-                };
-                session.SetConfig(sessionConfig);
+                };*/
+                //session.SetConfig(sessionConfig);
 
                 this.Environment.CurrentHost = host;
-                session.Connect();
+                //session.Connect();
 
-                Operations = new Operations(this, session);
-
-                foreach (var method in SortTasksInObjectByPriority(taskInstance))
+                using (Operations = new Operations(this, new SftpWrapper(host)))
                 {
-                    var parameters = method.GetParameters();
 
-                    if (parameters.Length == 0)
+                    foreach (var method in SortTasksInObjectByPriority(taskInstance))
                     {
-                        method.Invoke(taskInstance, null);
-                    }
-                    else if (parameters.Length == 1 &&
-                        parameters.First().ParameterType == typeof(DeploymentContext))
-                    {
-                        method.Invoke(taskInstance, new[] { this });
-                    }
-                    else
-                    {
-                        throw new ArgumentException(
-                            "Task method must either take no parameters or a DeploymentContext as its sole parameter.");
+                        var parameters = method.GetParameters();
+
+                        if (parameters.Length == 0)
+                        {
+                            method.Invoke(taskInstance, null);
+                        }
+                        else if (parameters.Length == 1 &&
+                            parameters.First().ParameterType == typeof(IDeploymentContext))
+                        {
+                            method.Invoke(taskInstance, new[] { this });
+                        }
+                        else
+                        {
+                            throw new ArgumentException(
+                                "Task method must either take no parameters or a DeploymentContext as its sole parameter.");
+                        }
                     }
                 }
+                Operations = null;
 
                 this.Environment.CurrentHost = null;
-                session.Disconnect();
             }
         }
     }

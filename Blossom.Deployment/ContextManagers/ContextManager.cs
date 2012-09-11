@@ -12,7 +12,7 @@ namespace Blossom.Deployment.ContextManagers
     {
         private bool _entered;
 
-        protected readonly DeploymentContext Context;
+        protected readonly IDeploymentContext Context;
 
         /// <summary>
         /// A function that manages "entering" the context.
@@ -33,7 +33,7 @@ namespace Blossom.Deployment.ContextManagers
         /// to the given context only.
         /// </summary>
         /// <param name="context"></param>
-        public ContextManager(DeploymentContext context)
+        public ContextManager(IDeploymentContext context)
         {
             Context = context;
             _entered = false;

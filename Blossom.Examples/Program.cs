@@ -1,33 +1,45 @@
-﻿using System;
+﻿using Blossom.Deployment;
+using CommandLine;
+using System;
 using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace Blossom.Deployment
+namespace Blossom.Examples
 {
     //http://docs.fabfile.org/en/1.4.3/#api-documentation
     public class Program
     {
         private static void Main(string[] args)
         {
-            if (args.Length == 0)
+            var options = new Blossom.Examples.CommandLineOptions();
+            if (!CommandLineParser.Default.ParseArguments(args, options))
             {
-                Console.WriteLine("Need to provide config file as argument.");
                 Environment.Exit(1);
             }
             var serializer = new XmlSerializer(typeof(Config));
 
-            var config = (Config)serializer.Deserialize(XmlReader.Create(args[0]));
+            var config = (Config)serializer.Deserialize(XmlReader.Create(options.ConfigFile));
 
             var sessionConfig = new Dictionary<string, string>
                 {
                     {"StrictHostKeyChecking", "no"}
                 };
 
-            var deployment = new DeploymentContext();
-            deployment.Environment.Hosts.AddRange(config.Hosts);
+            IDeploymentContext deployment;            
 
-            deployment.Environment.Remote = new Environments.Linux();
+            if (options.RemoteEnvironment == EnvironmentType.Linux)
+            {
+                deployment = new DeploymentContext(
+                    new Blossom.Deployment.Environments.Linux());
+            }
+            else
+            {
+                deployment = new DeploymentContext(
+                    new Blossom.Deployment.Environments.Windows());
+            }
+
+            deployment.Environment.Hosts.AddRange(config.Hosts);
             deployment.BeginDeployment(args,
                 new Tasks(deployment, config),
                 sessionConfig);

@@ -28,14 +28,14 @@ namespace Blossom.Deployment
 
         internal Stack<string> Prefixes { get; set; }
 
-        internal Env()
+        public Env()
             : this(new Windows()) { }
 
-        internal Env(IEnvironment remote)
+        public Env(IEnvironment remote)
             : this(remote, Environments.EnvironmentFinder.AutoDetermineLocalEnvironment(
                 AppDomain.CurrentDomain.BaseDirectory)) { }
 
-        internal Env(IEnvironment remote, IEnvironment local)
+        public Env(IEnvironment remote, IEnvironment local)
         {
             Remote = remote;
             Local = local;

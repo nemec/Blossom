@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Blossom.Deployment;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Blossom.Deployment
+namespace Blossom.Examples
 {
     [XmlRoot("Deployment")]
     public class Config
@@ -13,7 +14,26 @@ namespace Blossom.Deployment
         public class InputDir
         {
             [XmlAttribute("path")]
-            public string Path;
+            public string Path
+            {
+                get
+                {
+                    return _path;
+                }
+                set
+                {
+                    if (value.Contains(@"\") && !value.EndsWith(@"\"))
+                    {
+                        _path = value + @"\";
+                    }
+                    else if (value.Contains("/") && !value.EndsWith("/") ||
+                        !value.EndsWith("/") && !value.EndsWith(@"\"))
+                    {
+                        _path = value + "/";
+                    }
+                }
+            }
+            private string _path;
 
             public List<OutputDir> OutputDirs;
         }

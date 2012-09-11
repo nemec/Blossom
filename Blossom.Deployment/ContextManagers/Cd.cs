@@ -6,7 +6,7 @@ namespace Blossom.Deployment.ContextManagers
     {
         private readonly string NewPath;
 
-        public Cd(DeploymentContext context, string path)
+        public Cd(IDeploymentContext context, string path)
             : base(context)
         {
             NewPath = path;

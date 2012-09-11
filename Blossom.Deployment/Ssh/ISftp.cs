@@ -1,10 +1,9 @@
-﻿using Tamir.SharpSsh.jsch;
-
+﻿
 namespace Blossom.Deployment.Ssh
 {
     public interface ISftp
     {
-        bool Connected { get; }
+        bool IsConnected { get; }
 
         void Connect();
 
@@ -12,8 +11,8 @@ namespace Blossom.Deployment.Ssh
 
         void Mkdir(string path);
 
-        SftpATTRS Stat(string path);
+        bool Exists(string path);
 
-        void Put(string source, string destination, FileProgressMonitor monitor);
+        void Put(string source, string destination);
     }
 }

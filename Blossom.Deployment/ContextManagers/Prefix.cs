@@ -4,7 +4,7 @@
     {
         private string Pf { get; set; }
 
-        public Prefix(DeploymentContext context, string prefix)
+        public Prefix(IDeploymentContext context, string prefix)
             : base(context)
         {
             Pf = prefix;
