@@ -49,6 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DeploymentConfig.cs" />
+    <Compile Include="ExampleScript.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="ScriptOptions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="RuntimeAssembly.cs" />
