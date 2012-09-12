@@ -11,7 +11,8 @@ namespace Blossom.Deployment
 
         IOperations Operations { get; }
 
-        void BeginDeployment(string[] args, object taskInstance,
-            Dictionary<string, string> sessionConfig = null);
+        void BeginDeployment(string[] args, object deploymentInstance);
+
+        void BeginDeployment(string[] args, IEnumerable<object> deploymentInstances);
     }
 }

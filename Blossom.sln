@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit Tests", "Unit Tests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OperationsUnitTest", "OperationUnitTest\OperationsUnitTest.csproj", "{17BC9C5B-4F06-4CAB-BC1A-28D94355A662}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blossom.Scripting", "Blossom.Scripting\Blossom.Scripting.csproj", "{F30D3483-3977-4ECD-BBE8-EB99C588964D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{17BC9C5B-4F06-4CAB-BC1A-28D94355A662}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17BC9C5B-4F06-4CAB-BC1A-28D94355A662}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17BC9C5B-4F06-4CAB-BC1A-28D94355A662}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F30D3483-3977-4ECD-BBE8-EB99C588964D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F30D3483-3977-4ECD-BBE8-EB99C588964D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F30D3483-3977-4ECD-BBE8-EB99C588964D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F30D3483-3977-4ECD-BBE8-EB99C588964D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

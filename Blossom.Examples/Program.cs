@@ -1,9 +1,13 @@
 ﻿using Blossom.Deployment;
+using Blossom.Scripting;
 using CommandLine;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Linq;
+using System.Reflection;
 
 namespace Blossom.Examples
 {
@@ -15,34 +19,28 @@ namespace Blossom.Examples
             var options = new Blossom.Examples.CommandLineOptions();
             if (!CommandLineParser.Default.ParseArguments(args, options))
             {
+                Console.Error.WriteLine(options.GetUsage());
                 Environment.Exit(1);
             }
             var serializer = new XmlSerializer(typeof(Config));
 
             var config = (Config)serializer.Deserialize(XmlReader.Create(options.ConfigFile));
 
-            var sessionConfig = new Dictionary<string, string>
-                {
-                    {"StrictHostKeyChecking", "no"}
-                };
-
+            IDeploymentConfig conf = new DeploymentConfig(config);
             IDeploymentContext deployment;            
 
             if (options.RemoteEnvironment == EnvironmentType.Linux)
             {
-                deployment = new DeploymentContext(
+                deployment = new DeploymentContext(conf,
                     new Blossom.Deployment.Environments.Linux());
             }
             else
             {
-                deployment = new DeploymentContext(
+                deployment = new DeploymentContext(conf,
                     new Blossom.Deployment.Environments.Windows());
             }
-
-            deployment.Environment.Hosts.AddRange(config.Hosts);
-            deployment.BeginDeployment(args,
-                new Tasks(deployment, config),
-                sessionConfig);
+            
+            deployment.BeginDeployment(args, new Tasks(deployment, config));
         }
     }
 }

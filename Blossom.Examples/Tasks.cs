@@ -18,6 +18,12 @@ namespace Blossom.Examples
         }
 
         [Task]
+        public void ListDirs()
+        {
+            Context.Logger.Info(Context.Operations.RunCommand("ls"));
+        }
+
+        [Task]
         public void CopyFiles()
         {
             foreach (var input in Config.InputDirs)
@@ -29,6 +35,7 @@ namespace Blossom.Examples
                         Context.Operations.MkDir(output.Path, true);
                         foreach (var file in output.Files)
                         {
+                            Context.Logger.Info(String.Format("Copying file {0} to {1}.", file, output.Path));
                             Context.Operations.PutFile(file, output.Path);
                         }
                     }

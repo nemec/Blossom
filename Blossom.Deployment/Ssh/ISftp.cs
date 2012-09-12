@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 namespace Blossom.Deployment.Ssh
 {
     public interface ISftp

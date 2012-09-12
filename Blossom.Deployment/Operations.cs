@@ -1,5 +1,6 @@
 ﻿using Blossom.Deployment.Ssh;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -15,23 +16,30 @@ namespace Blossom.Deployment
     {
         private IDeploymentContext Context { get; set; }
 
+        private IShell Shell { get; set; }
+
         private ISftp Sftp { get; set; }
 
-        public Operations(IDeploymentContext context, ISftp sftp)
+        public Operations(IDeploymentContext context, IShell shell, ISftp sftp)
         {
             Context = context;
             Sftp = sftp;
             Sftp.Connect();
+
+            Shell = shell;
         }
 
         ~Operations()
         {
             Dispose(false);
         }
+
+        #region IOperations Members
+        public Stream ShellStream { get { return Shell.Stream; } }
         
-        public void Run(string command)
+        public string RunCommand(string command)
         {
-            throw new NotImplementedException("Running a command not implemented.");
+            return Shell.RunCommand(command);
         }
 
         public void PutFile(string sourcePath, string destinationPath)
@@ -154,6 +162,8 @@ namespace Blossom.Deployment
 
             return response;
         }
+
+        #endregion
 
         protected virtual void Dispose(bool freeManagedObjects)
         {

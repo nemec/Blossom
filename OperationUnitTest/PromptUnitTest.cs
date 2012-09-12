@@ -13,6 +13,7 @@ namespace OperationsUnitTest
     {
         RhinoAutoMocker<IOperations> MockOperations { get; set; }
         IDeploymentContext MockContext { get; set; }
+        IShell MockShell { get; set; }
         ISftp MockSftp { get; set; }
 
         [TestInitialize]
@@ -20,6 +21,7 @@ namespace OperationsUnitTest
         {
             MockOperations = new RhinoAutoMocker<IOperations>();
             MockContext = MockOperations.Get<IDeploymentContext>();
+            MockShell = MockOperations.Get<IShell>();
             MockSftp = MockOperations.Get<ISftp>();
         }
 
@@ -35,7 +37,7 @@ namespace OperationsUnitTest
             var host = new Host();
 
             // Act
-            IOperations operations = new Operations(MockContext, MockSftp);
+            IOperations operations = new Operations(MockContext, MockShell, MockSftp);
             var response = operations.Prompt("What?");
         }
 
@@ -52,7 +54,7 @@ namespace OperationsUnitTest
             var input = new StringReader(sampleResponse + "\n");
 
             // Act
-            IOperations operations = new Operations(MockContext, MockSftp);
+            IOperations operations = new Operations(MockContext, MockShell, MockSftp);
             var response = operations.Prompt("What?", inputStream: input);
 
             // Assert

@@ -10,10 +10,15 @@ namespace Blossom.Deployment
     public interface IOperations : IDisposable
     {
         /// <summary>
+        /// A stream enabling access to the shell's input and output.
+        /// </summary>
+        Stream ShellStream { get; }
+
+        /// <summary>
         /// Run a shell command on the remote host.
         /// </summary>
         /// <param name="command"></param>
-        void Run(string command);
+        string RunCommand(string command);
 
         /// <summary>
         /// Copy a file from the local host to the remote host.

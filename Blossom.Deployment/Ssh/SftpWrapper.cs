@@ -1,5 +1,7 @@
 ﻿using Renci.SshNet;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Blossom.Deployment.Ssh
@@ -35,6 +37,14 @@ namespace Blossom.Deployment.Ssh
         public bool Exists(string path)
         {
             return Sftp.Exists(path);
+        }
+
+        public IEnumerable<string> ListDirectory(string path)
+        {
+            foreach (var file in Sftp.ListDirectory(path))
+            {
+                yield return file.Name;
+            }
         }
 
         public void Put(string source, string destination)

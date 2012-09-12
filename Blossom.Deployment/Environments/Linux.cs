@@ -2,6 +2,9 @@
 
 namespace Blossom.Deployment.Environments
 {
+    /// <summary>
+    /// Environment that uses forward slashes as path separators.
+    /// </summary>
     public class Linux : BaseEnvironment, IEnvironment
     {
         public Linux()

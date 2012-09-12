@@ -3,6 +3,10 @@ using System.IO;
 
 namespace Blossom.Deployment.Environments
 {
+    /// <summary>
+    /// Environment that uses backslashes as path separators and
+    /// carriage returns in line endings.
+    /// </summary>
     public class Windows : BaseEnvironment, IEnvironment
     {
         public Windows()

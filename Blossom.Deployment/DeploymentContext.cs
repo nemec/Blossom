@@ -1,6 +1,7 @@
 ﻿using Blossom.Deployment.Environments;
 using Blossom.Deployment.Logging;
 using Blossom.Deployment.Ssh;
+using Renci.SshNet.Common;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,19 +18,27 @@ namespace Blossom.Deployment
 
         public IOperations Operations { get; private set; }
 
-        public DeploymentContext()
+        private Dictionary<string, string> _sessionConfig { get; set; }
+
+        public DeploymentContext(IDeploymentConfig config)
         {
-            Logger = new ConsoleLogger();
             this.Environment = new Env();
+            Initialize(config);
         }
 
-        public DeploymentContext(IEnvironment remoteEnvironment)
+        public DeploymentContext(IDeploymentConfig config, IEnvironment remoteEnvironment)
+        {
+            this.Environment = new Env(remoteEnvironment);
+            Initialize(config);
+        }
+
+        private void Initialize(IDeploymentConfig config)
         {
             Logger = new ConsoleLogger();
-            this.Environment = new Env(remoteEnvironment);
+            this.Environment.Hosts = config.Hosts;
         }
 
-        private static IEnumerable<MethodInfo> SortTasksInObjectByPriority(object obj)
+        private static IEnumerable<MethodInfo> SortTasksInObjectByPriorityAscending(object obj)
         {
             return obj.GetType().GetMethods()
                 .Select(m => new
@@ -43,53 +52,67 @@ namespace Blossom.Deployment
                 .Select(k => k.Method);
         }
 
-        public void BeginDeployment(string[] args, object taskInstance,
-            Dictionary<string, string> sessionConfig = null)
+        public void BeginDeployment(string[] args, object deploymentInstance)
         {
-            // http://www.tamirgal.com/blog/page/SharpSSH.aspx
-            
+            BeginDeployment(args, new object[] { deploymentInstance });
+        }
 
+        public void BeginDeployment(string[] args, IEnumerable<object> deploymentInstances)
+        {
             foreach (var host in this.Environment.Hosts)
             {
                 Logger.Info(String.Format("Beginning deployment for {0}.", host));
-                //var session = new SessionWrapper(host);
-
-
-                /*session.UserInfo = new ConsoleSessionUserInfo(this)
-                {
-                    Password = host.Password,
-                    AutoRespondYN = AutoResponse.Yes
-                };*/
-                //session.SetConfig(sessionConfig);
-
                 this.Environment.CurrentHost = host;
-                //session.Connect();
 
-                using (Operations = new Operations(this, new SftpWrapper(host)))
+                try
                 {
-
-                    foreach (var method in SortTasksInObjectByPriority(taskInstance))
+                    using (Operations = new Operations(this,
+                        new ShellWrapper(host), new SftpWrapper(host)))
                     {
-                        var parameters = method.GetParameters();
 
-                        if (parameters.Length == 0)
+                        foreach (var deploymentInstance in deploymentInstances)
                         {
-                            method.Invoke(taskInstance, null);
-                        }
-                        else if (parameters.Length == 1 &&
-                            parameters.First().ParameterType == typeof(IDeploymentContext))
-                        {
-                            method.Invoke(taskInstance, new[] { this });
-                        }
-                        else
-                        {
-                            throw new ArgumentException(
-                                "Task method must either take no parameters or a DeploymentContext as its sole parameter.");
+                            foreach (var method in SortTasksInObjectByPriorityAscending(deploymentInstance))
+                            {
+                                var parameters = method.GetParameters();
+
+                                if (parameters.Length == 0)
+                                {
+                                    try
+                                    {
+                                        method.Invoke(deploymentInstance, null);
+                                    }
+                                    catch (TargetInvocationException exception)
+                                    {
+                                        throw exception.InnerException;
+                                    }
+                                }
+                                else if (parameters.Length == 1 &&
+                                    parameters.First().ParameterType == typeof(IDeploymentContext))
+                                {
+                                    try
+                                    {
+                                        method.Invoke(deploymentInstance, new[] { this });
+                                    }
+                                    catch (TargetInvocationException exception)
+                                    {
+                                        throw exception.InnerException;
+                                    }
+                                }
+                                else
+                                {
+                                    throw new ArgumentException(
+                                        "Task method must either take no parameters or a DeploymentContext as its sole parameter.");
+                                }
+                            }
                         }
                     }
                 }
+                catch (SshException exception)
+                {
+                    Logger.Fatal(exception.Message, exception);
+                }
                 Operations = null;
-
                 this.Environment.CurrentHost = null;
             }
         }

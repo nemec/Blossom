@@ -6,11 +6,11 @@ namespace Blossom.Deployment
 {
     public class Env
     {
-        public IEnvironment Remote { get; set; }
+        internal IEnvironment Remote { get; set; }
 
-        public IEnvironment Local { get; set; }
+        internal IEnvironment Local { get; set; }
 
-        public List<Host> Hosts { get; set; }
+        internal List<Host> Hosts { get; set; }
 
         #region Properties
 
