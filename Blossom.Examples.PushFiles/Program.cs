@@ -10,7 +10,7 @@ using System.Linq;
 using System.Reflection;
 using Blossom.Deployment.Dependencies;
 
-namespace Blossom.Examples
+namespace Blossom.Examples.PushFiles
 {
     //http://docs.fabfile.org/en/1.4.3/#api-documentation
     public class Program
@@ -18,7 +18,7 @@ namespace Blossom.Examples
         // Comment
         private static void Main(string[] args)
         {
-            var options = new Blossom.Examples.CommandLineOptions();
+            var options = new Blossom.Examples.PushFiles.CommandLineOptions();
             if (!CommandLineParser.Default.ParseArguments(args, options))
             {
                 Console.Error.WriteLine(options.GetUsage());

@@ -8,7 +8,7 @@ using Blossom.Deployment.Logging;
 using Blossom.Deployment.Ssh;
 using Renci.SshNet.Sftp;
 
-namespace Blossom.Examples
+namespace Blossom.Examples.PushFiles
 {
     public class FileTransferHandler : IFileTransferHandler
     {

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Blossom.Examples
+namespace Blossom.Examples.PushFiles
 {
     internal class Tasks
     {

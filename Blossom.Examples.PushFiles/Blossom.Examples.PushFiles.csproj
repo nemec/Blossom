@@ -7,7 +7,7 @@
     <ProjectGuid>{07B73B7B-B9ED-4148-97A7-0535D9AD44FE}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Blossom.Examples</RootNamespace>
+    <RootNamespace>Blossom.Examples.PushFiles</RootNamespace>
     <AssemblyName>Blossom</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

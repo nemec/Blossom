@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Blossom.Examples
+namespace Blossom.Examples.PushFiles
 {
     [XmlRoot("Deployment")]
     public class Config
