@@ -383,9 +383,10 @@ namespace Renci.SshNet.Sftp
         /// <param name="offset">The offset.</param>
         /// <param name="data">The data to send.</param>
         /// <param name="wait">The wait event handle if needed.</param>
-        internal void RequestWrite(byte[] handle, UInt64 offset, byte[] data, EventWaitHandle wait)
+        /// <param name="handler">The object that handles callbacks for transferred data.</param>
+        internal void RequestWrite(byte[] handle, UInt64 offset, byte[] data, EventWaitHandle wait, IFileTransferHandler handler)
         {
-            var maximumDataSize = 1024 * 32 - 38;
+            var maximumDataSize = 1024 * 32 - 52;
 
             if (data.Length < maximumDataSize + 1)
             {
@@ -396,6 +397,8 @@ namespace Renci.SshNet.Sftp
                         {
                             if (wait != null)
                                 wait.Set();
+                            if (handler != null)
+                                handler.IncrementBytesTransferred((ulong)data.Length);
                         }
                         else
                         {
@@ -426,6 +429,8 @@ namespace Renci.SshNet.Sftp
                             {
                                 if (wait != null)
                                     wait.Set();
+                                if (handler != null)
+                                    handler.IncrementBytesTransferred((ulong)blockBufferSize);
                             }
                             else
                             {

@@ -1,5 +1,7 @@
-﻿using Blossom.Deployment.Environments;
+﻿using Blossom.Deployment.Dependencies;
+using Blossom.Deployment.Environments;
 using Blossom.Deployment.Logging;
+using Blossom.Deployment.Operations;
 using Blossom.Deployment.Ssh;
 using Renci.SshNet.Common;
 using System;
@@ -16,7 +18,9 @@ namespace Blossom.Deployment
 
         public Env Environment { get; set; }
 
-        public IOperations Operations { get; private set; }
+        public ILocalOperations LocalOps { get; private set; }
+
+        public IRemoteOperations RemoteOps { get; private set; }
 
         private Dictionary<string, string> _sessionConfig { get; set; }
 
@@ -34,7 +38,7 @@ namespace Blossom.Deployment
 
         private void Initialize(IDeploymentConfig config)
         {
-            Logger = new ConsoleLogger();
+            Logger = new SimpleConsoleLogger();
             this.Environment.Hosts = config.Hosts;
         }
 
@@ -48,16 +52,15 @@ namespace Blossom.Deployment
                     Method = m
                 })
                 .Where(k => k.Attr != null)
-                .OrderBy(k => k.Attr.Priority)
                 .Select(k => k.Method);
         }
 
-        public void BeginDeployment(string[] args, object deploymentInstance)
+        public void BeginDeployment(object deploymentInstance)
         {
-            BeginDeployment(args, new object[] { deploymentInstance });
+            BeginDeployment(new object[] { deploymentInstance });
         }
 
-        public void BeginDeployment(string[] args, IEnumerable<object> deploymentInstances)
+        public void BeginDeployment(IEnumerable<object> taskBlocks)
         {
             foreach (var host in this.Environment.Hosts)
             {
@@ -66,21 +69,25 @@ namespace Blossom.Deployment
 
                 try
                 {
-                    using (Operations = new Operations(this,
+                    using (var ops = new BasicOperations(this,
                         new ShellWrapper(host), new SftpWrapper(host)))
                     {
+                        LocalOps = ops;
+                        RemoteOps = ops;
 
-                        foreach (var deploymentInstance in deploymentInstances)
+                        foreach (var taskBlock in taskBlocks)
                         {
-                            foreach (var method in SortTasksInObjectByPriorityAscending(deploymentInstance))
+                            var dependencyResolver = new DependencyResolver(taskBlock);
+                            foreach (var method in dependencyResolver.OrderTasks())
                             {
+                                Logger.Info("Beginning task: " + method.Name);
                                 var parameters = method.GetParameters();
 
                                 if (parameters.Length == 0)
                                 {
                                     try
                                     {
-                                        method.Invoke(deploymentInstance, null);
+                                        method.Invoke(taskBlock, null);
                                     }
                                     catch (TargetInvocationException exception)
                                     {
@@ -92,7 +99,7 @@ namespace Blossom.Deployment
                                 {
                                     try
                                     {
-                                        method.Invoke(deploymentInstance, new[] { this });
+                                        method.Invoke(taskBlock, new[] { this });
                                     }
                                     catch (TargetInvocationException exception)
                                     {
@@ -112,8 +119,14 @@ namespace Blossom.Deployment
                 {
                     Logger.Fatal(exception.Message, exception);
                 }
-                Operations = null;
+
+                #region Clean up getters
+
+                LocalOps = null;
+                RemoteOps = null;
                 this.Environment.CurrentHost = null;
+
+                #endregion
             }
         }
     }

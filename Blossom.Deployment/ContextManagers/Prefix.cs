@@ -1,5 +1,10 @@
 ﻿namespace Blossom.Deployment.ContextManagers
 {
+    /// <summary>
+    /// Context manager to prefix all commands with
+    /// the given prefix command. Commands will be
+    /// run as: 'prefix && command'.
+    /// </summary>
     public class Prefix : ContextManager
     {
         private string Pf { get; set; }

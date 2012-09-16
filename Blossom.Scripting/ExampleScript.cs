@@ -27,6 +27,6 @@ public class Test
     [Task]
     public void Run(IDeploymentContext context)
     {
-        context.Logger.Info(context.Operations.RunCommand("ls"));
+        context.Logger.Info(context.RemoteOps.RunCommand("ls"));
     }
 }

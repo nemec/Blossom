@@ -35,9 +35,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -284,6 +282,7 @@
     <Compile Include="Security\Cryptography\Ciphers\Modes\CfbCipherMode.cs" />
     <Compile Include="Security\Cryptography\Ciphers\Modes\CtrCipherMode.cs" />
     <Compile Include="Security\Cryptography\Ciphers\Modes\OfbCipherMode.cs" />
+    <Compile Include="Security\Cryptography\Ciphers\Paddings\PKCS5Padding.cs" />
     <Compile Include="Security\Cryptography\Ciphers\Paddings\PKCS7Padding.cs" />
     <Compile Include="Security\Cryptography\Ciphers\RsaCipher.cs">
       <SubType>Code</SubType>
@@ -357,6 +356,7 @@
     </Compile>
     <Compile Include="SftpClient.NET40.cs" />
     <Compile Include="Sftp\Flags.cs" />
+    <Compile Include="Sftp\IFileTransferHandler.cs" />
     <Compile Include="Sftp\Requests\SftpCloseRequest.cs" />
     <Compile Include="Sftp\Requests\SftpFSetStatRequest.cs" />
     <Compile Include="Sftp\Requests\SftpFStatRequest.cs" />
@@ -441,10 +441,10 @@
     <None Include="Documentation\Content\Guide\SshClient\PortForwarding\Remote.aml" />
     <None Include="Documentation\Content\Guide\SshClient\Shell\Overview.aml" />
     <None Include="Documentation\Content\Reference.aml" />
-    <None Include="Documentation\Renci.SshClient.content" />
+    <None Include="Documentation\Renci.SshNet.content" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Documentation\SshClient.shfbproj" />
+    <Content Include="Documentation\SshNet.shfbproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

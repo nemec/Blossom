@@ -1,4 +1,5 @@
 ﻿using Blossom.Deployment.Logging;
+using Blossom.Deployment.Operations;
 using System.Collections.Generic;
 
 namespace Blossom.Deployment
@@ -9,10 +10,12 @@ namespace Blossom.Deployment
 
         Env Environment { get; set; }
 
-        IOperations Operations { get; }
+        ILocalOperations LocalOps { get; }
 
-        void BeginDeployment(string[] args, object deploymentInstance);
+        IRemoteOperations RemoteOps { get; }
 
-        void BeginDeployment(string[] args, IEnumerable<object> deploymentInstances);
+        void BeginDeployment(object deploymentInstance);
+
+        void BeginDeployment(IEnumerable<object> deploymentInstances);
     }
 }

@@ -38,6 +38,9 @@
     <Reference Include="CommandLine">
       <HintPath>..\packages\CommandLineParser.1.9.3.19\lib\CommandLine.dll</HintPath>
     </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -47,12 +50,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\AllowMultipleExecutionAttribute.cs" />
+    <Compile Include="Attributes\DependsAttribute.cs" />
     <Compile Include="Attributes\DeploymentAttribute.cs" />
-    <Compile Include="CommandLineOptions.cs" />
+    <Compile Include="CompressionScheme.cs" />
     <Compile Include="ContextManagers\Cd.cs" />
     <Compile Include="ContextManagers\ContextManager.cs" />
     <Compile Include="ContextManagers\Lcd.cs" />
     <Compile Include="ContextManagers\Prefix.cs" />
+    <Compile Include="ContextManagers\Sudo.cs" />
+    <Compile Include="DependencyResolver.cs" />
     <Compile Include="DeploymentContext.cs" />
     <Compile Include="Env.cs" />
     <Compile Include="Environments\BaseEnvironment.cs" />
@@ -61,14 +68,19 @@
     <Compile Include="Environments\Linux.cs" />
     <Compile Include="Environments\CustomEnvironment.cs" />
     <Compile Include="Environments\Windows.cs" />
+    <Compile Include="Exceptions\CircularTaskDependencyException.cs" />
+    <Compile Include="Exceptions\TaskDependencyException.cs" />
+    <Compile Include="Exceptions\UnknownTaskException.cs" />
     <Compile Include="Host.cs" />
     <Compile Include="IDeploymentConfig.cs" />
     <Compile Include="IDeploymentContext.cs" />
+    <Compile Include="Logging\NullLogger.cs" />
+    <Compile Include="Operations\ILocalOperations.cs" />
     <Compile Include="InteractionType.cs" />
-    <Compile Include="IOperations.cs" />
-    <Compile Include="Logging\ConsoleLogger.cs" />
+    <Compile Include="Operations\IRemoteOperations.cs" />
+    <Compile Include="Logging\SimpleConsoleLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
-    <Compile Include="Operations.cs" />
+    <Compile Include="Operations\BasicOperations.cs" />
     <Compile Include="PathSeparator.cs" />
     <Compile Include="Exceptions\NonInteractiveSessionException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -76,8 +88,6 @@
     <Compile Include="Ssh\IShell.cs" />
     <Compile Include="Ssh\SftpWrapper.cs" />
     <Compile Include="Ssh\ShellWrapper.cs" />
-    <Compile Include="Static.cs" />
-    <Compile Include="Summary.cs" />
     <Compile Include="Attributes\TaskAttribute.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="AutoResponse.cs" />

@@ -16,11 +16,31 @@ namespace Blossom.Deployment.Environments
         public override string LineEnding
         {
             get { return @"\n"; }
+            protected set { }
+        }
+
+        public override string ShellCommand
+        {
+            get { return "/bin/sh"; }
+            protected set { }
+        }
+
+        public override string ShellStartArguments
+        {
+            get { return ""; }
+            protected set { }
+        }
+
+        public override string SudoPrefix
+        {
+            get { return "sudo"; }
+            protected set { }
         }
 
         public override PathSeparator PathSeparator
         {
             get { return PathSeparator.ForwardSlash; }
+            protected set { }
         }
 
         public override string ExpandUser(string path, string username)

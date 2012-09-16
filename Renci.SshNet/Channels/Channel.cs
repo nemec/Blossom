@@ -20,6 +20,8 @@ namespace Renci.SshNet.Channels
 
         private EventWaitHandle _disconnectedWaitHandle = new ManualResetEvent(false);
 
+        private bool _closeMessageSent = false;
+
         private uint _initialWindowSize = 0x100000;
 
         private uint _maximumPacketSize = 0x8000;
@@ -216,7 +218,11 @@ namespace Renci.SshNet.Channels
         public virtual void Close()
         {
             //  Send message to close the channel on the server
-            this.SendMessage(new ChannelCloseMessage(this.RemoteChannelNumber));
+            if (!_closeMessageSent)
+            {
+                this.SendMessage(new ChannelCloseMessage(this.RemoteChannelNumber));
+                this._closeMessageSent = true;
+            }
 
             //  Wait for channel to be closed
             this._session.WaitHandle(this._channelClosedWaitHandle);
@@ -332,7 +338,11 @@ namespace Renci.SshNet.Channels
             this._session.Disconnected -= Session_Disconnected;
 
             //  Send close message to channel to confirm channel closing
-            this.SendMessage(new ChannelCloseMessage(this.RemoteChannelNumber));
+            if (!_closeMessageSent)
+            {
+                this.SendMessage(new ChannelCloseMessage(this.RemoteChannelNumber));
+                this._closeMessageSent = true;
+            }
             
             if (this.Closed != null)
             {
@@ -477,11 +487,19 @@ namespace Renci.SshNet.Channels
 
         private void Session_Disconnected(object sender, EventArgs e)
         {
+            //  If objected is disposed or being disposed don't handle this event
+            if (this._isDisposed)
+                return;
+
             this._disconnectedWaitHandle.Set();
         }
 
         private void Session_ErrorOccured(object sender, ExceptionEventArgs e)
         {
+            //  If objected is disposed or being disposed don't handle this event
+            if (this._isDisposed)
+                return;
+
             this._errorOccuredWaitHandle.Set();
         }
 

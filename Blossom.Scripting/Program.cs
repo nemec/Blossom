@@ -66,7 +66,7 @@ namespace Blossom.Scripting
             }
 
             var deploymentObjects = RuntimeAssembly.LoadTaskInstancesFromAssembly(assembly, deployment);
-            deployment.BeginDeployment(args, deploymentObjects);
+            deployment.BeginDeployment(deploymentObjects);
         }
     }
 }

@@ -18,11 +18,30 @@ namespace Blossom.Deployment.Environments
         public override string LineEnding
         {
             get { return @"\r\n"; }
+            protected set { }
         }
+        public override string ShellCommand
+        {
+            get { return "cmd.exe"; }
+            protected set { }
+        }
+
+        public override string ShellStartArguments
+        {
+            get { return "/Q /C"; }
+            protected set { }
+        }
+
+        public override string SudoPrefix
+        {
+            get { return "runas /user:Administrator"; }
+            protected set { }
+        } 
 
         public override PathSeparator PathSeparator
         {
             get { return PathSeparator.Backslash; }
+            protected set { }
         }
 
         public override string ExpandUser(string path, string username)

@@ -12,7 +12,9 @@ namespace Blossom.Deployment
 
         internal List<Host> Hosts { get; set; }
 
-        #region Properties
+        internal Host CurrentHost { get; set; }
+
+        #region Environment Varables
 
         /// <summary>
         /// Allows for a guaranteed non-interactive session.
@@ -24,9 +26,6 @@ namespace Blossom.Deployment
 
         #endregion Properties
 
-        internal Host CurrentHost { get; set; }
-
-        internal Stack<string> Prefixes { get; set; }
 
         public Env()
             : this(new Windows()) { }

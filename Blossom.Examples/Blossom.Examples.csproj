@@ -53,6 +53,7 @@
     <Compile Include="CommandLineOptions.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="DeploymentConfig.cs" />
+    <Compile Include="FileTransferHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tasks.cs" />
@@ -69,6 +70,10 @@
     <ProjectReference Include="..\Blossom.Scripting\Blossom.Scripting.csproj">
       <Project>{f30d3483-3977-4ecd-bbe8-eb99c588964d}</Project>
       <Name>Blossom.Scripting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj">
+      <Project>{2f5f8c90-0bd1-424f-997c-7bc6280919d1}</Project>
+      <Name>Renci.SshNet</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -10,17 +10,7 @@ namespace Blossom.Deployment
     /// all tasks without a priority are performed last.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class TaskAttribute : Attribute
+    public sealed class TaskAttribute : Attribute
     {
-        /// <summary>
-        /// Specifies the priority of a task.
-        /// Tasks with lower priority will be executed first.
-        /// </summary>
-        public readonly int Priority;
-
-        public TaskAttribute(int priority = Int32.MaxValue)
-        {
-            Priority = priority;
-        }
     }
 }

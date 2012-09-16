@@ -31,6 +31,10 @@ namespace Blossom.Examples
                     {
                         _path = value + "/";
                     }
+                    else
+                    {
+                        _path = value;
+                    }
                 }
             }
             private string _path;

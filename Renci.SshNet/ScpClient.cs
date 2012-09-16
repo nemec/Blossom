@@ -61,7 +61,7 @@ namespace Renci.SshNet
             : base(connectionInfo)
         {
             this.OperationTimeout = new TimeSpan(0, 0, 0, 0, -1);
-            this.BufferSize = 1024 * 32 - 38;
+            this.BufferSize = 1024 * 32 - 52;
 
             if (_byteToChar == null)
             {
@@ -170,8 +170,19 @@ namespace Renci.SshNet
         /// </summary>
         /// <param name="filename">Remote host file name.</param>
         /// <param name="destination">The stream where to download remote file.</param>
+        /// <exception cref="ArgumentException"><paramref name="filename"/> is null or contains whitespace characters.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="destination"/> is null.</exception>
+        /// <remarks>Method calls made by this method to <paramref name="destination"/>, may under certain conditions result in exceptions thrown by the stream.</remarks>
         public void Download(string filename, Stream destination)
         {
+            if (filename.IsNullOrWhiteSpace())
+                throw new ArgumentException("filename");
+
+            if (destination == null)
+                throw new ArgumentNullException("destination");
+
+            //  UNDONE:   Should call EnsureConnection here to keep it consistent? If you add the call, please add to comment: <exception cref="SshConnectionException">Client is not connected.</exception>
+
             using (var input = new PipeStream())
             using (var channel = this.Session.CreateChannel<ChannelSession>())
             {

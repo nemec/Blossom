@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Blossom.Deployment.Environments
 {
@@ -9,9 +11,15 @@ namespace Blossom.Deployment.Environments
 
         internal Stack<string> Prefixes { get; set; }
 
-        public abstract string LineEnding { get; }
+        public abstract string LineEnding { get; protected set; }
 
-        public abstract PathSeparator PathSeparator { get; }
+        public abstract string ShellCommand { get; protected set; }
+
+        public abstract string ShellStartArguments { get; protected set; }
+
+        public abstract string SudoPrefix { get; protected set; }
+
+        public abstract PathSeparator PathSeparator { get; protected set; }
 
         public abstract string ExpandUser(string path, string username);
 
@@ -26,6 +34,8 @@ namespace Blossom.Deployment.Environments
             Prefixes = new Stack<string>();
             Pushd(initialDirectory ?? "");
         }
+
+        public bool IsElevated { get; set; }
 
         public void Pushd(string newDirectory)
         {
@@ -57,6 +67,12 @@ namespace Blossom.Deployment.Environments
             var ret = Prefixes.Peek();
             Prefixes.Pop();
             return ret;
+        }
+
+
+        public string PrefixString
+        {
+            get { return String.Join(" && ", Prefixes.Reverse()); }
         }
     }
 }

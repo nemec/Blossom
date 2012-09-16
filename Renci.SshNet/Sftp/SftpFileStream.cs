@@ -21,6 +21,7 @@ namespace Renci.SshNet.Sftp
         private bool _isAsync;
         private string _path;
         private SftpSession _session;
+        private IFileTransferHandler _fileTransferHandler;
 
         // Buffer information.
         private int _bufferSize;
@@ -205,6 +206,12 @@ namespace Renci.SshNet.Sftp
         }
 
         internal SftpFileStream(SftpSession session, string path, FileMode mode, FileAccess access, int bufferSize, bool useAsync)
+            : this(session, path, mode, access, bufferSize, useAsync, null)
+        {
+            // Nothing to do here.
+        }
+
+        internal SftpFileStream(SftpSession session, string path, FileMode mode, FileAccess access, int bufferSize, bool useAsync, IFileTransferHandler handler)
         {
             // Validate the parameters.
             if (path == null)
@@ -240,6 +247,7 @@ namespace Renci.SshNet.Sftp
             this._bufferOwnedByWrite = false;
             this._canSeek = true;
             this._position = 0;
+            this._fileTransferHandler = handler;
 
             var flags = Flags.None;
 
@@ -801,7 +809,7 @@ namespace Renci.SshNet.Sftp
 
                         using (var wait = new AutoResetEvent(false))
                         {
-                            this._session.RequestWrite(this._handle, (ulong)this.Position, data, wait);
+                            this._session.RequestWrite(this._handle, (ulong)this.Position, data, wait, _fileTransferHandler);
                         }
 
                         this._bufferPosn = 0;
@@ -822,7 +830,7 @@ namespace Renci.SshNet.Sftp
 
                         using (var wait = new AutoResetEvent(false))
                         {
-                            this._session.RequestWrite(this._handle, (ulong)this.Position, data, wait);
+                            this._session.RequestWrite(this._handle, (ulong)this.Position, data, wait, _fileTransferHandler);
                         }
                     }
                     else
@@ -848,7 +856,7 @@ namespace Renci.SshNet.Sftp
 
                     using (var wait = new AutoResetEvent(false))
                     {
-                        this._session.RequestWrite(this._handle, (ulong)this.Position, data, wait);
+                        this._session.RequestWrite(this._handle, (ulong)this.Position, data, wait, _fileTransferHandler);
                     }
 
                     this._bufferPosn = 0;
@@ -882,7 +890,7 @@ namespace Renci.SshNet.Sftp
 
                     using (var wait = new AutoResetEvent(false))
                     {
-                        this._session.RequestWrite(this._handle, (ulong)this.Position, data, wait);
+                        this._session.RequestWrite(this._handle, (ulong)this.Position, data, wait, _fileTransferHandler);
                     }
 
                     this._bufferPosn = 0;
@@ -949,7 +957,7 @@ namespace Renci.SshNet.Sftp
 
                 using (var wait = new AutoResetEvent(false))
                 {
-                    this._session.RequestWrite(this._handle, (ulong)(this.Position - this._bufferPosn), data, wait);
+                    this._session.RequestWrite(this._handle, (ulong)(this.Position - this._bufferPosn), data, wait, _fileTransferHandler);
                 }
 
                 this._bufferPosn = 0;

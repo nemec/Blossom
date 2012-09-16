@@ -10,6 +10,9 @@ namespace Blossom.Deployment
         [XmlText]
         public string Hostname { get; set; }
 
+        [XmlAttribute("alias")]
+        public string Alias { get; set; }
+
         [XmlAttribute("username")]
         public string Username { get; set; }
 

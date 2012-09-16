@@ -11,7 +11,7 @@ namespace Blossom.Deployment
     /// contain tasks.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public class DeploymentAttribute : Attribute
+    public sealed class DeploymentAttribute : Attribute
     {
     }
 }

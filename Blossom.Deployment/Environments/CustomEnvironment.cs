@@ -5,25 +5,26 @@ namespace Blossom.Deployment.Environments
 {
     public class CustomEnvironment : BaseEnvironment, IEnvironment
     {
-        private string _lineEnding;
+        public override string LineEnding { get; protected set; }
 
-        public override string LineEnding { get { return _lineEnding; } }
+        public override string ShellCommand { get; protected set; }
 
-        private PathSeparator _pathSeparator;
+        public override string ShellStartArguments { get; protected set; }
 
-        public override PathSeparator PathSeparator { get { return _pathSeparator; } }
+        public override string SudoPrefix { get; protected set; }
 
-        public CustomEnvironment(
-            string lineEnding, PathSeparator pathSeparator, string initialDirectory)
+        public override PathSeparator PathSeparator { get; protected set; }
+
+        public CustomEnvironment(string initialDirectory,
+            string lineEnding, string shellCommand, string shellStartArguments,
+            string sudoPrefix, PathSeparator pathSeparator)
             : base(initialDirectory)
         {
-            _lineEnding = lineEnding;
-            _pathSeparator = pathSeparator;
-        }
-
-        public CustomEnvironment(string lineEnding, PathSeparator pathSeparator)
-            : this(lineEnding, pathSeparator, null)
-        {
+            LineEnding = lineEnding;
+            ShellCommand = shellCommand;
+            ShellStartArguments = shellStartArguments;
+            SudoPrefix = sudoPrefix;
+            PathSeparator = pathSeparator;
         }
 
         public override string ExpandUser(string path, string username)

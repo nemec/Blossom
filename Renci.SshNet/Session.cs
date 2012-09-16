@@ -183,7 +183,7 @@ namespace Renci.SshNet
         {
             get
             {
-                return this._socket != null && this._socket.Connected && this._isAuthenticated && this._messageListenerCompleted != null;
+                return (!this._isDisconnecting && this._socket != null && this._socket.Connected && this._isAuthenticated && this._messageListenerCompleted != null) && !(this._socket.Poll(10, SelectMode.SelectRead));
             }
         }
 
@@ -412,6 +412,7 @@ namespace Renci.SshNet
         /// </summary>
         public void Connect()
         {
+            //   TODO: Add exception documentation for Proxy.
             if (this.ConnectionInfo == null)
             {
                 throw new ArgumentNullException("connectionInfo");
@@ -480,6 +481,10 @@ namespace Renci.SshNet
                             break;
                         }
                     }
+
+                    //  Set connection versions
+                    this.ConnectionInfo.ServerVersion = this.ServerVersion;
+                    this.ConnectionInfo.ClientVersion = this.ClientVersion;
 
                     //  Get server SSH version
                     var version = versionMatch.Result("${protoversion}");
@@ -912,7 +917,7 @@ namespace Renci.SshNet
                         if (this._messageListenerCompleted != null)
                         {
                             //  Wait for listener task to finish
-                            this._messageListenerCompleted.WaitOne();
+                            this.WaitHandle(this._messageListenerCompleted);
                             this._messageListenerCompleted.Dispose();
                             this._messageListenerCompleted = null;
                         }
@@ -1839,7 +1844,7 @@ namespace Renci.SshNet
             var encoding = new Renci.SshNet.Common.ASCIIEncoding();
 
             this.SocketWrite(encoding.GetBytes(string.Format("CONNECT {0}:{1} HTTP/1.0\r\n", this.ConnectionInfo.Host, this.ConnectionInfo.Port)));
-            
+
             //  Sent proxy authorization is specified
             if (!string.IsNullOrEmpty(this.ConnectionInfo.ProxyUsername))
             {

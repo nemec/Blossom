@@ -22,8 +22,17 @@ namespace Renci.SshNet
         /// </summary>
         /// <param name="fileInfo">Local file to upload.</param>
         /// <param name="filename">Remote host file name.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="fileInfo"/> or <paramref name="filename"/> is null.</exception>
         public void Upload(FileInfo fileInfo, string filename)
         {
+            if (fileInfo == null)
+                throw new ArgumentNullException("fileInfo");
+
+            if (filename == null)
+                throw new ArgumentNullException("filename"); //  TODO:   Should add IsNullOrWhitespace for this filename parameter?
+
+            //  UNDONE:   EnsureConnection?
+
             using (var input = new PipeStream())
             using (var channel = this.Session.CreateChannel<ChannelSession>())
             {
@@ -36,7 +45,8 @@ namespace Renci.SshNet
                 channel.Open();
 
                 //  Send channel command request
-                channel.SendExecRequest(string.Format("scp -qt {0}", filename));
+                channel.SendExecRequest(string.Format("scp -qt \"{0}\"", filename));
+
                 this.CheckReturnCode(input);
 
                 this.InternalUpload(channel, input, fileInfo, filename);
@@ -50,8 +60,17 @@ namespace Renci.SshNet
         /// </summary>
         /// <param name="directoryInfo">Local directory to upload.</param>
         /// <param name="filename">Remote host directory name.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="directoryInfo"/> or <paramref name="filename"/> is null.</exception>
         public void Upload(DirectoryInfo directoryInfo, string filename)
         {
+            if (directoryInfo == null)
+                throw new ArgumentNullException("directoryInfo");
+
+            if (filename == null)
+                throw new ArgumentNullException("filename"); //  TODO:   Should add IsNullOrWhitespace for this filename parameter?
+
+            //  UNDONE:   EnsureConnection?
+
             using (var input = new PipeStream())
             using (var channel = this.Session.CreateChannel<ChannelSession>())
             {
@@ -64,7 +83,7 @@ namespace Renci.SshNet
                 channel.Open();
 
                 //  Send channel command request
-                channel.SendExecRequest(string.Format("scp -qrt {0}", filename));
+                channel.SendExecRequest(string.Format("scp -qrt \"{0}\"", filename));
                 this.CheckReturnCode(input);
 
                 this.InternalUpload(channel, input, directoryInfo, filename);
@@ -78,8 +97,17 @@ namespace Renci.SshNet
         /// </summary>
         /// <param name="filename">Remote host file name.</param>
         /// <param name="fileInfo">Local file information.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="fileInfo"/> or <paramref name="filename"/> is null.</exception>
         public void Download(string filename, FileInfo fileInfo)
         {
+            if (fileInfo == null)
+                throw new ArgumentNullException("fileInfo");
+
+            if (filename == null)
+                throw new ArgumentNullException("filename"); //  TODO:   Should add IsNullOrWhitespace for this filename parameter?
+
+            //  UNDONE:   EnsureConnection?
+
             using (var input = new PipeStream())
             using (var channel = this.Session.CreateChannel<ChannelSession>())
             {
@@ -106,8 +134,17 @@ namespace Renci.SshNet
         /// </summary>
         /// <param name="directoryName">Remote host directory name.</param>
         /// <param name="directoryInfo">Local directory information.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="directoryInfo"/> or <paramref name="directoryName"/> is null.</exception>
         public void Download(string directoryName, DirectoryInfo directoryInfo)
         {
+            if (directoryInfo == null)
+                throw new ArgumentNullException("directoryInfo");
+
+            if (directoryName == null)
+                throw new ArgumentNullException("directoryName"); //  TODO:   Should add IsNullOrWhitespace for this filename parameter?
+
+            //  UNDONE:   EnsureConnection?
+
             using (var input = new PipeStream())
             using (var channel = this.Session.CreateChannel<ChannelSession>())
             {
@@ -120,7 +157,7 @@ namespace Renci.SshNet
                 channel.Open();
 
                 //  Send channel command request
-                channel.SendExecRequest(string.Format("scp -qprf {0}", directoryName));
+                channel.SendExecRequest(string.Format("scp -qprf \"{0}\"", directoryName));
                 this.SendConfirmation(channel); //  Send reply
 
                 this.InternalDownload(channel, input, directoryInfo);

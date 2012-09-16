@@ -1,5 +1,7 @@
-﻿
+﻿using Renci.SshNet.Sftp;
 using System.Collections.Generic;
+using System.IO;
+
 namespace Blossom.Deployment.Ssh
 {
     public interface ISftp
@@ -14,6 +16,14 @@ namespace Blossom.Deployment.Ssh
 
         bool Exists(string path);
 
-        void Put(string source, string destination);
+        void Get(string source, string destination, IFileTransferHandler handler);
+
+        bool Put(string source, string destination, IFileTransferHandler handler);
+
+        bool Put(string source, string destination, IFileTransferHandler handler, bool ifNewer);
+
+        void Put(Stream source, string destination);
+
+        void Put(Stream source, string destination, IFileTransferHandler handler);
     }
 }

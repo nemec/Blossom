@@ -59,18 +59,34 @@ namespace Renci.SshNet
             var data = new byte[1];
             do
             {
-                this._socket.Receive(data);
+                var received = this._socket.Receive(data);
+
+                //  If zero bytes received then exit
+                if (received == 0)
+                    break;
 
                 buffer.Add(data[0]);
             }
-            while (!(buffer.Count > 1 && buffer[buffer.Count - 1] == 0x0A));
+            while (!(buffer.Count > 1 && (buffer[buffer.Count - 1] == 0x0A || buffer[buffer.Count - 1] == 0x00)));
 
-            if (buffer.Count > 1 && buffer[buffer.Count - 2] == 0x0D)
+            // Return an empty version string if the buffer consists of a 0x00 character.
+            if (buffer[buffer.Count - 1] == 0x00)
+            {
+                response = string.Empty;
+            }
+            else if (buffer.Count > 1 && buffer[buffer.Count - 2] == 0x0D)
                 response = encoding.GetString(buffer.Take(buffer.Count - 2).ToArray());
             else
                 response = encoding.GetString(buffer.Take(buffer.Count - 1).ToArray());
         }
 
+        /// <summary>
+        /// Function to read <paramref name="length"/> amount of data before returning, or throwing an exception.
+        /// </summary>
+        /// <param name="length">The amount wanted.</param>
+        /// <param name="buffer">The buffer to read to.</param>
+        /// <exception cref="SshConnectionException">Happens when the socket is closed.</exception>
+        /// <exception cref="Exception">Unhandled exception.</exception>
         partial void SocketRead(int length, ref byte[] buffer)
         {
             var offset = 0;
@@ -88,14 +104,30 @@ namespace Renci.SshNet
                     }
                     else
                     {
-                        throw new SshConnectionException("An established connection was aborted by the software in your host machine.", DisconnectReason.ConnectionLost);
+                        // 2012-09-11: Kenneth_aa
+                        // When Disconnect or Dispose is called, this throws SshConnectionException(), which...
+                        // 1 - goes up to ReceiveMessage() 
+                        // 2 - up again to MessageListener()
+                        // which is where there is a catch-all exception block so it can notify event listeners.
+                        // 3 - MessageListener then again calls RaiseError().
+                        // There the exception is checked for the exception thrown here (ConnectionLost), and if it matches it will not call Session.SendDisconnect().
+                        //
+                        // Adding a check for this._isDisconnecting causes ReceiveMessage() to throw SshConnectionException: "Bad packet length {0}".
+                        //
+						throw new SshConnectionException("An established connection was aborted by the software in your host machine.", DisconnectReason.ConnectionLost);
                     }
                 }
                 catch (SocketException exp)
                 {
-                    if (exp.SocketErrorCode == SocketError.WouldBlock ||
-                        exp.SocketErrorCode == SocketError.IOPending ||
-                        exp.SocketErrorCode == SocketError.NoBufferSpaceAvailable)
+                    if (exp.SocketErrorCode == SocketError.ConnectionAborted)
+                    {
+                        buffer = new byte[length];
+                        this.Disconnect();
+                        return;
+                    }
+                    else if (exp.SocketErrorCode == SocketError.WouldBlock ||
+                       exp.SocketErrorCode == SocketError.IOPending ||
+                       exp.SocketErrorCode == SocketError.NoBufferSpaceAvailable)
                     {
                         // socket buffer is probably empty, wait and try again
                         Thread.Sleep(30);

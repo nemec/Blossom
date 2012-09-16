@@ -171,6 +171,16 @@ namespace Renci.SshNet
         public string CurrentServerCompressionAlgorithm { get; internal set; }
 
         /// <summary>
+        /// Gets the server version.
+        /// </summary>
+        public string ServerVersion { get; internal set; }
+
+        /// <summary>
+        /// Get the client version.
+        /// </summary>
+        public string ClientVersion { get; internal set; }
+
+        /// <summary>
         /// Gets the current client compression algorithm.
         /// </summary>
         public string CurrentClientCompressionAlgorithm { get; internal set; }
@@ -182,7 +192,7 @@ namespace Renci.SshNet
         /// <param name="username">The username.</param>
         /// <param name="authenticationMethods">The authentication methods.</param>
         public ConnectionInfo(string host, string username, params AuthenticationMethod[] authenticationMethods)
-            : this(host, 22, username, ProxyTypes.None, string.Empty, 0, string.Empty, string.Empty, authenticationMethods)
+            : this(host, 22, username, ProxyTypes.None, null, 0, null, null, authenticationMethods)
         {
         }
 
@@ -194,9 +204,11 @@ namespace Renci.SshNet
         /// <param name="username">The username.</param>
         /// <param name="authenticationMethods">The authentication methods.</param>
         public ConnectionInfo(string host, int port, string username, params AuthenticationMethod[] authenticationMethods)
-            : this(host, port, username, ProxyTypes.None, string.Empty, 0, string.Empty, string.Empty, authenticationMethods)
+            : this(host, port, username, ProxyTypes.None, null, 0, null, null, authenticationMethods)
         {
         }
+
+        //  TODO: DOCS Add exception documentation for this class.
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConnectionInfo"/> class.
@@ -220,14 +232,17 @@ namespace Renci.SshNet
             if (!host.IsValidHost())
                 throw new ArgumentException("host");
 
-            if (!string.IsNullOrEmpty(proxyHost) && !proxyHost.IsValidHost())
-                throw new ArgumentException("proxyHost");
+            if (proxyType != ProxyTypes.None)
+            {
+                if (string.IsNullOrEmpty(proxyHost) && !proxyHost.IsValidHost())
+                    throw new ArgumentException("proxyHost");
+
+                if (!proxyPort.IsValidPort())
+                    throw new ArgumentOutOfRangeException("proxyPort");
+            }
 
             if (!port.IsValidPort())
                 throw new ArgumentOutOfRangeException("port");
-
-            if (!proxyPort.IsValidPort())
-                throw new ArgumentOutOfRangeException("proxyPort");
 
             if (username.IsNullOrWhiteSpace())
                 throw new ArgumentException("username");
@@ -337,6 +352,7 @@ namespace Renci.SshNet
         /// <param name="session">The session to be authenticated.</param>
         /// <returns>true if authenticated; otherwise false.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="session"/> is null.</exception>
+        /// <exception cref="SshAuthenticationException">No suitable authentication method found to complete authentication.</exception>
         public bool Authenticate(Session session)
         {
             var authenticated = AuthenticationResult.Failure;

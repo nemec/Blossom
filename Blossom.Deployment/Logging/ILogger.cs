@@ -16,20 +16,22 @@ namespace Blossom.Deployment.Logging
 
         void ClearTicker();
 
-        void Debug(string message);
+        void Debug(string message, Exception exception = null);
 
-        void Info(string message);
+        void Verbose(string message, Exception exception = null);
 
-        void Warn(string message);
+        void Info(string message, Exception exception = null);
 
-        void Warn(string message, Exception exception);
+        void Warn(string message, Exception exception = null);
 
-        void Error(string message);
+        void Error(string message, Exception exception = null);
 
-        void Error(string message, Exception exception);
-
-        void Fatal(string message);
-
-        void Fatal(string message, Exception exception);
+        /// <summary>
+        /// A fatal error happened. This usually means the
+        /// application is unrecoverable.
+        /// </summary>
+        /// <param name="message">Error message to be displayed.</param>
+        /// <param name="exception">Exception associated with the error.</param>
+        void Fatal(string message, Exception exception = null);
     }
 }

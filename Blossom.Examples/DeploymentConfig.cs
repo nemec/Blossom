@@ -11,9 +11,9 @@ namespace Blossom.Examples
     {
         public List<Host> Hosts { get; set; }
 
-        public DeploymentConfig(Config config)
+        public DeploymentConfig(List<Host> hosts)
         {
-            Hosts = config.Hosts;
+            Hosts = hosts;
         }
     }
 }

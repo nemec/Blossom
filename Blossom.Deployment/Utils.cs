@@ -5,21 +5,6 @@ namespace Blossom.Deployment
 {
     internal static class Utils
     {
-        public static string HumanizeBytes(long bytes)
-        {
-            double tmpbytes = bytes;
-            int byteRadix = 1000;
-            foreach (var suffix in new string[] { "B", "kB", "MB", "GB", "TB" })
-            {
-                if (tmpbytes < byteRadix)
-                {
-                    return String.Format("{0:0.##}{1}", tmpbytes, suffix);
-                }
-                tmpbytes = tmpbytes / byteRadix;
-            }
-            return String.Format("{0}B", bytes);
-        }
-
         // TODO Context sensitive escaping for backslashes
         public static string NormalizePathSeparators(string path, PathSeparator sep)
         {
@@ -36,20 +21,6 @@ namespace Blossom.Deployment
                     sep.Value());
             }
             return path;
-        }
-
-        public static string CombineLocalPath(IDeploymentContext context, params string[] paths)
-        {
-            return NormalizePathSeparators(
-                Path.Combine(paths),
-                context.Environment.Local.PathSeparator);
-        }
-
-        public static string CombineRemotePath(IDeploymentContext context, params string[] paths)
-        {
-            return NormalizePathSeparators(
-                Path.Combine(paths),
-                context.Environment.Remote.PathSeparator);
         }
     }
 }

@@ -124,10 +124,14 @@ namespace Renci.SshNet
         /// <param name="session">The session.</param>
         /// <param name="commandText">The command text.</param>
         /// <param name="encoding">The encoding.</param>
+        /// <exception cref="ArgumentNullException">Either <paramref name="session"/>, <paramref name="commandText"/> or <paramref name="encoding"/> is null.</exception>
         internal SshCommand(Session session, string commandText, Encoding encoding)
         {
             if (session == null)
                 throw new ArgumentNullException("session");
+
+            if (commandText == null)
+                throw new ArgumentNullException("commandText");
 
             this._encoding = encoding;
             this._session = session;
@@ -305,6 +309,10 @@ namespace Renci.SshNet
 
         private void Session_Disconnected(object sender, EventArgs e)
         {
+            //  If objected is disposed or being disposed don't handle this event
+            if (this._isDisposed)
+                return;
+
             this._exception = new SshConnectionException("An established connection was aborted by the software in your host machine.", DisconnectReason.ConnectionLost);
 
             this._sessionErrorOccuredWaitHandle.Set();
@@ -312,6 +320,10 @@ namespace Renci.SshNet
 
         private void Session_ErrorOccured(object sender, ExceptionEventArgs e)
         {
+            //  If objected is disposed or being disposed don't handle this event
+            if (this._isDisposed)
+                return;
+
             this._exception = e.Exception;
 
             this._sessionErrorOccuredWaitHandle.Set();

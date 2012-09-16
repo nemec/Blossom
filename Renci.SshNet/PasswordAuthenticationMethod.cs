@@ -42,10 +42,10 @@ namespace Renci.SshNet
         /// <summary>
         /// Initializes a new instance of the <see cref="PasswordAuthenticationMethod"/> class.
         /// </summary>
-        /// <param name="host">The host.</param>
-        /// <param name="port">The port.</param>
         /// <param name="username">The username.</param>
         /// <param name="password">The password.</param>
+        /// <exception cref="ArgumentException"><paramref name="username"/> is whitespace or null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="password"/> is null.</exception>
         public PasswordAuthenticationMethod(string username, string password)
             : base(username)
         {
