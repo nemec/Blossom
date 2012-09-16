@@ -42,18 +42,23 @@ namespace Blossom.Deployment
             this.Environment.Hosts = config.Hosts;
         }
 
-        private static IEnumerable<MethodInfo> SortTasksInObjectByPriorityAscending(object obj)
+        public IEnumerable<MethodInfo> GetExecutionPlan(object taskBlock)
         {
-            return obj.GetType().GetMethods()
-                .Select(m => new
-                {
-                    Attr = (TaskAttribute)m.GetCustomAttributes(
-                        typeof(TaskAttribute), true).FirstOrDefault(),
-                    Method = m
-                })
-                .Where(k => k.Attr != null)
-                .Select(k => k.Method);
+            var methods = taskBlock.GetType().GetMethods();
+            var tasks = methods.
+                Where(t =>
+                    t.GetCustomAttribute<TaskAttribute>() != null &&
+                    t.GetCustomAttribute<DeploymentInitializeAttribute>() == null &&
+                    t.GetCustomAttribute<DeploymentCleanupAttribute>() == null);
+            var dependencyResolver = new DependencyResolver(tasks);
+
+            // First return the Initializers, then the Tasks in
+            // dependency order, then the Cleanup methods.
+            return methods.Where(t => t.GetCustomAttribute<DeploymentInitializeAttribute>() != null).
+                Concat(dependencyResolver.OrderTasks()).
+                Concat(methods.Where(t => t.GetCustomAttribute<DeploymentCleanupAttribute>() != null));
         }
+
 
         public void BeginDeployment(object deploymentInstance)
         {
@@ -77,8 +82,8 @@ namespace Blossom.Deployment
 
                         foreach (var taskBlock in taskBlocks)
                         {
-                            var dependencyResolver = new DependencyResolver(taskBlock);
-                            foreach (var method in dependencyResolver.OrderTasks())
+                            
+                            foreach (var method in GetExecutionPlan(taskBlock))
                             {
                                 Logger.Info("Beginning task: " + method.Name);
                                 var parameters = method.GetParameters();

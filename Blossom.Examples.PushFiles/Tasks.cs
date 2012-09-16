@@ -21,15 +21,6 @@ namespace Blossom.Examples.PushFiles
         }
 
         //[Task]
-        public void ListDirs()
-        {
-            using (new Prefix(Context, "cd /"))
-            {
-                Context.Logger.Info(Context.RemoteOps.RunCommand("ls"));
-            }
-        }
-
-        //[Task]
         public void TryCommand()
         {
             byte[] bytes = new byte[1024];
@@ -56,13 +47,6 @@ namespace Blossom.Examples.PushFiles
             {
                 Context.Logger.Info(Encoding.ASCII.GetString(bytes, 0, total));
             }
-        }
-
-        [Task]
-        public void GetFile()
-        {
-            Context.RemoteOps.GetFile("/home/dan/dest/Donkey Kong 64.zip",
-                @"C:\Users\nemecd\tmp\dk.zip", new FileTransferHandler(Context.Logger, "file"));
         }
 
         [Task]
@@ -99,19 +83,15 @@ namespace Blossom.Examples.PushFiles
         public void CopyFiles()
         {
             foreach (var input in Config.InputDirs)
+            using (new Lcd(Context, input.Path))
+            foreach (var output in input.OutputDirs)
             {
-                using (new Lcd(Context, input.Path))
+                Context.RemoteOps.MkDir(output.Path, true);
+                foreach (var file in output.Files)
                 {
-                    foreach (var output in input.OutputDirs)
-                    {
-                        Context.RemoteOps.MkDir(output.Path, true);
-                        foreach (var file in output.Files)
-                        {
-                            Context.Logger.Info(String.Format("Copying file {0} to {1}.", file, output.Path));
-                            Context.RemoteOps.PutFile(file, output.Path, new FileTransferHandler(Context.Logger, 
-                                Path.GetFileName(file)), true);
-                        }
-                    }
+                    Context.Logger.Info(String.Format("Copying file {0} to {1}.", file, output.Path));
+                    Context.RemoteOps.PutFile(file, output.Path, new FileTransferHandler(Context.Logger, 
+                        Path.GetFileName(file)), true);
                 }
             }
         }

@@ -15,7 +15,7 @@ namespace Blossom.Examples.PushFiles
     //http://docs.fabfile.org/en/1.4.3/#api-documentation
     public class Program
     {
-        // Comment
+        // TODO service oriented? https://github.com/fabric/fabric/issues/541
         private static void Main(string[] args)
         {
             var options = new Blossom.Examples.PushFiles.CommandLineOptions();
@@ -55,8 +55,21 @@ namespace Blossom.Examples.PushFiles
                     conf,
                     new Blossom.Deployment.Environments.Windows());
             }
+
+            var taskBlock = new Tasks(deployment, config);
+
+            if (options.List)
+            {
+                Console.WriteLine("Planned execution order:");
+                foreach (var task in deployment.GetExecutionPlan(taskBlock))
+                {
+                    Console.WriteLine(String.Format("\t{0}.{1}",
+                        task.ReflectedType.Name, task.Name));
+                }
+                return;
+            }
             
-            deployment.BeginDeployment(new Tasks(deployment, config));
+            deployment.BeginDeployment(taskBlock);
         }
     }
 }

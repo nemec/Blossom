@@ -12,11 +12,20 @@ namespace Blossom.Deployment.Dependencies
     {
         private List<Node> _nodes;
 
-        private object _taskBlock;
+        private Dictionary<string, MethodInfo> _methods;
 
-        public DependencyResolver(object taskBlock)
+        public DependencyResolver(IEnumerable<MethodInfo> methods)
         {
-            _taskBlock = taskBlock;
+            try
+            {
+                _methods = methods.ToDictionary(k => k.Name);
+            }
+            catch (ArgumentException exception)
+            {
+                throw new ArgumentException(
+                    "Cannot have multiple tasks with the same name (includes method overloads)",
+                    exception);
+            }
         }
 
         /// <summary>
@@ -35,8 +44,6 @@ namespace Blossom.Deployment.Dependencies
             {
                 Resolve(null, node, resolved, new HashSet<Node>());
             }
-
-            Console.WriteLine(String.Join(", ", resolved));
             return resolved.Select(n => n.Method);
         }
 
@@ -46,23 +53,18 @@ namespace Blossom.Deployment.Dependencies
         /// <exception cref="TaskDependencyException"></exception>
         private void BuildDependencyGraph()
         {
-            var nodeMap = new Dictionary<MethodInfo, Node>();
-            var tasks = _taskBlock.GetType().GetMethods().
-                Where(t => t.GetCustomAttribute<TaskAttribute>() != null).
-                OrderBy(t => t.Name);
+            var nodeMap = _methods.ToDictionary(
+                k => k.Key, 
+                v => new Node(this, v.Value));
 
-            foreach (var method in tasks)
-            {
-                nodeMap.Add(method, new Node(this, method));
-            }
-
+            // Add edges to all nodes.
             foreach (var pair in nodeMap)
             {
                 foreach (var dependency in pair.Value.Dependencies)
                 {
                     Node depend;
                     // Check that we have a node for the dependency.
-                    if (!nodeMap.TryGetValue(dependency, out depend))
+                    if (!nodeMap.TryGetValue(dependency.Name, out depend))
                     {
                         throw new UnknownTaskException(String.Format(
                             "Unable to find task for dependency {0}. Is dependency marked with {1}?",
@@ -72,7 +74,7 @@ namespace Blossom.Deployment.Dependencies
                 }
             }
 
-            _nodes = nodeMap.Values.ToList();
+            _nodes = nodeMap.OrderBy(m => m.Key).Select(m => m.Value).ToList();
         }
 
         private void Resolve(Node parent, Node curNode,
@@ -97,8 +99,9 @@ namespace Blossom.Deployment.Dependencies
             unresolved.Remove(curNode);
             var allowMultipleExecution = curNode.Method.
                     GetCustomAttribute<AllowMultipleExecutionAttribute>();
-            if (allowMultipleExecution == null || parent != null ||
-                parent == null && allowMultipleExecution.Standalone)
+            if (allowMultipleExecution == null && !taskQueue.Contains(curNode) ||
+                (allowMultipleExecution != null && (
+                    parent != null || parent == null && allowMultipleExecution.Standalone)))
             {
                 taskQueue.Add(curNode);
             }
@@ -113,8 +116,8 @@ namespace Blossom.Deployment.Dependencies
         /// <exception cref="TaskDependencyException"></exception>
         internal MethodInfo GetTaskForName(string taskName)
         {
-            var method = _taskBlock.GetType().GetMethod(taskName);
-            if (method == null)
+            MethodInfo method;
+            if (!_methods.TryGetValue(taskName, out method))
             {
                 throw new UnknownTaskException("Unable to find task " + taskName);
             }

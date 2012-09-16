@@ -29,6 +29,11 @@ namespace Blossom.Examples.PushFiles
             HelpText = "Limits available hosts to the provided hosts (or aliases)")]
         public string[] Hosts { get; set; }
 
+        [Option("l", "list",
+            HelpText = "Display the execution plan and exit (Tasks to be executed " +
+                "and the order they will be executed).")]
+        public bool List { get; set; }
+
         [HelpOption]
         public string GetUsage()
         {
