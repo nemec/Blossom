@@ -55,7 +55,10 @@
     <Compile Include="Attributes\DeploymentAttribute.cs" />
     <Compile Include="Attributes\DeploymentCleanupAttribute.cs" />
     <Compile Include="Attributes\DeploymentInitializeAttribute.cs" />
+<<<<<<< HEAD
     <Compile Include="Attributes\ParallelizableAttribute.cs" />
+=======
+>>>>>>> acc9ea1a8fab3eaced3e72c4b4f398f79c0aef29
     <Compile Include="CompressionScheme.cs" />
     <Compile Include="ContextManagers\Cd.cs" />
     <Compile Include="ContextManagers\ContextManager.cs" />
