@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blossom.Scripting", "Blosso
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentUnitTest", "DeploymentUnitTest\DeploymentUnitTest.csproj", "{451635AB-53F1-4DE7-9A9B-D3287FAD0B3F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{62A17F76-DD0B-46BF-9B43-6BEDC8F89F21}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,5 +61,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{17BC9C5B-4F06-4CAB-BC1A-28D94355A662} = {477DFD5C-3F16-4024-B4D3-6B7DCBBAA96F}
 		{451635AB-53F1-4DE7-9A9B-D3287FAD0B3F} = {477DFD5C-3F16-4024-B4D3-6B7DCBBAA96F}
+		{07B73B7B-B9ED-4148-97A7-0535D9AD44FE} = {62A17F76-DD0B-46BF-9B43-6BEDC8F89F21}
 	EndGlobalSection
 EndGlobal

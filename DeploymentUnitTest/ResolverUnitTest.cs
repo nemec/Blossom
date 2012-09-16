@@ -121,15 +121,25 @@ namespace DeploymentUnitTest
         public void Task5() { }
     }
 
+    public static class TestExtensions
+    {
+        public static IEnumerable<MethodInfo> GetTasks(this object taskBlock)
+        {
+            return taskBlock.GetType().GetMethods().
+                Where(t => t.GetCustomAttribute<TaskAttribute>() != null);
+        }
+    }
+
     [TestClass]
     public class ResolverUnitTest
     {
+
         [TestMethod]
         [ExpectedException(typeof(UnknownTaskException))]
         public void GetTaskForName_WithInvalidTaskName_ThrowsUnknownTaskException()
         {
             // Arrange
-            var resolver = new DependencyResolver(new InvalidTaskDependency());
+            var resolver = new DependencyResolver(new InvalidTaskDependency().GetTasks());
 
             // Act
             resolver.OrderTasks();
@@ -140,7 +150,7 @@ namespace DeploymentUnitTest
         public void Resolve_WhereTasksHaveDirectCircularDependencies_ThrowsCircularTaskDependencyException()
         {
             // Arrange
-            var resolver = new DependencyResolver(new DirectCircularDependency());
+            var resolver = new DependencyResolver(new DirectCircularDependency().GetTasks());
 
             // Act
             resolver.OrderTasks();
@@ -151,7 +161,7 @@ namespace DeploymentUnitTest
         public void Resolve_WhereTasksHaveIndirectCircularDependencies_ThrowsCircularTaskDependencyException()
         {
             // Arrange
-            var resolver = new DependencyResolver(new IndirectCircularDependency());
+            var resolver = new DependencyResolver(new IndirectCircularDependency().GetTasks());
 
             // Act
             resolver.OrderTasks();
@@ -162,7 +172,7 @@ namespace DeploymentUnitTest
         public void Resolve_WhereTaskHasDependencyOnSelf_ThrowsCircularTaskDependencyException()
         {
             // Arrange
-            var resolver = new DependencyResolver(new SelfCircularDependency());
+            var resolver = new DependencyResolver(new SelfCircularDependency().GetTasks());
 
             // Act
             resolver.OrderTasks();
@@ -173,7 +183,7 @@ namespace DeploymentUnitTest
         {
             // Arrange
             var t = typeof(NoDependencies);
-            var resolver = new DependencyResolver(new NoDependencies());
+            var resolver = new DependencyResolver(new NoDependencies().GetTasks());
 
             var expected = new List<MethodInfo>
             {
@@ -194,7 +204,7 @@ namespace DeploymentUnitTest
         {
             // Arrange
             var t = typeof(WithMultipleExecutionStandalone);
-            var resolver = new DependencyResolver(new WithMultipleExecutionStandalone());
+            var resolver = new DependencyResolver(new WithMultipleExecutionStandalone().GetTasks());
 
             var expected = new List<MethodInfo>
             {
@@ -218,7 +228,7 @@ namespace DeploymentUnitTest
         {
             // Arrange
             var t = typeof(WithMultipleExecutionNonStandalone);
-            var resolver = new DependencyResolver(new WithMultipleExecutionNonStandalone());
+            var resolver = new DependencyResolver(new WithMultipleExecutionNonStandalone().GetTasks());
 
             var expected = new List<MethodInfo>
             {
@@ -242,7 +252,7 @@ namespace DeploymentUnitTest
         {
             // Arrange
             var t = typeof(Resolver);
-            var resolver = new DependencyResolver(new Resolver());
+            var resolver = new DependencyResolver(new Resolver().GetTasks());
 
             var expected = new List<MethodInfo>
             {

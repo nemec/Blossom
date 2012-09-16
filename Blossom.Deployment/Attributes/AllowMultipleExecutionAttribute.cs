@@ -21,6 +21,7 @@ namespace Blossom.Deployment
     /// referenced by name in a <see cref="DependsAttribute"/>
     /// in another task.
     /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
     public class AllowMultipleExecutionAttribute : Attribute
     {
         public bool Standalone { get; set; }

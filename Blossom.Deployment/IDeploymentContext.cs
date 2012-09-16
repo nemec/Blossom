@@ -1,6 +1,7 @@
 ﻿using Blossom.Deployment.Logging;
 using Blossom.Deployment.Operations;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Blossom.Deployment
 {
@@ -14,8 +15,10 @@ namespace Blossom.Deployment
 
         IRemoteOperations RemoteOps { get; }
 
-        void BeginDeployment(object deploymentInstance);
+        IEnumerable<MethodInfo> GetExecutionPlan(object taskBlock);
 
-        void BeginDeployment(IEnumerable<object> deploymentInstances);
+        void BeginDeployment(object taskBlock);
+
+        void BeginDeployment(IEnumerable<object> taskBlocks);
     }
 }

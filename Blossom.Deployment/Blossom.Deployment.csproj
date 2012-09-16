@@ -53,6 +53,8 @@
     <Compile Include="Attributes\AllowMultipleExecutionAttribute.cs" />
     <Compile Include="Attributes\DependsAttribute.cs" />
     <Compile Include="Attributes\DeploymentAttribute.cs" />
+    <Compile Include="Attributes\DeploymentCleanupAttribute.cs" />
+    <Compile Include="Attributes\DeploymentInitializeAttribute.cs" />
     <Compile Include="CompressionScheme.cs" />
     <Compile Include="ContextManagers\Cd.cs" />
     <Compile Include="ContextManagers\ContextManager.cs" />
