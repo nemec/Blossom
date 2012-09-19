@@ -31,7 +31,10 @@ namespace Blossom.Scripting
                 }).ToList();
             }
 
-            IDeploymentConfig config = new DeploymentConfig(hosts);
+            DeploymentConfig config = new DeploymentConfig
+            {
+                Hosts = hosts
+            };
 
             var assemblyPath = RuntimeAssembly.BuildAssembly(options.ScriptFile);
             if (assemblyPath == null)
@@ -41,7 +44,7 @@ namespace Blossom.Scripting
             }
             var assembly = RuntimeAssembly.LoadAssembly(assemblyPath);
 
-            IDeploymentConfig assemblyConf = RuntimeAssembly.GetDeploymentConfigFromAssembly(assembly);
+            DeploymentConfig assemblyConf = RuntimeAssembly.GetDeploymentConfigFromAssembly(assembly);
             if (assemblyConf != null)
             {
                 config.MergeFrom(assemblyConf);
@@ -66,7 +69,7 @@ namespace Blossom.Scripting
             }
 
             var deploymentObjects = RuntimeAssembly.LoadTaskInstancesFromAssembly(assembly, deployment);
-            deployment.BeginDeployment(deploymentObjects);
+            //deployment.BeginDeployment(deploymentObjects);
         }
     }
 }

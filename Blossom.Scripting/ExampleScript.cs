@@ -2,7 +2,7 @@
 using Blossom.Deployment;
 using System.Collections.Generic;
 
-public class DeploymentConfig : IDeploymentConfig
+public class CustomDeploymentConfig : DeploymentConfig
 {
     private List<Host> _hosts = new List<Host>
     {
@@ -19,6 +19,9 @@ public class DeploymentConfig : IDeploymentConfig
         get { return _hosts; }
         set { _hosts = value; }
     }
+
+
+    public bool DryRun { get; set; }
 }
 
 [Deployment]

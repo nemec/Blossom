@@ -22,7 +22,7 @@ namespace Blossom.Deployment
     /// in another task.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class AllowMultipleExecutionAttribute : Attribute
+    public sealed class AllowMultipleExecutionAttribute : Attribute
     {
         public bool Standalone { get; set; }
 

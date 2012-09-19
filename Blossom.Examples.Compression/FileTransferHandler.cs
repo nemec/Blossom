@@ -2,7 +2,7 @@
 using Renci.SshNet.Sftp;
 using System;
 
-namespace Blossom.Examples.PushFiles
+namespace Blossom.Examples.Compression
 {
     public class FileTransferHandler : IFileTransferHandler
     {

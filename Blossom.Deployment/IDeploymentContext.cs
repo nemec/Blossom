@@ -15,10 +15,6 @@ namespace Blossom.Deployment
 
         IRemoteOperations RemoteOps { get; }
 
-        IEnumerable<MethodInfo> GetExecutionPlan(object taskBlock);
-
-        void BeginDeployment(object taskBlock);
-
-        void BeginDeployment(IEnumerable<object> taskBlocks);
+        void BeginDeployment(IEnumerable<Invokable> tasks);
     }
 }

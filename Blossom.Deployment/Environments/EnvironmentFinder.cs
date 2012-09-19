@@ -2,9 +2,9 @@
 
 namespace Blossom.Deployment.Environments
 {
-    public static class EnvironmentFinder
+    internal static class EnvironmentFinder
     {
-        public static IEnvironment AutoDetermineLocalEnvironment(string initialDirectory = null)
+        internal static IEnvironment AutoDetermineLocalEnvironment(string initialDirectory = null)
         {
             var os = Environment.OSVersion;
             switch (Environment.OSVersion.Platform)

@@ -16,6 +16,8 @@ namespace Blossom.Examples.PushFiles
     public class Program
     {
         // TODO service oriented? https://github.com/fabric/fabric/issues/541
+        // http://docs.fabfile.org/en/1.4.3/usage/execution.html#execution-strategy
+        // https://github.com/fabric/fabric/issues/26
         private static void Main(string[] args)
         {
             var options = new Blossom.Examples.PushFiles.CommandLineOptions();
@@ -24,52 +26,57 @@ namespace Blossom.Examples.PushFiles
                 Console.Error.WriteLine(options.GetUsage());
                 Environment.Exit(1);
             }
+
+            if (options.PrintVersion)
+            {
+                Console.WriteLine("Blossom " + 
+                    Assembly.GetExecutingAssembly().GetName().Version.ToString());
+                return;
+            }
+
             var serializer = new XmlSerializer(typeof(Config));
 
             var config = (Config)serializer.Deserialize(XmlReader.Create(options.ConfigFile));
+            var taskBlock = new Tasks(config);
 
-            IDeploymentConfig conf;
+            DeploymentConfig conf;
             // Gets the subset of hosts specified at the command line.
             if (options.Hosts != null && options.Hosts.Length > 0)
             {
-                conf = new DeploymentConfig(
-                    config.Hosts.Where(h =>
+                conf = new DeploymentConfig
+                {
+                    Hosts = config.Hosts.Where(h =>
                         options.Hosts.Contains(h.Alias) ||
-                        options.Hosts.Contains(h.Hostname)).ToList());
+                        options.Hosts.Contains(h.Hostname)).ToList(),
+                        DryRun = options.DryRun
+                };
             }
             else
             {
-                conf = new DeploymentConfig(config.Hosts);
-            }
-            IDeploymentContext deployment;            
-
-            if (options.RemoteEnvironment == EnvironmentType.Linux)
-            {
-                deployment = new DeploymentContext(
-                    conf,
-                    new Blossom.Deployment.Environments.Linux());
-            }
-            else
-            {
-                deployment = new DeploymentContext(
-                    conf,
-                    new Blossom.Deployment.Environments.Windows());
+                conf = new DeploymentConfig
+                {
+                    Hosts = config.Hosts,
+                    DryRun = options.DryRun
+                };
             }
 
-            var taskBlock = new Tasks(deployment, config);
+            IDeploymentManager manager = new DeploymentManager(conf, taskBlock);
 
             if (options.List)
             {
                 Console.WriteLine("Planned execution order:");
-                foreach (var task in deployment.GetExecutionPlan(taskBlock))
+                foreach (var plan in manager.GetExecutionPlans())
                 {
-                    Console.WriteLine(String.Format("\t{0}.{1}",
-                        task.ReflectedType.Name, task.Name));
+                    Console.WriteLine(plan.Host);
+                    foreach (var task in plan.TaskOrder)
+                    {
+                        Console.WriteLine(String.Format("\t{0}.{1}",
+                            task.Method.ReflectedType.Name, task.Method.Name));
+                    }
                 }
                 return;
             }
-            
-            deployment.BeginDeployment(taskBlock);
+            manager.BeginDeployments();
         }
     }
 }

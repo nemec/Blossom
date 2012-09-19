@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Blossom.Deployment.Operations
 {
-    public interface IRemoteOperations
+    public interface IRemoteOperations : IDisposable
     {
         /// <summary>
         /// A stream enabling access to the shell's input and output.
@@ -23,7 +23,23 @@ namespace Blossom.Deployment.Operations
         /// <param name="command"></param>
         string RunCommand(string command);
 
-        void GetFile(string sourcePath, string destinationPath, IFileTransferHandler handler);
+        /// <summary>
+        /// Copy a file from the remote host to the local host.
+        /// </summary>
+        /// <param name="sourcePath"></param>
+        /// <param name="destinationPath"></param>
+        /// <param name="handler"></param>
+        /// <param name="ifNewer"></param>
+        /// <returns></returns>
+        bool GetFile(string sourcePath, string destinationPath, IFileTransferHandler handler, bool ifNewer);
+
+        /// <summary>
+        /// Copy a file from the remote host to a stream.
+        /// </summary>
+        /// <param name="sourcePath"></param>
+        /// <param name="destination"></param>
+        /// <param name="handler"></param>
+        void GetFile(string sourcePath, Stream destination, IFileTransferHandler handler);
 
         /// <summary>
         /// Copy a file from the local host to the remote host.

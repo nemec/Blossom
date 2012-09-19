@@ -3,22 +3,33 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
+[assembly:InternalsVisibleTo("DeploymentUnitTest")]
+
 namespace Blossom.Deployment.Dependencies
 {
-    public class DependencyResolver
+    internal class DependencyResolver
     {
         private List<Node> _nodes;
 
-        private Dictionary<string, MethodInfo> _methods;
+        private IEnumerable<Invokable> RootMethods { get; set; }
 
-        public DependencyResolver(IEnumerable<MethodInfo> methods)
+        private Dictionary<string, Invokable> AllMethods { get; set; }
+
+        internal DependencyResolver(IEnumerable<Invokable> methods)
+            : this(methods, methods) { }
+
+        internal DependencyResolver(
+            IEnumerable<Invokable> rootMethods,
+            IEnumerable<Invokable> allMethods)
         {
+            RootMethods = rootMethods;
             try
             {
-                _methods = methods.ToDictionary(k => k.Name);
+                AllMethods = allMethods.ToDictionary(k => MethodName(k));
             }
             catch (ArgumentException exception)
             {
@@ -28,6 +39,11 @@ namespace Blossom.Deployment.Dependencies
             }
         }
 
+        private static string MethodName(Invokable invokable)
+        {
+            return invokable.Method.ReflectedType.Namespace + "." + invokable.Method.Name;
+        }
+
         /// <summary>
         /// Resolves the dependencies in a task block.
         /// </summary>
@@ -35,16 +51,19 @@ namespace Blossom.Deployment.Dependencies
         /// An enumerable of task methods in the order
         /// they should be executed.
         /// </returns>
-        public IEnumerable<MethodInfo> OrderTasks()
+        internal IEnumerable<Invokable> OrderTasks()
         {
             BuildDependencyGraph();
 
             var resolved = new List<Node>();
-            foreach (var node in _nodes)
+            // Limit iteration to only the root methods.
+            // Only root methods and their dependencies should
+            // appear in the final order.
+            foreach (var node in _nodes.Where(n => RootMethods.Contains(n.Invokable)))
             {
                 Resolve(null, node, resolved, new HashSet<Node>());
             }
-            return resolved.Select(n => n.Method);
+            return resolved.Select(n => n.Invokable);
         }
 
         /// <summary>
@@ -53,7 +72,7 @@ namespace Blossom.Deployment.Dependencies
         /// <exception cref="TaskDependencyException"></exception>
         private void BuildDependencyGraph()
         {
-            var nodeMap = _methods.ToDictionary(
+            var nodeMap = AllMethods.ToDictionary(
                 k => k.Key, 
                 v => new Node(this, v.Value));
 
@@ -64,13 +83,13 @@ namespace Blossom.Deployment.Dependencies
                 {
                     Node depend;
                     // Check that we have a node for the dependency.
-                    if (!nodeMap.TryGetValue(dependency.Name, out depend))
+                    if (!nodeMap.TryGetValue(MethodName(dependency), out depend))
                     {
                         throw new UnknownTaskException(String.Format(
                             "Unable to find task for dependency {0}. Is dependency marked with {1}?",
-                            dependency.Name, typeof(TaskAttribute).Name));
+                            MethodName(dependency), typeof(TaskAttribute).Name));
                     }
-                    pair.Value.Edges.Add(depend.Method.Name, depend);
+                    pair.Value.Edges.Add(MethodName(depend.Invokable), depend);
                 }
             }
 
@@ -83,7 +102,7 @@ namespace Blossom.Deployment.Dependencies
             unresolved.Add(curNode);
             foreach (var edge in curNode.Edges)
             {
-                var allowMultipleExecutionEdge = edge.Value.Method.
+                var allowMultipleExecutionEdge = edge.Value.Invokable.Method.
                     GetCustomAttribute<AllowMultipleExecutionAttribute>();
                 if (!taskQueue.Contains(edge.Value) ||
                     allowMultipleExecutionEdge != null)
@@ -91,13 +110,13 @@ namespace Blossom.Deployment.Dependencies
                     if (unresolved.Contains(edge.Value))
                     {
                         throw new CircularTaskDependencyException(
-                            "Circular dependency for " + edge.Value.Method.Name);
+                            "Circular dependency for " + MethodName(edge.Value.Invokable));
                     }
                     Resolve(curNode, edge.Value, taskQueue, unresolved);
                 }
             }
             unresolved.Remove(curNode);
-            var allowMultipleExecution = curNode.Method.
+            var allowMultipleExecution = curNode.Invokable.Method.
                     GetCustomAttribute<AllowMultipleExecutionAttribute>();
             if (allowMultipleExecution == null && !taskQueue.Contains(curNode) ||
                 (allowMultipleExecution != null && (
@@ -114,10 +133,10 @@ namespace Blossom.Deployment.Dependencies
         /// <returns>The method for the found task.</returns>
         /// <exception cref="System.AmbiguousMatchException"></exception>
         /// <exception cref="TaskDependencyException"></exception>
-        internal MethodInfo GetTaskForName(string taskName)
+        internal Invokable GetTaskForName(string taskName)
         {
-            MethodInfo method;
-            if (!_methods.TryGetValue(taskName, out method))
+            Invokable method;
+            if (!AllMethods.TryGetValue(taskName, out method))
             {
                 throw new UnknownTaskException("Unable to find task " + taskName);
             }
@@ -128,12 +147,12 @@ namespace Blossom.Deployment.Dependencies
         {
             private DependencyResolver _resolver;
 
-            internal MethodInfo Method { get; private set; }
+            internal Invokable Invokable { get; private set; }
 
             internal SortedList<string, Node> Edges { get; private set; }
 
-            private List<MethodInfo> _dependencies;
-            internal List<MethodInfo> Dependencies
+            private List<Invokable> _dependencies;
+            internal List<Invokable> Dependencies
             {
                 get
                 {
@@ -145,28 +164,29 @@ namespace Blossom.Deployment.Dependencies
                 }
             }
 
-            internal Node(DependencyResolver resolver, MethodInfo method)
+            internal Node(DependencyResolver resolver, Invokable method)
             {
                 _resolver = resolver;
-                Method = method;
+                Invokable = method;
                 Edges = new SortedList<string, Node>();
             }
 
-            private List<MethodInfo> GenerateDependencies()
+            private List<Invokable> GenerateDependencies()
             {
-                var dependencies = new List<MethodInfo>();
-                foreach (var taskName in Method.
+                var dependencies = new List<Invokable>();
+                foreach (var taskName in Invokable.Method.
                     GetCustomAttributes<DependsAttribute>().Select(a => a.TaskName)
                     .Distinct())
                 {
-                    dependencies.Add(_resolver.GetTaskForName(taskName));
+                    dependencies.Add(_resolver.GetTaskForName(
+                        Invokable.Method.ReflectedType.Namespace + "." + taskName));
                 }
                 return dependencies;
             }
 
             public override string ToString()
             {
-                return Method != null ? Method.Name : "<Null>";
+                return Invokable != null ? MethodName(Invokable) : "<Null>";
             }
         }
     }

@@ -4,7 +4,6 @@ using StructureMap.AutoMocking;
 using Blossom.Deployment;
 using System.IO;
 using Rhino.Mocks;
-using Blossom.Deployment.Ssh;
 using Blossom.Deployment.Operations;
 using System.Text;
 
@@ -15,16 +14,12 @@ namespace OperationsUnitTest
     {
         RhinoAutoMocker<ILocalOperations> MockLocalOperations { get; set; }
         IDeploymentContext MockContext { get; set; }
-        IShell MockShell { get; set; }
-        ISftp MockSftp { get; set; }
 
         [TestInitialize]
         public void Setup()
         {
             MockLocalOperations = new RhinoAutoMocker<ILocalOperations>();
             MockContext = MockLocalOperations.Get<IDeploymentContext>();
-            MockShell = MockLocalOperations.Get<IShell>();
-            MockSftp = MockLocalOperations.Get<ISftp>();
         }
 
         [TestMethod]
@@ -39,8 +34,8 @@ namespace OperationsUnitTest
             var host = new Host();
 
             // Act
-            ILocalOperations operations = new BasicOperations(MockContext, MockShell, MockSftp);
-            var response = operations.Prompt("What?");
+            ILocalOperations operations = new BasicLocalOperations(MockContext);
+            var response = operations.PromptWithNoValidation("What?");
         }
 
         [TestMethod]
@@ -56,8 +51,8 @@ namespace OperationsUnitTest
             var input = new StringReader(sampleResponse + "\n");
 
             // Act
-            ILocalOperations operations = new BasicOperations(MockContext, MockShell, MockSftp);
-            var response = operations.Prompt("What?", inputStream: input);
+            ILocalOperations operations = new BasicLocalOperations(MockContext);
+            var response = operations.PromptWithNoValidation("What?", inputStream: input);
 
             // Assert
             Assert.AreEqual(sampleResponse, response);
@@ -77,8 +72,8 @@ namespace OperationsUnitTest
             var input = new StringReader(normalInput + "\n");
 
             // Act
-            ILocalOperations operations = new BasicOperations(MockContext, MockShell, MockSftp);
-            var response = operations.Prompt("What?", 
+            ILocalOperations operations = new BasicLocalOperations(MockContext);
+            var response = operations.PromptWithNoValidation("What?", 
                 defaultResponse:defaultResponse, inputStream: input);
 
             // Assert
@@ -103,8 +98,8 @@ namespace OperationsUnitTest
             var host = new Host();
 
             // Act
-            ILocalOperations operations = new BasicOperations(MockContext, MockShell, MockSftp);
-            var response = operations.Prompt("What?",
+            ILocalOperations operations = new BasicLocalOperations(MockContext);
+            var response = operations.PromptWithNoValidation("What?",
                 defaultResponse: defaultResponse);
 
             // Assert
@@ -123,8 +118,8 @@ namespace OperationsUnitTest
             var host = new Host();
 
             // Act
-            ILocalOperations operations = new BasicOperations(MockContext, MockShell, MockSftp);
-            var response = operations.Prompt("What?");
+            ILocalOperations operations = new BasicLocalOperations(MockContext);
+            var response = operations.PromptWithNoValidation("What?");
         }
 
         [TestMethod]
@@ -140,14 +135,13 @@ namespace OperationsUnitTest
             input.AppendLine("invalid input");
             input.AppendLine(validText);
 
-            Func<string, bool> validationCallable = (resp) => resp == validText;
+            Func<string, bool> validationCallback = (resp) => resp == validText;
             var host = new Host();
 
             // Act
-            ILocalOperations operations = new BasicOperations(MockContext, MockShell, MockSftp);
-            var response = operations.Prompt("What?",
-                validateCallable: validationCallable,
-                inputStream: new StringReader(input.ToString()));
+            ILocalOperations operations = new BasicLocalOperations(MockContext);
+            var response = operations.PromptWithCallbackValidation("What?",
+                validationCallback, inputStream: new StringReader(input.ToString()));
 
             // Assert
             Assert.AreEqual(validText, response);
@@ -170,10 +164,9 @@ namespace OperationsUnitTest
             var host = new Host();
 
             // Act
-            ILocalOperations operations = new BasicOperations(MockContext, MockShell, MockSftp);
-            var response = operations.Prompt("What?",
-                validateRegex: validationRegex,
-                inputStream: new StringReader(input.ToString()));
+            ILocalOperations operations = new BasicLocalOperations(MockContext);
+            var response = operations.PromptWithRegexValidation("What?",
+                validationRegex, inputStream: new StringReader(input.ToString()));
 
             // Assert
             Assert.AreEqual(validText, response);
@@ -197,10 +190,9 @@ namespace OperationsUnitTest
             var host = new Host();
 
             // Act
-            ILocalOperations operations = new BasicOperations(MockContext, MockShell, MockSftp);
-            var response = operations.Prompt("What?",
-                validateRegex: validationRegex,
-                inputStream: new StringReader(input.ToString()));
+            ILocalOperations operations = new BasicLocalOperations(MockContext);
+            var response = operations.PromptWithRegexValidation("What?",
+                validationRegex, inputStream: new StringReader(input.ToString()));
 
             // Assert
             Assert.AreEqual(validText, response);

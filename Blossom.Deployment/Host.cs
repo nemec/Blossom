@@ -1,17 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 
 namespace Blossom.Deployment
 {
     [XmlRoot("Host")]
-    public class Host
+    public class Host : IEquatable<Host>
     {
+        public const string LoopbackHostname = "loopback";
+
         [XmlText]
         public string Hostname { get; set; }
 
         [XmlAttribute("alias")]
         public string Alias { get; set; }
+
+        [XmlAttribute("roles")]
+        public string Roles { get; set; }
 
         [XmlAttribute("username")]
         public string Username { get; set; }
@@ -44,6 +50,30 @@ namespace Blossom.Deployment
                 builder.Append(Port);
             }
             return builder.ToString();
+        }
+
+        public bool Equals(Host other)
+        {
+            return other != null &&
+                this.Hostname == other.Hostname &&
+                this.Port == other.Port;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (this == null && obj == null)
+            {
+                return true;
+            }
+            return Equals(obj as Host);
+        }
+
+        public override int GetHashCode()
+        {
+            var num = -1962473570;
+            num = num * Hostname.GetHashCode();
+            num = num * Port;
+            return num;
         }
     }
 }

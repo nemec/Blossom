@@ -59,6 +59,27 @@ namespace Blossom.Deployment.Operations
         /// This string will be substituted in the response if the user
         /// does not enter in a value (or just enters whitespace).
         /// </param>
+        /// <param name="displayStream">
+        /// An optional TextWriter containing the output stream to display
+        /// prompt messages on. Defaults to Console.Out.
+        /// </param>
+        /// <param name="inputStream">
+        /// An optional TextReader containing the input stream to read
+        /// responses from. Defaults to Console.In.
+        /// </param>
+        /// <returns>
+        /// The user's response (or default value, if provided).
+        /// </returns>
+        string PromptWithNoValidation(
+            string message, string defaultResponse = null,
+            TextWriter displayStream = null, TextReader inputStream = null);
+
+        /// <summary>
+        /// Prompt the user (on the local machine) for a response.
+        /// Response passes validation if it matches the given
+        /// regular expression.
+        /// </summary>
+        /// <param name="message">Prompt message to display.</param>
         /// <param name="validateCallable">
         /// This callable will be provided with the user's output and must
         /// provide a boolean return value indicating whether or not the
@@ -66,22 +87,47 @@ namespace Blossom.Deployment.Operations
         /// If validation fails, the validationFailedMessage will be displayed
         /// and the prompt repeated until the user passes validation or
         /// presses Ctrl-C.
-        ///
-        /// If both Regex and Callable matching are provided, only the Callable
-        /// will be compared with the output.
-        /// </param>
-        /// <param name="validateRegex">
-        /// A regular expression used to validate the response.
-        /// If validation fails, the validationFailedMessage will be displayed
-        /// and the prompt repeated until the user passes validation or
-        /// presses Ctrl-C. The regular expression must match the input
-        /// *exactly* (eg. the rx will be bounded by `^` and `$` if necessary).
-        ///
-        /// If both Regex and Callable matching are provided, only the Callable
-        /// will be compared with the output.
         /// </param>
         /// <param name="validationFailedMessage">
         /// The message displayed when validation fails.
+        /// </param>
+        /// <param name="defaultResponse">
+        /// This string will be substituted in the response if the user
+        /// does not enter in a value (or just enters whitespace).
+        /// </param>
+        /// <param name="displayStream">
+        /// An optional TextWriter containing the output stream to display
+        /// prompt messages on. Defaults to Console.Out.
+        /// </param>
+        /// <param name="inputStream">
+        /// An optional TextReader containing the input stream to read
+        /// responses from. Defaults to Console.In.
+        /// </param>
+        /// <returns>
+        /// </returns>
+        string PromptWithRegexValidation(string message, string validateRegex,
+            string validationFailedMessage = "", string defaultResponse = null,
+            TextWriter displayStream = null, TextReader inputStream = null);
+
+        /// <summary>
+        /// Prompt the user (on the local machine) for a response.
+        /// Validates the response by checking the callback.
+        /// </summary>
+        /// <param name="message">Prompt message to display.</param>
+        /// <param name="validateCallable">
+        /// This callable will be provided with the user's output and must
+        /// provide a boolean return value indicating whether or not the
+        /// output passes validation.
+        /// If validation fails, the validationFailedMessage will be displayed
+        /// and the prompt repeated until the user passes validation or
+        /// presses Ctrl-C.
+        /// </param>
+        /// <param name="validationFailedMessage">
+        /// The message displayed when validation fails.
+        /// </param>
+        /// <param name="defaultResponse">
+        /// This string will be substituted in the response if the user
+        /// does not enter in a value (or just enters whitespace).
         /// </param>
         /// <param name="displayStream">
         /// An optional TextWriter containing the output stream to display
@@ -94,10 +140,8 @@ namespace Blossom.Deployment.Operations
         /// <returns>
         /// The user's response (or default value, if provided).
         /// </returns>
-        string Prompt(
-            string message, string defaultResponse = null,
-            Func<string, bool> validateCallable = null, string validateRegex = null,
-            string validationFailedMessage = "",
+        string PromptWithCallbackValidation(string message, Func<string, bool> validationCallback,
+            string validationFailedMessage = "", string defaultResponse = null,
             TextWriter displayStream = null, TextReader inputStream = null);
     }
 }

@@ -1,5 +1,4 @@
-﻿using Blossom.Deployment.Ssh;
-using ICSharpCode.SharpZipLib.Tar;
+﻿using ICSharpCode.SharpZipLib.Tar;
 using ICSharpCode.SharpZipLib.GZip;
 using Renci.SshNet.Common;
 using System;
@@ -10,6 +9,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Renci.SshNet;
 using Renci.SshNet.Sftp;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("OperationsUnitTest")]
 
 namespace Blossom.Deployment.Operations
 {
@@ -18,110 +20,17 @@ namespace Blossom.Deployment.Operations
     /// session. Most of the operations are taken directly from Fabric's API.
     /// </summary>
     /// <see cref="http://docs.fabfile.org/en/1.4.3/api/core/operations.html"/>
-    public class BasicOperations : ILocalOperations, IRemoteOperations, IDisposable
+    internal class BasicLocalOperations : ILocalOperations
     {
         private IDeploymentContext Context { get; set; }
 
-        private IShell Shell { get; set; }
+        private object _lock;
 
-        private ISftp Sftp { get; set; }
-
-        public BasicOperations(IDeploymentContext context, IShell shell, ISftp sftp)
+        internal BasicLocalOperations(IDeploymentContext context)
         {
             Context = context;
-            Sftp = sftp;
-            Sftp.Connect();
-
-            Shell = shell;
+            _lock = new object();
         }
-
-        ~BasicOperations()
-        {
-            Dispose(false);
-        }
-
-        #region IRemoteOperations Members
-
-        public Stream ShellStream { get { return Shell.Stream; } }
-        
-        public string RunCommand(string command)
-        {
-            var prefix = Context.Environment.Remote.PrefixString;
-            var fullCommand = !String.IsNullOrWhiteSpace(prefix) ?
-                prefix + " && " + command :
-                command;
-            if (Context.Environment.Remote.IsElevated)
-            {
-                return Shell.RunCommand(
-                    Context.Environment.Remote.SudoPrefix +
-                    " " +
-                    fullCommand);
-            }
-            else
-            {
-                return Shell.RunCommand(fullCommand);
-            }
-        }
-
-        public void GetFile(string sourcePath, string destinationPath, IFileTransferHandler handler)
-        {
-            Sftp.Get(sourcePath, destinationPath, handler);
-        }
-
-        public bool PutFile(string sourcePath, string destinationPath, IFileTransferHandler handler, bool ifNewer)
-        {
-            var filename = Path.GetFileName(sourcePath);
-            var source = Context.Environment.Local.CombinePath(
-                Context.Environment.Local.CurrentDirectory,
-                sourcePath);
-            var dest = Context.Environment.Remote.CombinePath(
-                Context.Environment.Remote.CurrentDirectory,
-                destinationPath);
-
-            if (Path.GetFileName(destinationPath) == "")
-            {
-                dest = Context.Environment.Remote.CombinePath(dest, filename);
-            }
-
-            return Sftp.Put(source, dest, handler, ifNewer);
-        }
-
-        public void PutFile(Stream source, string destinationPath, IFileTransferHandler handler)
-        {
-            Sftp.Put(source, destinationPath, handler);
-        }
-        
-        public void MkDir(string path, bool makeParents = false)
-        {
-            // Iteratively check whether or not each directory in the path exists
-            // and create them if they do not.
-            if (makeParents)
-            {
-                var currentPath = new StringBuilder();
-                foreach (var dir in path.Split(
-                    Context.Environment.Remote.PathSeparator.Value().ToCharArray()))
-                {
-                    currentPath.Append(dir);
-                    currentPath.Append(Context.Environment.Remote.PathSeparator.Value());
-                    var pathToCheck = currentPath.ToString();
-                    if(!Sftp.Exists(pathToCheck))
-                    {
-                        Sftp.Mkdir(pathToCheck);
-                    }
-                }
-            }
-            else
-            {
-                if(!Sftp.Exists(path))
-                {
-                    Sftp.Mkdir(path);
-                }
-            }
-        }
-
-        #endregion
-
-        #region ILocalOperations Members
 
         /// <summary>
         /// Run a command on the local machine in the current working
@@ -319,9 +228,40 @@ namespace Blossom.Deployment.Operations
             stream.CloseEntry();
         }
 
-        public virtual string Prompt(
-            string message, string defaultResponse,
-            Func<string, bool> validateCallable, string validateRegex,
+        public virtual string PromptWithNoValidation(string message, string defaultResponse = null,
+            TextWriter displayStream = null, TextReader inputStream = null)
+        {
+            return PromptWithCallbackValidation(message, (s) => true,
+                defaultResponse, null, displayStream, inputStream);
+        }
+
+        public virtual string PromptWithRegexValidation(
+            string message, string validateRegex, string defaultResponse,
+            string validationFailedMessage,
+            TextWriter displayStream, TextReader inputStream)
+        {
+            if (validateRegex != null)
+            {
+                if (!validateRegex.StartsWith("^"))
+                {
+                    validateRegex = "^" + validateRegex;
+                }
+                if (!validateRegex.EndsWith("$"))
+                {
+                    validateRegex = validateRegex + "$";
+                }
+            }
+
+            Func<string, bool> regexCallback = (response) => {
+                return Regex.IsMatch(response, validateRegex);
+            };
+
+            return PromptWithCallbackValidation(message, regexCallback, defaultResponse,
+                validationFailedMessage, displayStream, inputStream);
+        }
+
+        public virtual string PromptWithCallbackValidation(
+            string message, Func<string, bool> validationCallback, string defaultResponse,
             string validationFailedMessage,
             TextWriter displayStream, TextReader inputStream)
         {
@@ -337,85 +277,53 @@ namespace Blossom.Deployment.Operations
                 throw new ArgumentNullException("message parameter cannot be null");
             }
 
-            if (displayStream == null)
-            {
-                displayStream = Console.Out;
-            }
-            if (inputStream == null)
-            {
-                inputStream = Console.In;
-            }
-
-            if (validateRegex != null)
-            {
-                if (!validateRegex.StartsWith("^"))
-                {
-                    validateRegex = "^" + validateRegex;
-                }
-                if (!validateRegex.EndsWith("$"))
-                {
-                    validateRegex = validateRegex + "$";
-                }
-            }
-
-            displayStream.Write(message + " ");
-
-            if (defaultResponse != null)
-            {
-                displayStream.Write(String.Format("[{0}] ", defaultResponse));
-            }
+            displayStream = displayStream ?? Console.Out;
+            inputStream = inputStream ?? Console.In;
 
             string response = null;
-            switch(Context.Environment.InteractionType)
+
+            // Ensure that only one prompt is active at a time.
+            lock (_lock)
             {
-                case InteractionType.AskForInput:
-                    while (true)
-                    {
-                        response = inputStream.ReadLine();
-                        if ((validateCallable == null && validateRegex == null) ||
-                            (validateCallable != null && validateCallable(response)) ||
-                            validateRegex != null && Regex.IsMatch(response, validateRegex))
+                displayStream.Write(message + " ");
+
+                if (defaultResponse != null)
+                {
+                    displayStream.Write(String.Format("[{0}] ", defaultResponse));
+                }
+
+                switch (Context.Environment.InteractionType)
+                {
+                    case InteractionType.AskForInput:
+                        while (true)
                         {
-                            break;
+                            response = inputStream.ReadLine();
+                            if (validationCallback(response))
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                displayStream.WriteLine(validationFailedMessage ??
+                                    "Response did not pass validation. Please try again.");
+                            }
                         }
-                        else
+                        if (defaultResponse != null && String.IsNullOrWhiteSpace(response))
                         {
-                            displayStream.WriteLine(validationFailedMessage ??
-                                "Response did not pass validation. Please try again.");
+                            response = defaultResponse;
                         }
-                    }
-                    if (defaultResponse != null && String.IsNullOrWhiteSpace(response))
-                    {
+                        break;
+                    case InteractionType.UseDefaults:
                         response = defaultResponse;
-                    }
-                    break;
-                case InteractionType.UseDefaults:
-                    response = defaultResponse;
-                    break;
-                default:
-                    throw new ArgumentException(
-                        "Invalid InteractionType " + 
-                        Context.Environment.InteractionType.ToString());
+                        break;
+                    default:
+                        throw new ArgumentException(
+                            "Invalid InteractionType " +
+                            Context.Environment.InteractionType.ToString());
+                }
             }
 
             return response;
-        }
-
-        #endregion
-
-        protected virtual void Dispose(bool freeManagedObjects)
-        {
-            if (Sftp != null && Sftp.IsConnected)
-            {
-                Sftp.Disconnect();
-                Sftp = null;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

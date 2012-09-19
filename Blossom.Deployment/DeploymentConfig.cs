@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace Blossom.Deployment
 {
-    public interface IDeploymentConfig
+    public class DeploymentConfig
     {
-        List<Host> Hosts { get; set; }
+        public List<Host> Hosts { get; set; }
+        public bool DryRun { get; set; }
     }
 
-    public static class IDeploymentConfigExtensions
+    public static class DeploymentConfigExtensions
     {
-        public static void MergeFrom(this IDeploymentConfig target, IDeploymentConfig config)
+        public static void MergeFrom(this DeploymentConfig target, DeploymentConfig config)
         {
             #region Merge Hosts
 

@@ -12,5 +12,10 @@ namespace Blossom.Deployment
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class TaskAttribute : Attribute
     {
+        /// <summary>
+        /// Short description of the task. Suitable
+        /// for displaying in a help menu.
+        /// </summary>
+        public string Description { get; set; }
     }
 }

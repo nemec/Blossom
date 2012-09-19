@@ -55,10 +55,9 @@
     <Compile Include="Attributes\DeploymentAttribute.cs" />
     <Compile Include="Attributes\DeploymentCleanupAttribute.cs" />
     <Compile Include="Attributes\DeploymentInitializeAttribute.cs" />
-<<<<<<< HEAD
+    <Compile Include="Attributes\HostAttribute.cs" />
     <Compile Include="Attributes\ParallelizableAttribute.cs" />
-=======
->>>>>>> acc9ea1a8fab3eaced3e72c4b4f398f79c0aef29
+    <Compile Include="Attributes\RoleAttribute.cs" />
     <Compile Include="CompressionScheme.cs" />
     <Compile Include="ContextManagers\Cd.cs" />
     <Compile Include="ContextManagers\ContextManager.cs" />
@@ -67,6 +66,8 @@
     <Compile Include="ContextManagers\Sudo.cs" />
     <Compile Include="DependencyResolver.cs" />
     <Compile Include="DeploymentContext.cs" />
+    <Compile Include="Invokable.cs" />
+    <Compile Include="Managers\DeploymentManager.cs" />
     <Compile Include="Env.cs" />
     <Compile Include="Environments\BaseEnvironment.cs" />
     <Compile Include="Environments\EnvironmentFinder.cs" />
@@ -78,22 +79,25 @@
     <Compile Include="Exceptions\TaskDependencyException.cs" />
     <Compile Include="Exceptions\UnknownTaskException.cs" />
     <Compile Include="Host.cs" />
-    <Compile Include="IDeploymentConfig.cs" />
+    <Compile Include="DeploymentConfig.cs" />
     <Compile Include="IDeploymentContext.cs" />
+    <Compile Include="Managers\ExecutionPlan.cs" />
+    <Compile Include="Managers\ExecutionPlanner.cs" />
+    <Compile Include="Managers\IDeploymentManager.cs" />
     <Compile Include="Logging\NullLogger.cs" />
+    <Compile Include="Operations\BasicRemoteOperations.cs" />
+    <Compile Include="Operations\DryRunLocalOperations.cs" />
+    <Compile Include="Operations\DryRunRemoteOperations.cs" />
     <Compile Include="Operations\ILocalOperations.cs" />
     <Compile Include="InteractionType.cs" />
     <Compile Include="Operations\IRemoteOperations.cs" />
     <Compile Include="Logging\SimpleConsoleLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
-    <Compile Include="Operations\BasicOperations.cs" />
-    <Compile Include="PathSeparator.cs" />
+    <Compile Include="Operations\BasicLocalOperations.cs" />
+    <Compile Include="Operations\LoopbackRemoteOperations.cs" />
+    <Compile Include="PathSeparatorExtension.cs" />
     <Compile Include="Exceptions\NonInteractiveSessionException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Ssh\ISftp.cs" />
-    <Compile Include="Ssh\IShell.cs" />
-    <Compile Include="Ssh\SftpWrapper.cs" />
-    <Compile Include="Ssh\ShellWrapper.cs" />
     <Compile Include="Attributes\TaskAttribute.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="AutoResponse.cs" />

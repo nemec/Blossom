@@ -56,16 +56,16 @@ namespace Blossom.Scripting
             return Assembly.Load(assemblyBytes);
         }
 
-        public static IDeploymentConfig GetDeploymentConfigFromAssembly(Assembly assembly)
+        public static DeploymentConfig GetDeploymentConfigFromAssembly(Assembly assembly)
         {
             var implementation = assembly.GetTypes().Where(t => 
-                typeof(IDeploymentConfig).IsAssignableFrom(t)).FirstOrDefault();
+                typeof(DeploymentConfig).IsAssignableFrom(t)).FirstOrDefault();
             var constructor = implementation.GetConstructor(Type.EmptyTypes);
             if (constructor == null)
             {
                 Console.Error.WriteLine("Could not find empty constructor for IDeploymentConfig implementation in config file.");
             }
-            return (IDeploymentConfig)constructor.Invoke(null);
+            return (DeploymentConfig)constructor.Invoke(null);
         }
 
         /// <summary>

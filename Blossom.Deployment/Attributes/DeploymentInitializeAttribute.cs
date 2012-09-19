@@ -17,7 +17,7 @@ namespace Blossom.Deployment
     /// run in an undefined order.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class DeploymentInitializeAttribute : Attribute
+    public sealed class DeploymentInitializeAttribute : Attribute
     {
     }
 }

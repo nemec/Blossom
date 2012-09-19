@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentUnitTest", "Deplo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{62A17F76-DD0B-46BF-9B43-6BEDC8F89F21}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blossom.Examples.Compression", "Blossom.Examples.Compression\Blossom.Examples.Compression.csproj", "{AC42D67F-2040-4C1B-9BA3-8E467AAFBF1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,13 +56,18 @@ Global
 		{451635AB-53F1-4DE7-9A9B-D3287FAD0B3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{451635AB-53F1-4DE7-9A9B-D3287FAD0B3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{451635AB-53F1-4DE7-9A9B-D3287FAD0B3F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC42D67F-2040-4C1B-9BA3-8E467AAFBF1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC42D67F-2040-4C1B-9BA3-8E467AAFBF1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC42D67F-2040-4C1B-9BA3-8E467AAFBF1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC42D67F-2040-4C1B-9BA3-8E467AAFBF1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{07B73B7B-B9ED-4148-97A7-0535D9AD44FE} = {62A17F76-DD0B-46BF-9B43-6BEDC8F89F21}
+		{AC42D67F-2040-4C1B-9BA3-8E467AAFBF1D} = {62A17F76-DD0B-46BF-9B43-6BEDC8F89F21}
 		{17BC9C5B-4F06-4CAB-BC1A-28D94355A662} = {477DFD5C-3F16-4024-B4D3-6B7DCBBAA96F}
 		{451635AB-53F1-4DE7-9A9B-D3287FAD0B3F} = {477DFD5C-3F16-4024-B4D3-6B7DCBBAA96F}
-		{07B73B7B-B9ED-4148-97A7-0535D9AD44FE} = {62A17F76-DD0B-46BF-9B43-6BEDC8F89F21}
 	EndGlobalSection
 EndGlobal

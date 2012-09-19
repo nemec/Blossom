@@ -123,10 +123,15 @@ namespace DeploymentUnitTest
 
     public static class TestExtensions
     {
-        public static IEnumerable<MethodInfo> GetTasks(this object taskBlock)
+        public static IEnumerable<Invokable> GetTasks(this object taskBlock)
         {
             return taskBlock.GetType().GetMethods().
-                Where(t => t.GetCustomAttribute<TaskAttribute>() != null);
+                Where(t => t.GetCustomAttribute<TaskAttribute>() != null).Select(
+                    m => new Invokable
+                    {
+                        Base = taskBlock,
+                        Method = m
+                    });
         }
     }
 
