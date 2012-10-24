@@ -1,9 +1,28 @@
 ﻿using System;
+using Blossom.Deployment.Exceptions;
 
 namespace Blossom.Deployment.Logging
 {
     public interface ILogger
     {
+        /// <summary>
+        /// Allow access to the IDeploymentContext during logging.
+        /// </summary>
+        IDeploymentContext Context { get; set; }
+
+        /// <summary>
+        /// Define the minimum log level that should be recorded.
+        /// All logging to levels less than the given is ignored.
+        /// </summary>
+        LogLevel DisplayLogLevel { get; set; }
+
+        /// <summary>
+        /// Define the minimum log level to abort execution.
+        /// Attempts to log at this level or above should
+        /// throw an <exception cref="AbortExecutionException"></exception>
+        /// </summary>
+        LogLevel AbortLogLevel { get; set; }
+
         /// <summary>
         /// Display text in a ticker at the bottom
         /// of the logging interface. If there is no

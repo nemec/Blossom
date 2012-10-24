@@ -8,6 +8,9 @@ namespace Blossom.Deployment.Logging
 {
     public class NullLogger : ILogger
     {
+
+        public IDeploymentContext Context { get; set; }
+
         public void Tick(string message)
         {
         }

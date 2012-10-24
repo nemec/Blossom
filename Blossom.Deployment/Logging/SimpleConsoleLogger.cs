@@ -1,4 +1,5 @@
 ﻿using System;
+using Blossom.Deployment.Exceptions;
 
 namespace Blossom.Deployment.Logging
 {
@@ -8,37 +9,44 @@ namespace Blossom.Deployment.Logging
     /// </summary>
     public class SimpleConsoleLogger : ILogger
     {
-        private object _lock;
+        private readonly object _lock;
+
+        public IDeploymentContext Context { get; set; }
+
+        public LogLevel DisplayLogLevel { get; set; }
+
+        public LogLevel AbortLogLevel { get; set; }
 
         public SimpleConsoleLogger()
         {
             _lock = new object();
         }
 
-        private void PrintException(Exception exception)
+        private bool CheckLevel(LogLevel level)
+        {
+            if(AbortLogLevel <= level)
+            {
+                throw new AbortExecutionException();
+            }
+            return DisplayLogLevel <= level;
+        }
+
+        private static void PrintException(Exception exception)
         {
             if (exception != null)
             {
-                lock (_lock)
-                {
-                    Console.Error.WriteLine("\t" + exception.Message);
-                }
+                Console.Error.WriteLine("\t" + exception.Message);
             }
         }
 
         public void Tick(string message)
         {
-            int currentCol = Console.CursorLeft;
-            int currentLine = Console.CursorTop;
+            var currentCol = Console.CursorLeft;
+            var currentLine = Console.CursorTop;
 
-            if (message.Length > Console.WindowWidth - 1)
-            {
-                message = message.Substring(0, Math.Min(message.Length, Console.WindowWidth - 1));
-            }
-            else
-            {
-                message = message.PadRight(Console.WindowWidth - 1);
-            }
+            message = message.Length > Console.WindowWidth - 1 ?
+                message.Substring(0, Math.Min(message.Length, Console.WindowWidth - 1)) :
+                message.PadRight(Console.WindowWidth - 1);
 
             lock (_lock)
             {
@@ -50,8 +58,8 @@ namespace Blossom.Deployment.Logging
 
         public void ClearTicker()
         {
-            int currentCol = Console.CursorLeft;
-            int currentLine = Console.CursorTop;
+            var currentCol = Console.CursorLeft;
+            var currentLine = Console.CursorTop;
 
             lock (_lock)
             {
@@ -65,6 +73,8 @@ namespace Blossom.Deployment.Logging
         {
             lock (_lock)
             {
+                if (!CheckLevel(LogLevel.Debug)) return;
+
                 Console.WriteLine("Debug: " + message);
                 PrintException(exception);
             }
@@ -74,7 +84,9 @@ namespace Blossom.Deployment.Logging
         {
             lock (_lock)
             {
-                Info(message, exception);
+                if (!CheckLevel(LogLevel.Verbose)) return;
+
+                Console.WriteLine("Verbose: " + message);
                 PrintException(exception);
             }
         }
@@ -83,6 +95,8 @@ namespace Blossom.Deployment.Logging
         {
             lock (_lock)
             {
+                if (!CheckLevel(LogLevel.Info)) return;
+
                 Console.WriteLine("Info: " + message);
                 PrintException(exception);
             }
@@ -92,6 +106,8 @@ namespace Blossom.Deployment.Logging
         {
             lock (_lock)
             {
+                if (!CheckLevel(LogLevel.Warn)) return;
+
                 Console.WriteLine("Warn: " + message);
                 PrintException(exception);
             }
@@ -100,6 +116,8 @@ namespace Blossom.Deployment.Logging
         {
             lock (_lock)
             {
+                if (!CheckLevel(LogLevel.Error)) return;
+
                 Console.WriteLine("Error: " + message);
                 PrintException(exception);
             }
@@ -109,6 +127,8 @@ namespace Blossom.Deployment.Logging
         {
             lock (_lock)
             {
+                if (!CheckLevel(LogLevel.Fatal)) return;
+
                 Console.WriteLine("Fatal: " + message);
                 PrintException(exception);
             }
