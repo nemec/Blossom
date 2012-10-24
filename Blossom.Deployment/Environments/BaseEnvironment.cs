@@ -23,12 +23,12 @@ namespace Blossom.Deployment.Environments
 
         public abstract string ExpandUser(string path, string username);
 
-        public BaseEnvironment()
+        protected BaseEnvironment()
             : this(null)
         {
         }
 
-        public BaseEnvironment(string initialDirectory)
+        protected BaseEnvironment(string initialDirectory)
         {
             Directories = new Stack<string>();
             Prefixes = new Stack<string>();

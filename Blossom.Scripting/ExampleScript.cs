@@ -1,35 +1,38 @@
-﻿using System;
-using Blossom.Deployment;
+﻿using Blossom.Deployment;
 using System.Collections.Generic;
+using Blossom.Deployment.Attributes;
 
-public class CustomDeploymentConfig : DeploymentConfig
+namespace Blossom.Scripting
 {
-    private List<Host> _hosts = new List<Host>
+    public class CustomDeploymentConfig : DeploymentConfig
     {
-        new Host
-        {
-            Hostname = "192.168.1.1",
-            Username = "username",
-            Password = "password"
-        }
-    };
+        private List<Host> _hosts = new List<Host>
+            {
+                new Host
+                    {
+                        Hostname = "192.168.1.1",
+                        Username = "username",
+                        Password = "password"
+                    }
+            };
 
-    public List<Host> Hosts
-    {
-        get { return _hosts; }
-        set { _hosts = value; }
+        public override List<Host> Hosts
+        {
+            get { return _hosts; }
+            set { _hosts = value; }
+        }
+
+
+        public override bool DryRun { get; set; }
     }
 
-
-    public bool DryRun { get; set; }
-}
-
-[Deployment]
-public class Test
-{
-    [Task]
-    public void Run(IDeploymentContext context)
+    [Deployment]
+    public class Test
     {
-        context.Logger.Info(context.RemoteOps.RunCommand("ls"));
+        [Task]
+        public void Run(IDeploymentContext context)
+        {
+            context.Logger.Info(context.RemoteOps.RunCommand("ls"));
+        }
     }
 }

@@ -14,16 +14,16 @@ namespace Blossom.Examples.PushFiles
 
         private int ElapsedTime { get; set; }
 
-        private System.Timers.Timer Timer;
+        private readonly System.Timers.Timer _timer;
         
         public FileTransferHandler(ILogger logger, string filename)
         {
             Filename = filename;
             Logger = logger;
 
-            Timer = new System.Timers.Timer(1000);
-            Timer.Elapsed += TimerElapsed;
-            Timer.Start();
+            _timer = new System.Timers.Timer(1000);
+            _timer.Elapsed += TimerElapsed;
+            _timer.Start();
         }
 
         ~FileTransferHandler()
@@ -40,8 +40,8 @@ namespace Blossom.Examples.PushFiles
 
         public void TransferCompleted()
         {
-            Timer.Stop();
-            Timer.Dispose();
+            _timer.Stop();
+            _timer.Dispose();
             Logger.Info(String.Format("Completed {0}...... {1} [{2}s]",
                 Filename, HumanizeBytes(BytesTransferred), ElapsedTime));
             Logger.ClearTicker();
@@ -55,8 +55,8 @@ namespace Blossom.Examples.PushFiles
         private static string HumanizeBytes(ulong bytes)
         {
             double tmpbytes = bytes;
-            int byteRadix = 1000;
-            foreach (var suffix in new string[] { "B", "kB", "MB", "GB", "TB" })
+            const int byteRadix = 1000;
+            foreach (var suffix in new[] { "B", "kB", "MB", "GB", "TB" })
             {
                 if (tmpbytes < byteRadix)
                 {
@@ -77,7 +77,7 @@ namespace Blossom.Examples.PushFiles
         {
             if (disposeManaged)
             {
-                Timer.Dispose();
+                _timer.Dispose();
             }
         }
     }

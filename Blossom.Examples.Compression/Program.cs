@@ -1,11 +1,7 @@
 ﻿using Blossom.Deployment;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using Blossom.Deployment.Manager;
 
 namespace Blossom.Examples.Compression
 {
@@ -22,10 +18,11 @@ namespace Blossom.Examples.Compression
             };
 
             IDeploymentContext deployment = new DeploymentContext(
-                    deploymentConfig, new Blossom.Deployment.Environments.Linux());
-
+                    deploymentConfig, new Deployment.Environments.Linux());
+            
             var taskBlock = new Tasks(deployment, config);
-            //deployment.BeginDeployment(taskBlock);
+            var manager = new DeploymentManager(deploymentConfig, taskBlock);
+            manager.BeginDeployments();
         }
     }
 }

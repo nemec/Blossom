@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Blossom.Deployment
+namespace Blossom.Deployment.Attributes
 {
     /// <summary>
     /// Indicates to the deployment code which classes
@@ -12,8 +8,7 @@ namespace Blossom.Deployment
     /// 
     /// Usually ignored, but may be useful in cases where
     /// an assembly must be searched dynamically for
-    /// classes containing tasks
-    /// (see <seealso cref="Blossom.Scripting"/>).
+    /// classes containing tasks.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class DeploymentAttribute : Attribute

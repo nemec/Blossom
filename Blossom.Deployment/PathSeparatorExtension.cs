@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 
 namespace Blossom.Deployment
 {
@@ -18,17 +17,17 @@ namespace Blossom.Deployment
         public static string Value(this PathSeparator value)
         {
             // Get the type
-            Type type = value.GetType();
+            var type = value.GetType();
 
             // Get fieldinfo for this type
-            FieldInfo fieldInfo = type.GetField(value.ToString());
+            var fieldInfo = type.GetField(value.ToString());
 
             // Get the stringvalue attributes
-            StringValueAttribute[] attribs = fieldInfo.GetCustomAttributes(
+            var attribs = fieldInfo.GetCustomAttributes(
                 typeof(StringValueAttribute), false) as StringValueAttribute[];
 
             // Return the first if there was a match.
-            return attribs.Length > 0 ? attribs[0].Value : null;
+            return (attribs != null && attribs.Length > 0) ? attribs[0].Value : null;
         }
     }
 

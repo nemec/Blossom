@@ -1,10 +1,6 @@
 ﻿using CommandLine;
 using CommandLine.Text;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blossom.Examples.PushFiles
 {
@@ -16,10 +12,6 @@ namespace Blossom.Examples.PushFiles
 
     internal class CommandLineOptions : CommandLineOptionsBase
     {
-        [Option(null, "config", Required = true, 
-            HelpText = "Deployment config file.")]
-        public string ConfigFile { get; set; }
-
         [Option("e", "env", 
             DefaultValue = EnvironmentType.Linux, 
             HelpText = "Environment (Linux|Windows)")]
@@ -42,6 +34,9 @@ namespace Blossom.Examples.PushFiles
             HelpText = "Print the current version and exit.")]
         public bool PrintVersion { get; set; }
 
+        [ValueList(typeof(List<string>), MaximumElements = 1)]
+        public IList<string> ConfigFileList { get; set; }
+        
         [HelpOption]
         public string GetUsage()
         {

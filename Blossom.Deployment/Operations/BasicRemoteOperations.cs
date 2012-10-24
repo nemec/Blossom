@@ -2,18 +2,15 @@
 using Renci.SshNet.Common;
 using Renci.SshNet.Sftp;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 
 [assembly: InternalsVisibleTo("OperationsUnitTest")]
 
 namespace Blossom.Deployment.Operations
 {
-    internal class BasicRemoteOperations : IRemoteOperations, IDisposable
+    internal class BasicRemoteOperations : IRemoteOperations
     {
         private IDeploymentContext Context { get; set; }
 
@@ -27,10 +24,12 @@ namespace Blossom.Deployment.Operations
         {
             Context = context;
 
-            Sftp = new SftpClient(host.Hostname, host.Username, host.Password);
-            Sftp.OperationTimeout = TimeSpan.FromMinutes(2);
-            Sftp.ConnectionInfo.Timeout = TimeSpan.FromMinutes(2);
-            Sftp.BufferSize = 1024 * 16;
+            Sftp = new SftpClient(host.Hostname, host.Username, host.Password)
+                {
+                    OperationTimeout = TimeSpan.FromMinutes(2),
+                    ConnectionInfo = {Timeout = TimeSpan.FromMinutes(2)},
+                    BufferSize = 1024*16
+                };
             Sftp.Connect();
 
             Shell = new SshClient(host.Hostname, host.Username, host.Password);
@@ -56,10 +55,8 @@ namespace Blossom.Deployment.Operations
                     Context.Environment.Remote.SudoPrefix,
                     fullCommand)).Result;
             }
-            else
-            {
-                return Shell.RunCommand(fullCommand).Result;
-            }
+            
+            return Shell.RunCommand(fullCommand).Result;
         }
 
         public bool GetFile(string sourcePath, string destinationPath, IFileTransferHandler handler, bool ifNewer)
@@ -84,6 +81,10 @@ namespace Blossom.Deployment.Operations
 
         public bool PutFile(string sourcePath, string destinationPath, IFileTransferHandler handler, bool ifNewer)
         {
+            if(!File.Exists(sourcePath))
+            {
+                Context.Logger.Error(String.Format("File {0} does not exist.", sourcePath));
+            }
             var filename = Path.GetFileName(sourcePath);
             var source = Context.Environment.Local.CombinePath(
                 Context.Environment.Local.CurrentDirectory,

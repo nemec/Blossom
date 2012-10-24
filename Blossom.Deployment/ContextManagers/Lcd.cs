@@ -4,27 +4,27 @@ namespace Blossom.Deployment.ContextManagers
 {
     public class Lcd : ContextManager
     {
-        private readonly string NewPath;
+        private readonly string _newPath;
 
         public Lcd(IDeploymentContext context, string path)
             : base(context)
         {
-            NewPath = path;
+            _newPath = path;
             Begin();
         }
 
         protected override void Enter()
         {
-            if (NewPath != null)
+            if (_newPath != null)
             {
                 Context.Environment.Local.Pushd(
-                    Path.Combine(Context.Environment.Local.CurrentDirectory, NewPath));
+                    Path.Combine(Context.Environment.Local.CurrentDirectory, _newPath));
             }
         }
 
         protected override void Exit()
         {
-            if (NewPath != null)
+            if (_newPath != null)
             {
                 Context.Environment.Local.Popd();
             }

@@ -66,8 +66,10 @@
     <Compile Include="ContextManagers\Sudo.cs" />
     <Compile Include="DependencyResolver.cs" />
     <Compile Include="DeploymentContext.cs" />
+    <Compile Include="Exceptions\AbortExecutionException.cs" />
     <Compile Include="Invokable.cs" />
-    <Compile Include="Managers\DeploymentManager.cs" />
+    <Compile Include="Logging\LogLevel.cs" />
+    <Compile Include="Manager\DeploymentManager.cs" />
     <Compile Include="Env.cs" />
     <Compile Include="Environments\BaseEnvironment.cs" />
     <Compile Include="Environments\EnvironmentFinder.cs" />
@@ -81,9 +83,9 @@
     <Compile Include="Host.cs" />
     <Compile Include="DeploymentConfig.cs" />
     <Compile Include="IDeploymentContext.cs" />
-    <Compile Include="Managers\ExecutionPlan.cs" />
-    <Compile Include="Managers\ExecutionPlanner.cs" />
-    <Compile Include="Managers\IDeploymentManager.cs" />
+    <Compile Include="Manager\ExecutionPlan.cs" />
+    <Compile Include="Manager\ExecutionPlanner.cs" />
+    <Compile Include="Manager\IDeploymentManager.cs" />
     <Compile Include="Logging\NullLogger.cs" />
     <Compile Include="Operations\BasicRemoteOperations.cs" />
     <Compile Include="Operations\DryRunLocalOperations.cs" />

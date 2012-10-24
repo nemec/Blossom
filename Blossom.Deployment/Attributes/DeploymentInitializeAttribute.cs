@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Blossom.Deployment
+namespace Blossom.Deployment.Attributes
 {
     /// <summary>
     /// Code to run before any task is run.

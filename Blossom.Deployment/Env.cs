@@ -31,7 +31,7 @@ namespace Blossom.Deployment
             : this(new Windows()) { }
 
         public Env(IEnvironment remote)
-            : this(remote, Environments.EnvironmentFinder.AutoDetermineLocalEnvironment(
+            : this(remote, EnvironmentFinder.AutoDetermineLocalEnvironment(
                 AppDomain.CurrentDomain.BaseDirectory)) { }
 
         public Env(IEnvironment remote, IEnvironment local)

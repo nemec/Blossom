@@ -1,12 +1,9 @@
-﻿using Blossom.Deployment.Dependencies;
-using System;
+﻿using Blossom.Deployment.Attributes;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Blossom.Deployment
+namespace Blossom.Deployment.Manager
 {
     internal static class ExecutionPlanner
     {
@@ -57,23 +54,11 @@ namespace Blossom.Deployment
                 var hostAttrs = task.Method.GetCustomAttributes<HostAttribute>().Select(h => h.Host).Distinct();
                 var roleAttrs = task.Method.GetCustomAttributes<RoleAttribute>().Select(r => r.Role).Distinct();
 
-                if (hostAttrs.Contains(host.Hostname) || hostAttrs.Contains(host.Alias))
+                if (hostAttrs.Contains(host.Hostname) || hostAttrs.Contains(host.Alias) ||
+                    roleAttrs.Any(roles.Contains))
                 {
                     tasksForHost.Add(task);
-                    continue;
-                }
-                foreach (var role in roleAttrs)
-                {
-                    if (roles.Contains(role))
-                    {
-                        tasksForHost.Add(task);
-                        continue;  // Only add the task once per host
-                    }
-                }
-                if (!hostAttrs.Any() && !roleAttrs.Any())
-                {
-                    tasksForHost.Add(task);
-                    continue;
+                    break;
                 }
             }
             var resolver = new DependencyResolver(tasksForHost, tasks);

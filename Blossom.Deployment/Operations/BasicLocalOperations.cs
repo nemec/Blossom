@@ -1,14 +1,10 @@
-﻿using ICSharpCode.SharpZipLib.Tar;
+﻿using Blossom.Deployment.Exceptions;
+using ICSharpCode.SharpZipLib.Tar;
 using ICSharpCode.SharpZipLib.GZip;
-using Renci.SshNet.Common;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Text.RegularExpressions;
-using Renci.SshNet;
-using Renci.SshNet.Sftp;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("OperationsUnitTest")]
@@ -24,7 +20,7 @@ namespace Blossom.Deployment.Operations
     {
         private IDeploymentContext Context { get; set; }
 
-        private object _lock;
+        private readonly object _lock;
 
         internal BasicLocalOperations(IDeploymentContext context)
         {
@@ -56,7 +52,7 @@ namespace Blossom.Deployment.Operations
         /// <returns>Output of the command.</returns>
         public string RunLocal(string command, int timeout)
         {
-            ProcessStartInfo startInfo = new ProcessStartInfo(Context.Environment.Local.ShellCommand)
+            var startInfo = new ProcessStartInfo(Context.Environment.Local.ShellCommand)
             {
                 Arguments = String.Format(@"{0} ""{1}""",
                     Context.Environment.Local.ShellStartArguments,
@@ -84,21 +80,20 @@ namespace Blossom.Deployment.Operations
 
             if (process.ExitCode != 0)
             {
-                // TODO display error message
+                Context.Logger.Error(String.Format(
+                    "Process executed with nonzero error code [{0}]: {1}",
+                    process.ExitCode, errorText));
             }
 
             if (String.IsNullOrWhiteSpace(errorText))
             {
                 return outputText;
             }
-            else if (String.IsNullOrEmpty(outputText))
+            if (String.IsNullOrEmpty(outputText))
             {
                 return errorText;
             }
-            else
-            {
-                return String.Format("{0}\n{1}", outputText, errorText);
-            }
+            return String.Format("{0}\n{1}", outputText, errorText);
         }
 
         public void CompressFiles(string destination, params string[] sources)
@@ -111,14 +106,11 @@ namespace Blossom.Deployment.Operations
             Stream filestream = null;
             try
             {
-                if (overwriteDestination)
-                {
-                    filestream = File.Open(destination, FileMode.Truncate, FileAccess.Write);
-                }
-                else
-                {
-                    filestream = File.Open(destination, FileMode.CreateNew, FileAccess.Write);
-                }
+                filestream = File.Open(destination,
+                    overwriteDestination ?
+                        FileMode.Truncate :
+                        FileMode.CreateNew,
+                    FileAccess.Write);
                 CompressFiles(filestream, sources);
             }
             finally
@@ -180,7 +172,7 @@ namespace Blossom.Deployment.Operations
             else
             {
                 throw new NotImplementedException(String.Format(
-                    "Compression Scheme {0} not yet implemented.", scheme.ToString()));
+                    "Compression Scheme {0} not yet implemented.", scheme));
             }
         }
 
@@ -191,26 +183,25 @@ namespace Blossom.Deployment.Operations
                 return;
             }
 
-            if (Directory.Exists(source))
-            {
-                subdir = subdir ?? "";
-                foreach (var subfile in Directory.EnumerateFiles(source))
-                {
-                    TarFile(
-                        stream,
-                        Context.Environment.Local.CombinePath(subdir, Path.GetFileName(source)),
-                        subfile);
-                }
-                foreach(var dir in Directory.EnumerateDirectories(source)){
-                    string dirpath = Context.Environment.Local.CombinePath(
-                        subdir,
-                        Directory.GetParent(dir).Name);
-                    RecursiveTarDir(stream, dirpath, dir, depth > 0 ? depth - 1 : depth);
-                }
-            }
-            else
+            if (!Directory.Exists(source))
             {
                 throw new IOException("Could not find path " + source);
+            }
+
+            subdir = subdir ?? "";
+            foreach (var subfile in Directory.EnumerateFiles(source))
+            {
+                TarFile(
+                    stream,
+                    Context.Environment.Local.CombinePath(subdir, Path.GetFileName(source)),
+                    subfile);
+            }
+            foreach (var dir in Directory.EnumerateDirectories(source))
+            {
+                var dirpath = Context.Environment.Local.CombinePath(
+                    subdir,
+                    Directory.GetParent(dir).Name);
+                RecursiveTarDir(stream, dirpath, dir, depth > 0 ? depth - 1 : depth);
             }
         }
 
@@ -231,7 +222,7 @@ namespace Blossom.Deployment.Operations
         public virtual string PromptWithNoValidation(string message, string defaultResponse = null,
             TextWriter displayStream = null, TextReader inputStream = null)
         {
-            return PromptWithCallbackValidation(message, (s) => true,
+            return PromptWithCallbackValidation(message, s => true,
                 defaultResponse, null, displayStream, inputStream);
         }
 
@@ -252,9 +243,8 @@ namespace Blossom.Deployment.Operations
                 }
             }
 
-            Func<string, bool> regexCallback = (response) => {
-                return Regex.IsMatch(response, validateRegex);
-            };
+            Func<string, bool> regexCallback = (response =>
+                Regex.IsMatch(response, validateRegex ?? ""));
 
             return PromptWithCallbackValidation(message, regexCallback, defaultResponse,
                 validationFailedMessage, displayStream, inputStream);
@@ -274,13 +264,13 @@ namespace Blossom.Deployment.Operations
 
             if (message == null)
             {
-                throw new ArgumentNullException("message parameter cannot be null");
+                throw new ArgumentException("Message parameter cannot be null");
             }
 
             displayStream = displayStream ?? Console.Out;
             inputStream = inputStream ?? Console.In;
 
-            string response = null;
+            string response;
 
             // Ensure that only one prompt is active at a time.
             lock (_lock)
@@ -289,7 +279,7 @@ namespace Blossom.Deployment.Operations
 
                 if (defaultResponse != null)
                 {
-                    displayStream.Write(String.Format("[{0}] ", defaultResponse));
+                    displayStream.Write("[{0}] ", defaultResponse);
                 }
 
                 switch (Context.Environment.InteractionType)
@@ -302,11 +292,9 @@ namespace Blossom.Deployment.Operations
                             {
                                 break;
                             }
-                            else
-                            {
-                                displayStream.WriteLine(validationFailedMessage ??
-                                    "Response did not pass validation. Please try again.");
-                            }
+
+                            displayStream.WriteLine(validationFailedMessage ??
+                                "Response did not pass validation. Please try again.");
                         }
                         if (defaultResponse != null && String.IsNullOrWhiteSpace(response))
                         {

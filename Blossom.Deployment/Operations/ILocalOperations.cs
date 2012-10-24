@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blossom.Deployment.Operations
 {
@@ -80,7 +76,7 @@ namespace Blossom.Deployment.Operations
         /// regular expression.
         /// </summary>
         /// <param name="message">Prompt message to display.</param>
-        /// <param name="validateCallable">
+        /// <param name="validateRegex">
         /// This callable will be provided with the user's output and must
         /// provide a boolean return value indicating whether or not the
         /// output passes validation.
@@ -114,7 +110,7 @@ namespace Blossom.Deployment.Operations
         /// Validates the response by checking the callback.
         /// </summary>
         /// <param name="message">Prompt message to display.</param>
-        /// <param name="validateCallable">
+        /// <param name="validationCallback">
         /// This callable will be provided with the user's output and must
         /// provide a boolean return value indicating whether or not the
         /// output passes validation.

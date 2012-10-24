@@ -20,6 +20,7 @@ namespace Blossom.Deployment.Logging
         public SimpleConsoleLogger()
         {
             _lock = new object();
+            AbortLogLevel = LogLevel.Fatal;
         }
 
         private bool CheckLevel(LogLevel level)
@@ -131,6 +132,19 @@ namespace Blossom.Deployment.Logging
 
                 Console.WriteLine("Fatal: " + message);
                 PrintException(exception);
+            }
+        }
+
+        public void Abort(string message, Exception exception)
+        {
+            lock(_lock)
+            {
+                Console.Error.WriteLine("Abort: {0}", message);
+                if(exception is AbortExecutionException)
+                {
+                    throw exception;
+                }
+                throw new AbortExecutionException(message, exception);
             }
         }
     }

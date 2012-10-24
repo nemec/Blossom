@@ -1,4 +1,5 @@
 ﻿using System;
+using Blossom.Deployment.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StructureMap.AutoMocking;
 using Blossom.Deployment;
@@ -31,11 +32,10 @@ namespace OperationsUnitTest
             {
                 InteractionType = InteractionType.NonInteractive
             });
-            var host = new Host();
 
             // Act
             ILocalOperations operations = new BasicLocalOperations(MockContext);
-            var response = operations.PromptWithNoValidation("What?");
+            operations.PromptWithNoValidation("What?");
         }
 
         [TestMethod]
@@ -46,8 +46,7 @@ namespace OperationsUnitTest
             {
                 InteractionType = InteractionType.AskForInput
             });
-            var sampleResponse = "Response.";
-            var host = new Host();
+            const string sampleResponse = "Response.";
             var input = new StringReader(sampleResponse + "\n");
 
             // Act
@@ -66,15 +65,14 @@ namespace OperationsUnitTest
             {
                 InteractionType = InteractionType.AskForInput
             });
-            var normalInput = "Response.";
-            var defaultResponse = "Default.";
-            var host = new Host();
+            const string normalInput = "Response.";
+            const string defaultResponse = "Default.";
             var input = new StringReader(normalInput + "\n");
 
             // Act
             ILocalOperations operations = new BasicLocalOperations(MockContext);
             var response = operations.PromptWithNoValidation("What?", 
-                defaultResponse:defaultResponse, inputStream: input);
+                defaultResponse, inputStream: input);
 
             // Assert
             Assert.AreEqual(normalInput, response);
@@ -94,13 +92,11 @@ namespace OperationsUnitTest
             {
                 InteractionType = InteractionType.UseDefaults
             });
-            var defaultResponse = "Default.";
-            var host = new Host();
+            const string defaultResponse = "Default.";
 
             // Act
             ILocalOperations operations = new BasicLocalOperations(MockContext);
-            var response = operations.PromptWithNoValidation("What?",
-                defaultResponse: defaultResponse);
+            var response = operations.PromptWithNoValidation("What?", defaultResponse);
 
             // Assert
             Assert.AreEqual(defaultResponse, response);
@@ -115,11 +111,10 @@ namespace OperationsUnitTest
             {
                 InteractionType = InteractionType.UseDefaults
             });
-            var host = new Host();
 
             // Act
             ILocalOperations operations = new BasicLocalOperations(MockContext);
-            var response = operations.PromptWithNoValidation("What?");
+            operations.PromptWithNoValidation("What?");
         }
 
         [TestMethod]
@@ -130,13 +125,12 @@ namespace OperationsUnitTest
             {
                 InteractionType = InteractionType.AskForInput
             });
-            var validText = "welcome";
+            const string validText = "welcome";
             var input = new StringBuilder();
             input.AppendLine("invalid input");
             input.AppendLine(validText);
 
-            Func<string, bool> validationCallback = (resp) => resp == validText;
-            var host = new Host();
+            Func<string, bool> validationCallback = (resp => resp == validText);
 
             // Act
             ILocalOperations operations = new BasicLocalOperations(MockContext);
@@ -155,13 +149,12 @@ namespace OperationsUnitTest
             {
                 InteractionType = InteractionType.AskForInput
             });
-            var validText = "92389";
+            const string validText = "92389";
             var input = new StringBuilder();
             input.AppendLine("invalid input");
             input.AppendLine(validText);
 
-            var validationRegex = @"\d+";
-            var host = new Host();
+            const string validationRegex = @"\d+";
 
             // Act
             ILocalOperations operations = new BasicLocalOperations(MockContext);
@@ -180,14 +173,13 @@ namespace OperationsUnitTest
             {
                 InteractionType = InteractionType.AskForInput
             });
-            var validText = "92389";
+            const string validText = "92389";
             var input = new StringBuilder();
             input.AppendLine("invalid input");
             input.AppendLine(validText);
             input.AppendLine("more text");
 
-            var validationRegex = @"\d+";
-            var host = new Host();
+            const string validationRegex = @"\d+";
 
             // Act
             ILocalOperations operations = new BasicLocalOperations(MockContext);

@@ -6,7 +6,6 @@ namespace Blossom.Deployment.Environments
     {
         internal static IEnvironment AutoDetermineLocalEnvironment(string initialDirectory = null)
         {
-            var os = Environment.OSVersion;
             switch (Environment.OSVersion.Platform)
             {
                 case PlatformID.Unix:

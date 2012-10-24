@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 
@@ -55,16 +54,12 @@ namespace Blossom.Deployment
         public bool Equals(Host other)
         {
             return other != null &&
-                this.Hostname == other.Hostname &&
-                this.Port == other.Port;
+                Hostname == other.Hostname &&
+                Port == other.Port;
         }
 
         public override bool Equals(object obj)
         {
-            if (this == null && obj == null)
-            {
-                return true;
-            }
             return Equals(obj as Host);
         }
 

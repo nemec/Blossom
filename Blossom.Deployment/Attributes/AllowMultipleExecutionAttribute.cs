@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Blossom.Deployment
+namespace Blossom.Deployment.Attributes
 {
     /// <summary>
     /// Indicates to the dependency resolver that this task
@@ -12,7 +8,7 @@ namespace Blossom.Deployment
     /// will be run once every time it occurs as a
     /// *direct dependency* of another task.
     /// 
-    /// If <paramref name="Standalone"/> is true (the default),
+    /// If <see cref="Standalone"/> is true (the default),
     /// the task will be run once on its own as well as every
     /// time it's a dependency. Otherwise, the taskwill only be
     /// run if it is a dependency of another task.

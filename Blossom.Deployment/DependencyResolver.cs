@@ -1,15 +1,14 @@
-﻿using Blossom.Deployment.Exceptions;
+﻿using Blossom.Deployment.Attributes;
+using Blossom.Deployment.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 [assembly:InternalsVisibleTo("DeploymentUnitTest")]
 
-namespace Blossom.Deployment.Dependencies
+namespace Blossom.Deployment
 {
     internal class DependencyResolver
     {
@@ -29,7 +28,7 @@ namespace Blossom.Deployment.Dependencies
             RootMethods = rootMethods;
             try
             {
-                AllMethods = allMethods.ToDictionary(k => MethodName(k));
+                AllMethods = allMethods.ToDictionary(MethodName);
             }
             catch (ArgumentException exception)
             {
@@ -120,7 +119,7 @@ namespace Blossom.Deployment.Dependencies
                     GetCustomAttribute<AllowMultipleExecutionAttribute>();
             if (allowMultipleExecution == null && !taskQueue.Contains(curNode) ||
                 (allowMultipleExecution != null && (
-                    parent != null || parent == null && allowMultipleExecution.Standalone)))
+                    parent != null || allowMultipleExecution.Standalone)))
             {
                 taskQueue.Add(curNode);
             }
@@ -131,7 +130,7 @@ namespace Blossom.Deployment.Dependencies
         /// </summary>
         /// <param name="taskName">Name of task to find.</param>
         /// <returns>The method for the found task.</returns>
-        /// <exception cref="System.AmbiguousMatchException"></exception>
+        /// <exception cref="AmbiguousMatchException"></exception>
         /// <exception cref="TaskDependencyException"></exception>
         internal Invokable GetTaskForName(string taskName)
         {
@@ -145,23 +144,16 @@ namespace Blossom.Deployment.Dependencies
 
         private class Node
         {
-            private DependencyResolver _resolver;
+            private readonly DependencyResolver _resolver;
 
             internal Invokable Invokable { get; private set; }
 
             internal SortedList<string, Node> Edges { get; private set; }
 
             private List<Invokable> _dependencies;
-            internal List<Invokable> Dependencies
+            internal IEnumerable<Invokable> Dependencies
             {
-                get
-                {
-                    if (_dependencies == null)
-                    {
-                        _dependencies = GenerateDependencies();
-                    }
-                    return _dependencies;
-                }
+                get { return _dependencies ?? (_dependencies = GenerateDependencies()); }
             }
 
             internal Node(DependencyResolver resolver, Invokable method)

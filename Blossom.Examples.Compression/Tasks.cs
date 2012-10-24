@@ -1,10 +1,8 @@
 ﻿using Blossom.Deployment;
+using Blossom.Deployment.Attributes;
 using Blossom.Deployment.ContextManagers;
 using System;
 using System.IO;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Blossom.Examples.Compression
 {
@@ -17,6 +15,7 @@ namespace Blossom.Examples.Compression
         public Tasks(IDeploymentContext context, Config config)
         {
             Context = context;
+            Config = config;
         }
 
         [Task]

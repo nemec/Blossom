@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Blossom.Deployment
+namespace Blossom.Deployment.Manager
 {
     public class ExecutionPlan : IEquatable<ExecutionPlan>
     {
@@ -21,17 +18,24 @@ namespace Blossom.Deployment
 
         public bool Equals(ExecutionPlan other)
         {
-            return other != null &&
-                this.Host == other.Host &&
-                this.TaskOrder.SequenceEqual(other.TaskOrder);
+            var matching = other != null &&
+                           Equals(Host, other.Host);
+            if(!matching)
+            {
+                return false;
+            }
+            foreach (var result in TaskOrder.Zip(other.TaskOrder, Tuple.Create))
+            {
+                if(!result.Item1.Equals(result.Item2))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public override bool Equals(object obj)
         {
-            if (this == null && obj == null)
-            {
-                return true;
-            }
             return Equals(obj as ExecutionPlan);
         }
 

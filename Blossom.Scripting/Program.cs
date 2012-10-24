@@ -1,11 +1,9 @@
 ﻿using Blossom.Deployment;
+using Blossom.Deployment.Manager;
 using CommandLine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blossom.Scripting
 {
@@ -31,7 +29,7 @@ namespace Blossom.Scripting
                 }).ToList();
             }
 
-            DeploymentConfig config = new DeploymentConfig
+            var config = new DeploymentConfig
             {
                 Hosts = hosts
             };
@@ -50,7 +48,7 @@ namespace Blossom.Scripting
                 config.MergeFrom(assemblyConf);
             }
 
-            if (config.Hosts.Count() == 0)
+            if (!config.Hosts.Any())
             {
                 Console.Error.WriteLine("Need to provide at least one hostname (with username).");
                 Environment.Exit(1);
@@ -60,16 +58,17 @@ namespace Blossom.Scripting
             if (options.RemoteEnvironment == EnvironmentType.Linux)
             {
                 deployment = new DeploymentContext(config,
-                    new Blossom.Deployment.Environments.Linux());
+                    new Deployment.Environments.Linux());
             }
             else
             {
                 deployment = new DeploymentContext(config,
-                    new Blossom.Deployment.Environments.Windows());
+                    new Deployment.Environments.Windows());
             }
 
             var deploymentObjects = RuntimeAssembly.LoadTaskInstancesFromAssembly(assembly, deployment);
-            //deployment.BeginDeployment(deploymentObjects);
+            var manager = new DeploymentManager(config, deploymentObjects);
+            manager.BeginDeployments();
         }
     }
 }

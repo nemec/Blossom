@@ -1,12 +1,10 @@
-﻿using Blossom.Deployment.Dependencies;
+﻿using Blossom.Deployment.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Blossom.Deployment
+namespace Blossom.Deployment.Manager
 {
     public class DeploymentManager : IDeploymentManager
     {
@@ -23,8 +21,9 @@ namespace Blossom.Deployment
         public DeploymentManager(DeploymentConfig config, string taskNamespace)
         {
             Config = config;
-            throw new NotImplementedException(); // TODO find and initialize all classes in namespace
-            //InitializeTasks(taskBlocks);
+
+            var taskBlocks = FindNamespace(taskNamespace);
+            InitializeTasks(taskBlocks);
         }
 
         public DeploymentManager(DeploymentConfig config, params object[] taskBlocks)
@@ -33,9 +32,14 @@ namespace Blossom.Deployment
             InitializeTasks(taskBlocks);
         }
 
+        private static object[] FindNamespace(string ns)
+        {
+            throw new NotImplementedException(); // TODO find and initialize all classes in namespace
+        }
+
         private void InitializeTasks(object[] taskBlocks)
         {
-            Tasks = taskBlocks.SelectMany<object, MethodInfo, Invokable>(
+            Tasks = taskBlocks.SelectMany(
                 b => b.GetType().GetMethods(),
                 (o, m) => new Invokable
                 {
@@ -59,7 +63,7 @@ namespace Blossom.Deployment
 
             }
 
-            InitializationMethods = taskBlocks.SelectMany<object, MethodInfo, Invokable>(
+            InitializationMethods = taskBlocks.SelectMany(
                 b => b.GetType().GetMethods(),
                 (o, m) => new Invokable
                 {
@@ -68,7 +72,7 @@ namespace Blossom.Deployment
                 }).
                 Where(t => t.Method.GetCustomAttribute<DeploymentInitializeAttribute>() != null);
 
-            CleanupMethods = taskBlocks.SelectMany<object, MethodInfo, Invokable>(
+            CleanupMethods = taskBlocks.SelectMany(
                 b => b.GetType().GetMethods(),
                 (o, m) => new Invokable
                 {
@@ -80,12 +84,8 @@ namespace Blossom.Deployment
 
         public IEnumerable<ExecutionPlan> GetExecutionPlans()
         {
-            if (ExecutionPlans == null)
-            {
-                ExecutionPlans = ExecutionPlanner.GetExecutionPlans(
-                    Config, InitializationMethods, Tasks, CleanupMethods);
-            }
-            return ExecutionPlans;
+            return ExecutionPlans ?? (ExecutionPlans = ExecutionPlanner.GetExecutionPlans(
+                Config, InitializationMethods, Tasks, CleanupMethods));
         }
 
         public IEnumerable<Tuple<string, string>> GetAvailableCommands()
@@ -112,7 +112,7 @@ namespace Blossom.Deployment
             {
                 IDeploymentContext deployment = new DeploymentContext(
                     Config,
-                    new Blossom.Deployment.Environments.Linux());
+                    new Environments.Linux());
 
                 deployment.BeginDeployment(plan.TaskOrder);
             }

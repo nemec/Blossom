@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blossom.Deployment
 {
@@ -14,7 +11,7 @@ namespace Blossom.Deployment
 
         public void Invoke(IDeploymentContext context)
         {
-            Method.Invoke(Base, new[] { context });
+            Method.Invoke(Base, new object[] { context });
         }
 
         public bool Equals(Invokable other)
@@ -23,7 +20,7 @@ namespace Blossom.Deployment
             {
                 return false;
             }
-            return this.Method == other.Method;
+            return Method == other.Method;
         }
 
         public override bool Equals(object obj)

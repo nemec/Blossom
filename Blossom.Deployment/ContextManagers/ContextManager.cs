@@ -33,7 +33,7 @@ namespace Blossom.Deployment.ContextManagers
         /// to the given context only.
         /// </summary>
         /// <param name="context"></param>
-        public ContextManager(IDeploymentContext context)
+        protected ContextManager(IDeploymentContext context)
         {
             Context = context;
             _entered = false;

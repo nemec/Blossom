@@ -1,7 +1,8 @@
 ﻿using System;
+using Blossom.Deployment.Attributes;
+using Blossom.Deployment.Manager;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Blossom.Deployment;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,10 +13,10 @@ namespace DeploymentUnitTest
         internal static IEnumerable<Invokable> GetObjMethods(this object obj, params string[] name)
         {
             return obj.GetType().GetMethods().Where(m => name.Contains(m.Name)).Select(m => new Invokable
-            {
-                Base = obj,
-                Method = m
-            });
+                {
+                    Base = obj,
+                    Method = m
+                }).ToArray();
         }
     }
 

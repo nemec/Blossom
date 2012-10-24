@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Blossom.Deployment
+namespace Blossom.Deployment.Attributes
 {
     /// <summary>
     /// Indicates to the deployment code which methods define tasks

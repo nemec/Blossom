@@ -5,10 +5,9 @@ namespace Blossom.Deployment.Environments
     /// <summary>
     /// Environment that uses forward slashes as path separators.
     /// </summary>
-    public class Linux : BaseEnvironment, IEnvironment
+    public class Linux : BaseEnvironment
     {
-        public Linux()
-            : base() { }
+        public Linux() { }
 
         public Linux(string initialDirectory)
             : base(initialDirectory) { }

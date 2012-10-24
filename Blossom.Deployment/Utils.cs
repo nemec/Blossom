@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace Blossom.Deployment
+﻿namespace Blossom.Deployment
 {
     internal static class Utils
     {
@@ -14,7 +11,8 @@ namespace Blossom.Deployment
                     PathSeparator.Backslash.Value(),
                     sep.Value());
             }
-            else if (sep == PathSeparator.Backslash)
+            
+            if (sep == PathSeparator.Backslash)
             {
                 return path.Replace(
                     PathSeparator.ForwardSlash.Value(),

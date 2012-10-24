@@ -7,10 +7,9 @@ namespace Blossom.Deployment.Environments
     /// Environment that uses backslashes as path separators and
     /// carriage returns in line endings.
     /// </summary>
-    public class Windows : BaseEnvironment, IEnvironment
+    public class Windows : BaseEnvironment
     {
-        public Windows()
-            : base() { }
+        public Windows() { }
 
         public Windows(string initialDirectory)
             : base(initialDirectory) { }

@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Blossom.Deployment.Environments
 {
-    public class CustomEnvironment : BaseEnvironment, IEnvironment
+    public sealed class CustomEnvironment : BaseEnvironment
     {
         public override string LineEnding { get; protected set; }
 

@@ -13,7 +13,7 @@
             : base(context)
         {
             Pf = prefix;
-            base.Begin();
+            Begin();
         }
 
         protected override void Enter()

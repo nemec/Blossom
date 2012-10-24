@@ -1,12 +1,6 @@
-﻿using Renci.SshNet;
-using Renci.SshNet.Common;
-using Renci.SshNet.Sftp;
+﻿using Renci.SshNet.Sftp;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blossom.Deployment.Operations
 {

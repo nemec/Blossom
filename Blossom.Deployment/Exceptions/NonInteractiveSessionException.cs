@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace Blossom.Deployment
+namespace Blossom.Deployment.Exceptions
 {
     public class NonInteractiveSessionException : Exception
     {
-        public NonInteractiveSessionException()
-            : base() { }
+        public NonInteractiveSessionException() { }
 
         public NonInteractiveSessionException(string message)
             : base(message) { }

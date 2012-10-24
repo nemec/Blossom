@@ -1,11 +1,9 @@
-﻿using Microsoft.CSharp;
+﻿using Blossom.Deployment.Attributes;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Blossom.Deployment;
 using System.Reflection;
 
@@ -15,55 +13,60 @@ namespace Blossom.Scripting
     {
         public static string BuildAssembly(string sourcePath)
         {
-            CodeDomProvider provider = CodeDomProvider.CreateProvider("CSharp");
+            var provider = CodeDomProvider.CreateProvider("CSharp");
 
-            string assemblyName = Path.GetTempFileName();
+            var assemblyName = Path.GetTempFileName();
 
-            CompilerParameters parameters = new CompilerParameters
+            var parameters = new CompilerParameters
             {
                 OutputAssembly = assemblyName
             };
             parameters.ReferencedAssemblies.Add(typeof(TaskAttribute).Assembly.ManifestModule.Name);
 
-            CompilerResults results = provider.CompileAssemblyFromFile(parameters, sourcePath);
+            var results = provider.CompileAssemblyFromFile(parameters, sourcePath);
 
             if (results.Errors.Count > 0)
             {
                 foreach (CompilerError error in results.Errors)
                 {
-                    Console.Error.WriteLine(String.Format("{0}:{1}) {2} - {3}",
-                        error.Line, error.Column, error.ErrorNumber, error.ErrorText));
+                    Console.Error.WriteLine("{0}:{1}) {2} - {3}",
+                        error.Line, error.Column, error.ErrorNumber, error.ErrorText);
                 }
                 return null;
             }
-            else
-            {
-                return assemblyName;
-            }
+
+            return assemblyName;
         }
 
         public static Assembly LoadAssembly(string assemblyPath)
         {
-            byte[] assemblyBytes = File.ReadAllBytes(assemblyPath);
+            var assemblyBytes = File.ReadAllBytes(assemblyPath);
             try
             {
                 File.Delete(assemblyPath);
             }
             catch (Exception exception)
             {
-                Console.Error.WriteLine(String.Format("Could not delete assembly {0}: {1}", assemblyPath, exception));
+                Console.Error.WriteLine("Could not delete assembly {0}: {1}", assemblyPath, exception);
             }
             return Assembly.Load(assemblyBytes);
         }
 
         public static DeploymentConfig GetDeploymentConfigFromAssembly(Assembly assembly)
         {
-            var implementation = assembly.GetTypes().Where(t => 
-                typeof(DeploymentConfig).IsAssignableFrom(t)).FirstOrDefault();
+            var implementation = assembly.GetTypes().FirstOrDefault(
+                t => typeof(DeploymentConfig).IsAssignableFrom(t));
+
+            if(implementation == null)
+            {
+                return null;
+            }
+
             var constructor = implementation.GetConstructor(Type.EmptyTypes);
             if (constructor == null)
             {
                 Console.Error.WriteLine("Could not find empty constructor for IDeploymentConfig implementation in config file.");
+                return null;
             }
             return (DeploymentConfig)constructor.Invoke(null);
         }
@@ -81,12 +84,12 @@ namespace Blossom.Scripting
             foreach (var type in assembly.GetTypes().Where(
                 t => t.GetCustomAttribute(typeof(DeploymentAttribute)) != null))
             {
-                ConstructorInfo constructor = null;
+                ConstructorInfo constructor;
                 if ((constructor = type.GetConstructor(Type.EmptyTypes))!= null)
                 {
                     objects.Add(constructor.Invoke(null));
                 }
-                else if ((constructor = type.GetConstructor(new Type[] { typeof(IDeploymentContext) })) != null)
+                else if ((constructor = type.GetConstructor(new[] { typeof(IDeploymentContext) })) != null)
                 {
                     objects.Add(constructor.Invoke(new object[] { contextInjection }));
                 }

@@ -52,5 +52,12 @@ namespace Blossom.Deployment.Logging
         /// <param name="message">Error message to be displayed.</param>
         /// <param name="exception">Exception associated with the error.</param>
         void Fatal(string message, Exception exception = null);
+
+        /// <summary>
+        /// Immediately display an error message and abort.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="exception"></param>
+        void Abort(string message, Exception exception = null);
     }
 }

@@ -1,15 +1,10 @@
 ﻿using Renci.SshNet.Sftp;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blossom.Deployment.Operations
 {
-    internal class LoopbackRemoteOperations : IRemoteOperations, IDisposable
+    internal class LoopbackRemoteOperations : IRemoteOperations
     {
         private IDeploymentContext Context { get; set; }
 
@@ -19,9 +14,10 @@ namespace Blossom.Deployment.Operations
         internal LoopbackRemoteOperations(IDeploymentContext context)
         {
             Context = context;
+            LocalOps = new BasicLocalOperations(context);
         }
 
-        public System.IO.Stream ShellStream
+        public Stream ShellStream
         {
             get { throw new NotImplementedException(); }
         }
@@ -33,13 +29,13 @@ namespace Blossom.Deployment.Operations
 
         private static void CopyFile(Stream source, string destination, int bytesPerChunk, IFileTransferHandler handler)
         {
-            using (BinaryReader br = new BinaryReader(source))
+            using (var br = new BinaryReader(source))
             {
-                using (FileStream fsDest = new FileStream(destination, FileMode.Truncate))
+                using (var fsDest = new FileStream(destination, FileMode.Truncate))
                 {
-                    BinaryWriter bw = new BinaryWriter(fsDest);
-                    byte[] buffer = new byte[bytesPerChunk];
-                    int bytesRead = 0;
+                    var bw = new BinaryWriter(fsDest);
+                    var buffer = new byte[bytesPerChunk];
+                    int bytesRead;
 
                     for (long i = 0; i < source.Length; i += bytesRead)
                     {
@@ -94,8 +90,9 @@ namespace Blossom.Deployment.Operations
         public void MkDir(string path, bool makeParents = false)
         {
             if (!makeParents &&
-                !Directory.Exists(path.Substring(0, path.LastIndexOf(
-                Context.Environment.Local.PathSeparator.Value()))))
+                !Directory.Exists(path.Substring(0,
+                path.LastIndexOf(Context.Environment.Local.PathSeparator.Value(),
+                    StringComparison.Ordinal))))
             {
                 throw new IOException("Parent directory does not exist.");
             }

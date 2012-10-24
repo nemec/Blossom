@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blossom.Deployment.ContextManagers
 {
@@ -17,7 +13,7 @@ namespace Blossom.Deployment.ContextManagers
         {
             throw new NotImplementedException(); // TODO Figure out how to give password to sudo
             _administratorPassword = administratorPassword;
-            base.Begin();
+            Begin();
         }
 
         protected override void Enter()

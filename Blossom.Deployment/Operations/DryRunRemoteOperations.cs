@@ -1,15 +1,11 @@
 ﻿using Blossom.Deployment.Logging;
 using Renci.SshNet.Sftp;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blossom.Deployment.Operations
 {
-    internal class DryRunRemoteOperations : IRemoteOperations, IDisposable
+    internal class DryRunRemoteOperations : IRemoteOperations
     {
         private ILogger Logger { get; set; }
 
@@ -24,7 +20,7 @@ namespace Blossom.Deployment.Operations
                 String.Format("Dry run executing {0}: {1}", commandName, output));
         }
 
-        private Stream _stream = new MemoryStream();
+        private readonly Stream _stream = new MemoryStream();
         public Stream ShellStream
         {
             get { return _stream; }
@@ -44,7 +40,7 @@ namespace Blossom.Deployment.Operations
             return false;
         }
 
-        public void GetFile(string sourcePath, System.IO.Stream destination, IFileTransferHandler handler)
+        public void GetFile(string sourcePath, Stream destination, IFileTransferHandler handler)
         {
             LogDryRun("GetFile", String.Format("Retrieving the file {0} from a remote host " +
                 "and writing it to a stream.", sourcePath));
@@ -57,7 +53,7 @@ namespace Blossom.Deployment.Operations
             return false;
         }
 
-        public void PutFile(System.IO.Stream source, string destinationPath, IFileTransferHandler handler)
+        public void PutFile(Stream source, string destinationPath, IFileTransferHandler handler)
         {
             LogDryRun("PutFile", String.Format("Sending contents of a stream to a remote host " +
                             "and placing it at {0}.", destinationPath));

@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Blossom.Deployment
 {
     public class DeploymentConfig
     {
-        public List<Host> Hosts { get; set; }
-        public bool DryRun { get; set; }
+        public virtual List<Host> Hosts { get; set; }
+        public virtual bool DryRun { get; set; }
     }
 
     public static class DeploymentConfigExtensions
