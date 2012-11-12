@@ -14,16 +14,16 @@ namespace Blossom.Deployment
     {
         private List<Node> _nodes;
 
-        private IEnumerable<Invokable> RootMethods { get; set; }
+        private IEnumerable<MethodInfo> RootMethods { get; set; }
 
-        private Dictionary<string, Invokable> AllMethods { get; set; }
+        private Dictionary<string, MethodInfo> AllMethods { get; set; }
 
-        internal DependencyResolver(IEnumerable<Invokable> methods)
+        internal DependencyResolver(IEnumerable<MethodInfo> methods)
             : this(methods, methods) { }
 
         internal DependencyResolver(
-            IEnumerable<Invokable> rootMethods,
-            IEnumerable<Invokable> allMethods)
+            IEnumerable<MethodInfo> rootMethods,
+            IEnumerable<MethodInfo> allMethods)
         {
             RootMethods = rootMethods;
             try
@@ -38,9 +38,9 @@ namespace Blossom.Deployment
             }
         }
 
-        private static string MethodName(Invokable invokable)
+        private static string MethodName(MethodInfo invokable)
         {
-            return invokable.Method.ReflectedType.Namespace + "." + invokable.Method.Name;
+            return invokable.ReflectedType.Namespace + "." + invokable.Name;
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Blossom.Deployment
         /// An enumerable of task methods in the order
         /// they should be executed.
         /// </returns>
-        internal IEnumerable<Invokable> OrderTasks()
+        internal IEnumerable<MethodInfo> OrderTasks()
         {
             BuildDependencyGraph();
 
@@ -101,7 +101,7 @@ namespace Blossom.Deployment
             unresolved.Add(curNode);
             foreach (var edge in curNode.Edges)
             {
-                var allowMultipleExecutionEdge = edge.Value.Invokable.Method.
+                var allowMultipleExecutionEdge = edge.Value.Invokable.
                     GetCustomAttribute<AllowMultipleExecutionAttribute>();
                 if (!taskQueue.Contains(edge.Value) ||
                     allowMultipleExecutionEdge != null)
@@ -115,7 +115,7 @@ namespace Blossom.Deployment
                 }
             }
             unresolved.Remove(curNode);
-            var allowMultipleExecution = curNode.Invokable.Method.
+            var allowMultipleExecution = curNode.Invokable.
                     GetCustomAttribute<AllowMultipleExecutionAttribute>();
             if (allowMultipleExecution == null && !taskQueue.Contains(curNode) ||
                 (allowMultipleExecution != null && (
@@ -132,9 +132,9 @@ namespace Blossom.Deployment
         /// <returns>The method for the found task.</returns>
         /// <exception cref="AmbiguousMatchException"></exception>
         /// <exception cref="TaskDependencyException"></exception>
-        internal Invokable GetTaskForName(string taskName)
+        internal MethodInfo GetTaskForName(string taskName)
         {
-            Invokable method;
+            MethodInfo method;
             if (!AllMethods.TryGetValue(taskName, out method))
             {
                 throw new UnknownTaskException("Unable to find task " + taskName);
@@ -146,32 +146,32 @@ namespace Blossom.Deployment
         {
             private readonly DependencyResolver _resolver;
 
-            internal Invokable Invokable { get; private set; }
+            internal MethodInfo Invokable { get; private set; }
 
             internal SortedList<string, Node> Edges { get; private set; }
 
-            private List<Invokable> _dependencies;
-            internal IEnumerable<Invokable> Dependencies
+            private List<MethodInfo> _dependencies;
+            internal IEnumerable<MethodInfo> Dependencies
             {
                 get { return _dependencies ?? (_dependencies = GenerateDependencies()); }
             }
 
-            internal Node(DependencyResolver resolver, Invokable method)
+            internal Node(DependencyResolver resolver, MethodInfo method)
             {
                 _resolver = resolver;
                 Invokable = method;
                 Edges = new SortedList<string, Node>();
             }
 
-            private List<Invokable> GenerateDependencies()
+            private List<MethodInfo> GenerateDependencies()
             {
-                var dependencies = new List<Invokable>();
-                foreach (var taskName in Invokable.Method.
+                var dependencies = new List<MethodInfo>();
+                foreach (var taskName in Invokable.
                     GetCustomAttributes<DependsAttribute>().Select(a => a.TaskName)
                     .Distinct())
                 {
                     dependencies.Add(_resolver.GetTaskForName(
-                        Invokable.Method.ReflectedType.Namespace + "." + taskName));
+                        Invokable.ReflectedType.Namespace + "." + taskName));
                 }
                 return dependencies;
             }

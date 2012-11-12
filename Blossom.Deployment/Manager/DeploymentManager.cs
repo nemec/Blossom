@@ -3,83 +3,43 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Blossom.Deployment.Logging;
+using CommandLine;
 
 namespace Blossom.Deployment.Manager
 {
-    public class DeploymentManager : IDeploymentManager
+    public class DeploymentManager<TDeployment, TTaskConfig>
+        where TDeployment : IDeployment<TTaskConfig>, new()
     {
-        private DeploymentConfig Config { get; set; }
+        public DeploymentConfig<TTaskConfig> Config { get; set; }
 
-        private IEnumerable<Invokable> Tasks { get; set; }
+        private IEnumerable<MethodInfo> Tasks { get; set; }
 
-        private IEnumerable<Invokable> InitializationMethods { get; set; }
+        private IEnumerable<MethodInfo> InitializationMethods { get; set; }
 
-        private IEnumerable<Invokable> CleanupMethods { get; set; }
+        private IEnumerable<MethodInfo> CleanupMethods { get; set; }
 
         private IEnumerable<ExecutionPlan> ExecutionPlans { get; set; }
 
-        public DeploymentManager(DeploymentConfig config, string taskNamespace)
+        public DeploymentManager(DeploymentConfig<TTaskConfig> config)
         {
             Config = config;
-
-            var taskBlocks = FindNamespace(taskNamespace);
-            InitializeTasks(taskBlocks);
+            InitializeTasks();
         }
 
-        public DeploymentManager(DeploymentConfig config, params object[] taskBlocks)
+        private void InitializeTasks()
         {
-            Config = config;
-            InitializeTasks(taskBlocks);
-        }
+            Tasks = typeof(TDeployment).GetMethods()
+                .Where(t =>
+                    t.GetCustomAttribute<TaskAttribute>() != null &&
+                    t.GetCustomAttribute<DeploymentInitializeAttribute>() == null &&
+                    t.GetCustomAttribute<DeploymentCleanupAttribute>() == null);
 
-        private static object[] FindNamespace(string ns)
-        {
-            throw new NotImplementedException(); // TODO find and initialize all classes in namespace
-        }
+            InitializationMethods = typeof(TDeployment).GetMethods()
+                .Where(t => t.GetCustomAttribute<DeploymentInitializeAttribute>() != null);
 
-        private void InitializeTasks(object[] taskBlocks)
-        {
-            Tasks = taskBlocks.SelectMany(
-                b => b.GetType().GetMethods(),
-                (o, m) => new Invokable
-                {
-                    Base = o,
-                    Method = m
-                }).
-                Where(t =>
-                    t.Method.GetCustomAttribute<TaskAttribute>() != null &&
-                    t.Method.GetCustomAttribute<DeploymentInitializeAttribute>() == null &&
-                    t.Method.GetCustomAttribute<DeploymentCleanupAttribute>() == null);
-
-            var uncallableTasks = Tasks.Where(t => {
-                var param = t.Method.GetParameters().FirstOrDefault();
-                return param == null || param.ParameterType != typeof(IDeploymentContext);
-            });
-            if (uncallableTasks.Any())
-            {
-                throw new ArgumentException(
-                    "Task methods [{0}] must take a DeploymentContext as its sole parameter.",
-                    String.Join(", ", uncallableTasks));
-
-            }
-
-            InitializationMethods = taskBlocks.SelectMany(
-                b => b.GetType().GetMethods(),
-                (o, m) => new Invokable
-                {
-                    Base = o,
-                    Method = m
-                }).
-                Where(t => t.Method.GetCustomAttribute<DeploymentInitializeAttribute>() != null);
-
-            CleanupMethods = taskBlocks.SelectMany(
-                b => b.GetType().GetMethods(),
-                (o, m) => new Invokable
-                {
-                    Base = o,
-                    Method = m
-                }).
-                Where(t => t.Method.GetCustomAttribute<DeploymentCleanupAttribute>() != null);
+            CleanupMethods = typeof(TDeployment).GetMethods()
+                .Where(t => t.GetCustomAttribute<DeploymentCleanupAttribute>() != null);
         }
 
         public IEnumerable<ExecutionPlan> GetExecutionPlans()
@@ -93,14 +53,14 @@ namespace Blossom.Deployment.Manager
             var commands = new List<Tuple<string, string>>();
             foreach (var task in Tasks)
             {
-                var taskAttr = task.Method.GetCustomAttribute<TaskAttribute>();
+                var taskAttr = task.GetCustomAttribute<TaskAttribute>();
                 if (taskAttr != null && taskAttr.Description != null)
                 {
-                    commands.Add(Tuple.Create(task.Method.Name, taskAttr.Description));
+                    commands.Add(Tuple.Create(task.Name, taskAttr.Description));
                 }
                 else
                 {
-                    commands.Add(Tuple.Create(task.Method.Name, ""));
+                    commands.Add(Tuple.Create(task.Name, ""));
                 }
             }
             return commands;
@@ -110,12 +70,96 @@ namespace Blossom.Deployment.Manager
         {
             foreach (var plan in GetExecutionPlans())
             {
-                IDeploymentContext deployment = new DeploymentContext(
+                var deployment = new DeploymentContext<TDeployment, TTaskConfig>(
                     Config,
                     new Environments.Linux());
 
                 deployment.BeginDeployment(plan.TaskOrder);
             }
         }
+
+        public static void Main(string[] args,
+            Action<DeploymentConfig<TTaskConfig>, string> initializeConfig)
+        {
+            var options = new CommandLineOptions();
+            if (!CommandLineParser.Default.ParseArguments(args, options))
+            {
+                Console.Error.WriteLine(options.GetUsage());
+                Environment.Exit(1);
+            }
+
+            if (options.PrintVersion)
+            {
+                Console.WriteLine("Blossom " +
+                    Assembly.GetExecutingAssembly().GetName().Version);
+                return;
+            }
+
+            var configFile = options.ConfigFileList.FirstOrDefault();
+            if (configFile == null)
+            {
+                Console.Error.WriteLine("Please provide config file path.");
+                Environment.Exit(1);
+            }
+
+            var config = new DeploymentConfig<TTaskConfig>
+                {
+                    Logger = new SimpleConsoleLogger()
+                };
+            initializeConfig(config, configFile);
+
+            #region Set DeploymentConfig from command line options
+
+            // Gets the subset of hosts specified at the command line.
+            if (options.Hosts != null && options.Hosts.Length > 0)
+            {
+                config.Hosts = config.Hosts.Where(h =>
+                    options.Hosts.Contains(h.Alias) ||
+                    options.Hosts.Contains(h.Hostname)).ToList();
+            }
+            if (options.DryRun)
+            {
+                config.DryRun = options.DryRun;
+            }
+
+            // Overwrite only if provided at command line
+            if(options.DisplayLogLevel.HasValue)
+            {
+                config.Logger.DisplayLogLevel = options.DisplayLogLevel.Value;
+            }
+
+            // Overwrite only if provided at command line
+            if (options.AbortLogLevel.HasValue)
+            {
+                config.Logger.AbortLogLevel = options.AbortLogLevel.Value;
+            }
+
+            #endregion
+
+            var manager = new DeploymentManager<TDeployment, TTaskConfig>(config);
+
+            if (options.List)
+            {
+                Console.WriteLine("Planned execution order:");
+                foreach (var plan in manager.GetExecutionPlans())
+                {
+                    Console.WriteLine(plan.Host);
+                    foreach (var task in plan.TaskOrder)
+                    {
+                        Console.WriteLine("\t{0}.{1}",
+                            task.ReflectedType.Name, task.Name);
+                    }
+                }
+                return;
+            }
+            manager.BeginDeployments();
+        }
+    }
+
+    public class DeploymentManager<TDeployment>
+        : DeploymentManager<TDeployment, NullConfig> where TDeployment : IDeployment<NullConfig>, new()
+    {
+        public DeploymentManager(DeploymentConfig<NullConfig> config)
+            : base(config) {}
     }
 }

@@ -122,15 +122,10 @@ namespace DeploymentUnitTest
 
     public static class TestExtensions
     {
-        public static IEnumerable<Invokable> GetTasks(this object taskBlock)
+        public static IEnumerable<MethodInfo> GetTasks(this object taskBlock)
         {
             return taskBlock.GetType().GetMethods().
-                Where(t => t.GetCustomAttribute<TaskAttribute>() != null).Select(
-                    m => new Invokable
-                    {
-                        Base = taskBlock,
-                        Method = m
-                    });
+                Where(t => t.GetCustomAttribute<TaskAttribute>() != null);
         }
     }
 
@@ -189,11 +184,11 @@ namespace DeploymentUnitTest
             var t = typeof(NoDependencies);
             var resolver = new DependencyResolver(new NoDependencies().GetTasks());
 
-            var expected = new List<Invokable>
+            var expected = new List<MethodInfo>
             {
-                new Invokable{ Method = t.GetMethod("ATask") },
-                new Invokable{ Method = t.GetMethod("KTask") },
-                new Invokable{ Method = t.GetMethod("ZTask") }
+                t.GetMethod("ATask"),
+                t.GetMethod("KTask"),
+                t.GetMethod("ZTask")
             };
 
             // Act
@@ -210,14 +205,14 @@ namespace DeploymentUnitTest
             var t = typeof(WithMultipleExecutionStandalone);
             var resolver = new DependencyResolver(new WithMultipleExecutionStandalone().GetTasks());
 
-            var expected = new List<Invokable>
+            var expected = new List<MethodInfo>
             {
-                new Invokable{ Method = t.GetMethod("Task1") },
-                new Invokable{ Method = t.GetMethod("Task1") },
-                new Invokable{ Method = t.GetMethod("Task2") },
-                new Invokable{ Method = t.GetMethod("Task1") },
-                new Invokable{ Method = t.GetMethod("Task3") },
-                new Invokable{ Method = t.GetMethod("Task4") }
+                t.GetMethod("Task1"),
+                t.GetMethod("Task1"),
+                t.GetMethod("Task2"),
+                t.GetMethod("Task1"),
+                t.GetMethod("Task3"),
+                t.GetMethod("Task4")
             };
 
             // Act
@@ -234,13 +229,13 @@ namespace DeploymentUnitTest
             var t = typeof(WithMultipleExecutionNonStandalone);
             var resolver = new DependencyResolver(new WithMultipleExecutionNonStandalone().GetTasks());
 
-            var expected = new List<Invokable>
+            var expected = new List<MethodInfo>
             {
-                new Invokable{ Method = t.GetMethod("Task1") },
-                new Invokable{ Method = t.GetMethod("Task2") },
-                new Invokable{ Method = t.GetMethod("Task1") },
-                new Invokable{ Method = t.GetMethod("Task3") },
-                new Invokable{ Method = t.GetMethod("Task4") }
+                t.GetMethod("Task1"),
+                t.GetMethod("Task2"),
+                t.GetMethod("Task1"),
+                t.GetMethod("Task3"),
+                t.GetMethod("Task4")
             };
 
             // Act
@@ -258,13 +253,13 @@ namespace DeploymentUnitTest
             var t = typeof(Resolver);
             var resolver = new DependencyResolver(new Resolver().GetTasks());
 
-            var expected = new List<Invokable>
+            var expected = new List<MethodInfo>
             {
-                new Invokable{ Method = t.GetMethod("Task2") },
-                new Invokable{ Method = t.GetMethod("Task1") },
-                new Invokable{ Method = t.GetMethod("Task3") },
-                new Invokable{ Method = t.GetMethod("Task5") },
-                new Invokable{ Method = t.GetMethod("Task4") }
+                t.GetMethod("Task2"),
+                t.GetMethod("Task1"),
+                t.GetMethod("Task3"),
+                t.GetMethod("Task5"),
+                t.GetMethod("Task4")
             };
 
             // Act

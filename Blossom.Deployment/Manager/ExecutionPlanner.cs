@@ -7,11 +7,11 @@ namespace Blossom.Deployment.Manager
 {
     internal static class ExecutionPlanner
     {
-        internal static IEnumerable<ExecutionPlan> GetExecutionPlans(
-            DeploymentConfig config,
-            IEnumerable<Invokable> initialization,
-            IEnumerable<Invokable> tasks,
-            IEnumerable<Invokable> cleanup)
+        internal static IEnumerable<ExecutionPlan> GetExecutionPlans<T>(
+            DeploymentConfig<T> config,
+            IEnumerable<MethodInfo> initialization,
+            IEnumerable<MethodInfo> tasks,
+            IEnumerable<MethodInfo> cleanup)
         {
             var roleMap = CreateRolemap(config);
             return roleMap.Select(
@@ -19,7 +19,7 @@ namespace Blossom.Deployment.Manager
                         initialization, tasks, cleanup)).ToArray();
         }
 
-        private static Dictionary<Host, HashSet<string>> CreateRolemap(DeploymentConfig config)
+        private static Dictionary<Host, HashSet<string>> CreateRolemap<T>(DeploymentConfig<T> config)
         {
             var map = new Dictionary<Host, HashSet<string>>();
 
@@ -44,15 +44,15 @@ namespace Blossom.Deployment.Manager
 
         private static ExecutionPlan CreateExecutionPlan(
             Host host, HashSet<string> roles,
-            IEnumerable<Invokable> initialization,
-            IEnumerable<Invokable> tasks,
-            IEnumerable<Invokable> cleanup)
+            IEnumerable<MethodInfo> initialization,
+            IEnumerable<MethodInfo> tasks,
+            IEnumerable<MethodInfo> cleanup)
         {
-            var tasksForHost = new HashSet<Invokable>();
+            var tasksForHost = new HashSet<MethodInfo>();
             foreach (var task in tasks)
             {
-                var hostAttrs = task.Method.GetCustomAttributes<HostAttribute>().Select(h => h.Host).Distinct();
-                var roleAttrs = task.Method.GetCustomAttributes<RoleAttribute>().Select(r => r.Role).Distinct();
+                var hostAttrs = task.GetCustomAttributes<HostAttribute>().Select(h => h.Host).Distinct();
+                var roleAttrs = task.GetCustomAttributes<RoleAttribute>().Select(r => r.Role).Distinct();
 
                 if (hostAttrs.Contains(host.Hostname) || hostAttrs.Contains(host.Alias) ||
                     roleAttrs.Any(roles.Contains))
@@ -61,6 +61,13 @@ namespace Blossom.Deployment.Manager
                     break;
                 }
             }
+
+            // If there are no defined roles or tasks, run every task.
+            if(!tasksForHost.Any())
+            {
+                tasksForHost.UnionWith(tasks);
+            }
+
             var resolver = new DependencyResolver(tasksForHost, tasks);
             return new ExecutionPlan(host,
                 initialization.

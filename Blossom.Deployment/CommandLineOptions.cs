@@ -1,8 +1,9 @@
-﻿using CommandLine;
+﻿using Blossom.Deployment.Logging;
+using CommandLine;
 using CommandLine.Text;
 using System.Collections.Generic;
 
-namespace Blossom.Examples.PushFiles
+namespace Blossom.Deployment
 {
     internal enum EnvironmentType
     {
@@ -33,6 +34,12 @@ namespace Blossom.Examples.PushFiles
         [Option(null, "version",
             HelpText = "Print the current version and exit.")]
         public bool PrintVersion { get; set; }
+
+        [Option(null, "logging", HelpText = "Minimum log level to display.")]
+        public LogLevel? DisplayLogLevel { get; set; }
+
+        [Option(null, "abort", HelpText = "Abort deployment when logs are written to this level.")]
+        public LogLevel? AbortLogLevel { get; set; }
 
         [ValueList(typeof(List<string>), MaximumElements = 1)]
         public IList<string> ConfigFileList { get; set; }

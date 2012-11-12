@@ -31,7 +31,7 @@ namespace Blossom.Deployment.Operations
         {
             using (var br = new BinaryReader(source))
             {
-                using (var fsDest = new FileStream(destination, FileMode.Truncate))
+                using (var fsDest = new FileStream(destination, FileMode.Create))
                 {
                     var bw = new BinaryWriter(fsDest);
                     var buffer = new byte[bytesPerChunk];
@@ -60,10 +60,17 @@ namespace Blossom.Deployment.Operations
 
         public bool PutFile(string sourcePath, string destinationPath, IFileTransferHandler handler, bool ifNewer)
         {
+            var filename = Path.GetFileName(sourcePath);
             sourcePath = Context.Environment.Local.CombinePath(
                 Context.Environment.Local.CurrentDirectory, sourcePath);
             destinationPath = Context.Environment.Local.CombinePath(
                 Context.Environment.Local.CurrentDirectory, destinationPath);
+
+            if (!File.Exists(sourcePath))
+            {
+                Context.Logger.Error(String.Format("File {0} does not exist.", filename));
+                return true;
+            }
 
             if (ifNewer && File.Exists(destinationPath) && 
                 File.GetLastWriteTimeUtc(sourcePath) <= File.GetLastWriteTimeUtc(destinationPath))

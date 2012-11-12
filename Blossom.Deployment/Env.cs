@@ -14,6 +14,8 @@ namespace Blossom.Deployment
 
         internal Host CurrentHost { get; set; }
 
+        internal Dictionary<string, object> Extras { get; set; } 
+
         #region Environment Varables
 
         /// <summary>
@@ -39,6 +41,7 @@ namespace Blossom.Deployment
             Remote = remote;
             Local = local;
             Hosts = new List<Host>();
+            Extras = new Dictionary<string, object>();
             InteractionType = InteractionType.AskForInput;
         }
     }

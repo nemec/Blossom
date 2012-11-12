@@ -12,16 +12,12 @@ namespace Blossom.Examples.Compression
             var serializer = new XmlSerializer(typeof(Config));
             var config = (Config)serializer.Deserialize(XmlReader.Create(args[0]));
 
-            var deploymentConfig = new DeploymentConfig
+            var deploymentConfig = new DeploymentConfig<Config>
             {
                 Hosts = config.Hosts
             };
 
-            IDeploymentContext deployment = new DeploymentContext(
-                    deploymentConfig, new Deployment.Environments.Linux());
-            
-            var taskBlock = new Tasks(deployment, config);
-            var manager = new DeploymentManager(deploymentConfig, taskBlock);
+            var manager = new DeploymentManager<Tasks, Config>(deploymentConfig);
             manager.BeginDeployments();
         }
     }

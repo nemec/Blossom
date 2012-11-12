@@ -58,6 +58,7 @@
     <Compile Include="Attributes\HostAttribute.cs" />
     <Compile Include="Attributes\ParallelizableAttribute.cs" />
     <Compile Include="Attributes\RoleAttribute.cs" />
+    <Compile Include="CommandLineOptions.cs" />
     <Compile Include="CompressionScheme.cs" />
     <Compile Include="ContextManagers\Cd.cs" />
     <Compile Include="ContextManagers\ContextManager.cs" />
@@ -65,9 +66,9 @@
     <Compile Include="ContextManagers\Prefix.cs" />
     <Compile Include="ContextManagers\Sudo.cs" />
     <Compile Include="DependencyResolver.cs" />
+    <Compile Include="IDeployment.cs" />
     <Compile Include="DeploymentContext.cs" />
     <Compile Include="Exceptions\AbortExecutionException.cs" />
-    <Compile Include="Invokable.cs" />
     <Compile Include="Logging\LogLevel.cs" />
     <Compile Include="Manager\DeploymentManager.cs" />
     <Compile Include="Env.cs" />
@@ -85,7 +86,6 @@
     <Compile Include="IDeploymentContext.cs" />
     <Compile Include="Manager\ExecutionPlan.cs" />
     <Compile Include="Manager\ExecutionPlanner.cs" />
-    <Compile Include="Manager\IDeploymentManager.cs" />
     <Compile Include="Logging\NullLogger.cs" />
     <Compile Include="Operations\BasicRemoteOperations.cs" />
     <Compile Include="Operations\DryRunLocalOperations.cs" />

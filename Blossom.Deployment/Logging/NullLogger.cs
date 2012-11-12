@@ -19,52 +19,42 @@ namespace Blossom.Deployment.Logging
         {
         }
 
-        public void Debug(string message, Exception exception = null)
+        public void Log(LogLevel level, string message, Exception exception = null)
         {
-            if(AbortLogLevel <= LogLevel.Debug)
+            if (AbortLogLevel <= level)
             {
                 throw new AbortExecutionException();
             }
+        }
+
+        public void Debug(string message, Exception exception = null)
+        {
+            Log(LogLevel.Debug, message, exception);
         }
 
         public void Verbose(string message, Exception exception = null)
         {
-            if (AbortLogLevel <= LogLevel.Verbose)
-            {
-                throw new AbortExecutionException();
-            }
+            Log(LogLevel.Verbose, message, exception);
         }
 
         public void Info(string message, Exception exception = null)
         {
-            if (AbortLogLevel <= LogLevel.Info)
-            {
-                throw new AbortExecutionException();
-            }
+            Log(LogLevel.Info, message, exception);
         }
 
         public void Warn(string message, Exception exception = null)
         {
-            if (AbortLogLevel <= LogLevel.Warn)
-            {
-                throw new AbortExecutionException();
-            }
+            Log(LogLevel.Warn, message, exception);
         }
 
         public void Error(string message, Exception exception = null)
         {
-            if (AbortLogLevel <= LogLevel.Error)
-            {
-                throw new AbortExecutionException();
-            }
+            Log(LogLevel.Error, message, exception);
         }
 
         public void Fatal(string message, Exception exception = null)
         {
-            if (AbortLogLevel <= LogLevel.Fatal)
-            {
-                throw new AbortExecutionException();
-            }
+            Log(LogLevel.Fatal, message, exception);
         }
 
 

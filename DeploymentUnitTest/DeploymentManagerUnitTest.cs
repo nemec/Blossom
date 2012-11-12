@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Blossom.Deployment.Attributes;
 using Blossom.Deployment.Manager;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -10,157 +11,198 @@ namespace DeploymentUnitTest
 {
     internal static class TaskExtensions
     {
-        internal static IEnumerable<Invokable> GetObjMethods(this object obj, params string[] name)
+        internal static IEnumerable<MethodInfo> GetObjMethods(this object obj, params string[] name)
         {
-            return obj.GetType().GetMethods().Where(m => name.Contains(m.Name)).Select(m => new Invokable
-                {
-                    Base = obj,
-                    Method = m
-                }).ToArray();
+            return obj.GetType().GetMethods().Where(m => name.Contains(m.Name)).ToArray();
         }
     }
 
-    internal class HostAttrs
+    internal class HostAttrs : IDeployment
     {
+        public IDeploymentContext Context { get; set; }
+        public NullConfig Config { get; set; }
+
         [Task]
         [Host(DeploymentManagerUnitTest.SomeHostname)]
-        public void Task1(IDeploymentContext context) { }
+        public void Task1() { }
     }
 
-    internal class RoleAttrs
+    internal class RoleAttrs : IDeployment
     {
+        public IDeploymentContext Context { get; set; }
+        public NullConfig Config { get; set; }
+
         [Task]
         [Role(DeploymentManagerUnitTest.SomeRole)]
-        public void Task1(IDeploymentContext context) { }
+        public void Task1() { }
     }
 
-    internal class RoleMultipleHosts
+    internal class RoleMultipleHosts : IDeployment
     {
+        public IDeploymentContext Context { get; set; }
+        public NullConfig Config { get; set; }
+
         [Task]
         [Role(DeploymentManagerUnitTest.SomeRole)]
-        public void Task1(IDeploymentContext context) { }
+        public void Task1() { }
     }
 
-    internal class MultipleRolesSingleHost
+    internal class MultipleRolesSingleHost : IDeployment
     {
+        public IDeploymentContext Context { get; set; }
+        public NullConfig Config { get; set; }
+
         [Task]
         [Role(DeploymentManagerUnitTest.SomeRole)]
-        public void Task1(IDeploymentContext context) { }
+        public void Task1() { }
 
         [Task]
         [Role(DeploymentManagerUnitTest.SomeRole2)]
-        public void Task2(IDeploymentContext context) { }
+        public void Task2() { }
     }
 
-    internal class MultipleRolesMultipleHosts
+    internal class MultipleRolesMultipleHosts : IDeployment
     {
+        public IDeploymentContext Context { get; set; }
+        public NullConfig Config { get; set; }
+
         [Task]
         [Role(DeploymentManagerUnitTest.SomeRole)]
         [Role(DeploymentManagerUnitTest.SomeRole2)]
-        public void Task1(IDeploymentContext context) { }
+        public void Task1() { }
     }
 
-    internal class MultipleExplicitHosts
+    internal class MultipleExplicitHosts : IDeployment
     {
+        public IDeploymentContext Context { get; set; }
+        public NullConfig Config { get; set; }
+
         [Task]
         [Host(DeploymentManagerUnitTest.SomeHostname)]
         [Host(DeploymentManagerUnitTest.SomeHostname2)]
-        public void Task1(IDeploymentContext context) { }
+        public void Task1() { }
     }
 
-    internal class DuplicateExplicitHosts
+    internal class DuplicateExplicitHosts : IDeployment
     {
+        public IDeploymentContext Context { get; set; }
+        public NullConfig Config { get; set; }
+
         [Task]
         [AllowMultipleExecution]  // Just to smoke out tasks that may be duplicated too
         [Host(DeploymentManagerUnitTest.SomeHostname)]
         [Host(DeploymentManagerUnitTest.SomeHostname)]
-        public void Task1(IDeploymentContext context) { }
+        public void Task1() { }
     }
 
-    internal class DuplicateHostAndAlias
+    internal class DuplicateHostAndAlias : IDeployment
     {
+        public IDeploymentContext Context { get; set; }
+        public NullConfig Config { get; set; }
+
         [Task]
         [AllowMultipleExecution]  // Just to smoke out tasks that may be duplicated too
         [Host(DeploymentManagerUnitTest.SomeHostname)]
         [Host(DeploymentManagerUnitTest.SomeAlias)]
-        public void Task1(IDeploymentContext context) { }
+        public void Task1() { }
     }
 
-    internal class DuplicateRoles
+    internal class DuplicateRoles : IDeployment
     {
+        public IDeploymentContext Context { get; set; }
+        public NullConfig Config { get; set; }
+
         [Task]
         [AllowMultipleExecution]  // Just to smoke out tasks that may be duplicated too
         [Role(DeploymentManagerUnitTest.SomeRole)]
         [Role(DeploymentManagerUnitTest.SomeRole)]
-        public void Task1(IDeploymentContext context) { }
+        public void Task1() { }
     }
 
-    internal class OverlappingHostAndRole
+    internal class OverlappingHostAndRole : IDeployment
     {
+        public IDeploymentContext Context { get; set; }
+        public NullConfig Config { get; set; }
+
         [Task]
         [AllowMultipleExecution]  // Just to smoke out tasks that may be duplicated too
         [Host(DeploymentManagerUnitTest.SomeHostname)]
         [Role(DeploymentManagerUnitTest.SomeRole)]
-        public void Task1(IDeploymentContext context) { }
+        public void Task1() { }
     }
 
-    internal class InheritDependencies
+    internal class InheritDependencies : IDeployment
     {
+        public IDeploymentContext Context { get; set; }
+        public NullConfig Config { get; set; }
+
         [Task]
-        public void Task1(IDeploymentContext context) { }
+        public void Task1() { }
 
         [Task]
         [Host(DeploymentManagerUnitTest.SomeHostname)]
         [Depends("Task1")]
-        public void Task2(IDeploymentContext context) { }
+        public void Task2() { }
     }
 
-    internal class InheritRecursiveDependencies
+    internal class InheritRecursiveDependencies : IDeployment
     {
+        public IDeploymentContext Context { get; set; }
+        public NullConfig Config { get; set; }
+
         [Task]
-        public void Task1(IDeploymentContext context) { }
+        public void Task1() { }
 
         [Task]
         [Depends("Task1")]
-        public void Task2(IDeploymentContext context) { }
+        public void Task2() { }
 
         [Task]
         [Host(DeploymentManagerUnitTest.SomeHostname)]
         [Depends("Task2")]
-        public void Task3(IDeploymentContext context) { }
+        public void Task3() { }
     }
 
-    internal class UnusedTask
+    internal class UnusedTask : IDeployment
     {
-        [Task]
-        public void Task1(IDeploymentContext context) { }
+        public IDeploymentContext Context { get; set; }
+        public NullConfig Config { get; set; }
 
         [Task]
-        public void Task2(IDeploymentContext context) { }
+        public void Task1() { }
+
+        [Task]
+        public void Task2() { }
 
         [Task]
         [Host(DeploymentManagerUnitTest.SomeHostname)]
         [Depends("Task2")]
-        public void Task3(IDeploymentContext context) { }
+        public void Task3() { }
     }
 
-    internal class InvalidTask
+    internal class InvalidTask : IDeployment
     {
+        public IDeploymentContext Context { get; set; }
+        public NullConfig Config { get; set; }
+
         [Task]
-        public void Task1(IDeploymentContext context) { }
+        public void Task1() { }
     }
 
-    internal class InitializationAndCleanup
+    internal class InitializationAndCleanup : IDeployment
     {
+        public IDeploymentContext Context { get; set; }
+        public NullConfig Config { get; set; }
+
         [DeploymentInitialize]
-        public void Init(IDeploymentContext context) { }
+        public void Init() { }
 
         [Task]
         [Host(DeploymentManagerUnitTest.SomeHostname)]
-        public void Task1(IDeploymentContext context) { }
+        public void Task1() { }
 
         [DeploymentCleanup]
-        public void Cleanup(IDeploymentContext context) { }
+        public void Cleanup() { }
     }
 
     [TestClass]
@@ -176,7 +218,7 @@ namespace DeploymentUnitTest
         public void GetExecutionPlan_WhereTaskHasOneHostAttributeAndHostProvided_ReturnsOnePlan()
         {
             // Arrange
-            var taskblock = new HostAttrs();
+            var taskblock = typeof(HostAttrs);
             var host = new Host
             {
                 Hostname = SomeHostname
@@ -195,7 +237,7 @@ namespace DeploymentUnitTest
             };
 
             // Act
-            var manager = new DeploymentManager(config, taskblock);
+            var manager = new DeploymentManager<HostAttrs>(config);
             var actual = manager.GetExecutionPlans();
 
             // Assert
@@ -208,7 +250,7 @@ namespace DeploymentUnitTest
         public void GetExecutionPlan_WhereTaskHasOneHostAttributeAndAliasProvided_ReturnsOnePlan()
         {
             // Arrange
-            var taskblock = new HostAttrs();
+            var taskblock = typeof(HostAttrs);
             var host = new Host
             {
                 Alias = SomeHostname,
@@ -228,7 +270,7 @@ namespace DeploymentUnitTest
             };
 
             // Act
-            var manager = new DeploymentManager(config, taskblock);
+            var manager = new DeploymentManager<HostAttrs>(config);
             var actual = manager.GetExecutionPlans();
 
             // Assert
@@ -241,7 +283,7 @@ namespace DeploymentUnitTest
         public void GetExecutionPlan_WhereTaskHasOneRoleAttributeAndHostProvided_ReturnsOnePlan()
         {
             // Arrange
-            var taskblock = new RoleAttrs();
+            var taskblock = typeof(RoleAttrs);
             var host = new Host
             {
                 Hostname = SomeHostname,
@@ -261,7 +303,7 @@ namespace DeploymentUnitTest
             };
 
             // Act
-            var manager = new DeploymentManager(config, taskblock);
+            var manager = new DeploymentManager<RoleAttrs>(config);
             var actual = manager.GetExecutionPlans();
 
             // Assert
@@ -274,7 +316,7 @@ namespace DeploymentUnitTest
         public void GetExecutionPlan_WhereTaskHasOneRoleAttributeAndMultipleHostsProvided_ReturnsMultiplePlans()
         {
             // Arrange
-            var taskblock = new RoleMultipleHosts();
+            var taskblock = typeof(RoleMultipleHosts);
             var host = new Host
             {
                 Hostname = SomeHostname,
@@ -301,7 +343,7 @@ namespace DeploymentUnitTest
             };
 
             // Act
-            var manager = new DeploymentManager(config, taskblock);
+            var manager = new DeploymentManager<RoleMultipleHosts>(config);
             var actual = manager.GetExecutionPlans();
 
             // Assert
@@ -314,7 +356,7 @@ namespace DeploymentUnitTest
         public void GetExecutionPlan_WhereTaskHasMultipleRoleAttributesAndOneHostProvided_ReturnsOnePlan()
         {
             // Arrange
-            var taskblock = new MultipleRolesSingleHost();
+            var taskblock = typeof(MultipleRolesSingleHost);
             var host = new Host
             {
                 Hostname = SomeHostname,
@@ -334,7 +376,7 @@ namespace DeploymentUnitTest
             };
 
             // Act
-            var manager = new DeploymentManager(config, taskblock);
+            var manager = new DeploymentManager<MultipleRolesSingleHost>(config);
             var actual = manager.GetExecutionPlans();
 
             // Assert
@@ -347,7 +389,7 @@ namespace DeploymentUnitTest
         public void GetExecutionPlan_WhereTaskHasMultipleRoleAttributesAndMultipleHostsProvided_ReturnsMultiplePlans()
         {
             // Arrange
-            var taskblock = new MultipleRolesMultipleHosts();
+            var taskblock = typeof(MultipleRolesMultipleHosts);
             var host = new Host
             {
                 Hostname = SomeHostname,
@@ -374,7 +416,7 @@ namespace DeploymentUnitTest
             };
 
             // Act
-            var manager = new DeploymentManager(config, taskblock);
+            var manager = new DeploymentManager<MultipleRolesMultipleHosts>(config);
             var actual = manager.GetExecutionPlans();
 
             // Assert
@@ -387,7 +429,7 @@ namespace DeploymentUnitTest
         public void GetExecutionPlan_WhereTaskHasMultipleExplicitHostsProvided_ReturnsMultiplePlans()
         {
             // Arrange
-            var taskblock = new MultipleExplicitHosts();
+            var taskblock = typeof(MultipleExplicitHosts);
             var host = new Host
             {
                 Hostname = SomeHostname
@@ -412,7 +454,7 @@ namespace DeploymentUnitTest
             };
 
             // Act
-            var manager = new DeploymentManager(config, taskblock);
+            var manager = new DeploymentManager<MultipleExplicitHosts>(config);
             var actual = manager.GetExecutionPlans();
 
             // Assert
@@ -425,7 +467,7 @@ namespace DeploymentUnitTest
         public void GetExecutionPlan_WhereTaskHasDuplicateExplicitHostsProvided_ReturnsOnePlan()
         {
             // Arrange
-            var taskblock = new DuplicateExplicitHosts();
+            var taskblock = typeof(DuplicateExplicitHosts);
             var host = new Host
             {
                 Hostname = SomeHostname
@@ -444,7 +486,7 @@ namespace DeploymentUnitTest
             };
 
             // Act
-            var manager = new DeploymentManager(config, taskblock);
+            var manager = new DeploymentManager<DuplicateExplicitHosts>(config);
             var actual = manager.GetExecutionPlans();
 
             // Assert
@@ -457,7 +499,7 @@ namespace DeploymentUnitTest
         public void GetExecutionPlan_WhereTaskHasDuplicateHostAndAliasProvided_ReturnsOnePlan()
         {
             // Arrange
-            var taskblock = new DuplicateHostAndAlias();
+            var taskblock = typeof(DuplicateHostAndAlias);
             var host = new Host
             {
                 Hostname = SomeHostname,
@@ -477,7 +519,7 @@ namespace DeploymentUnitTest
             };
 
             // Act
-            var manager = new DeploymentManager(config, taskblock);
+            var manager = new DeploymentManager<DuplicateHostAndAlias>(config);
             var actual = manager.GetExecutionPlans();
 
             // Assert
@@ -490,7 +532,7 @@ namespace DeploymentUnitTest
         public void GetExecutionPlan_WhereTaskHasDuplicateRolesProvided_ReturnsOnePlan()
         {
             // Arrange
-            var taskblock = new DuplicateHostAndAlias();
+            var taskblock = typeof(DuplicateRoles);
             var host = new Host
             {
                 Hostname = SomeHostname,
@@ -510,7 +552,7 @@ namespace DeploymentUnitTest
             };
 
             // Act
-            var manager = new DeploymentManager(config, taskblock);
+            var manager = new DeploymentManager<DuplicateRoles>(config);
             var actual = manager.GetExecutionPlans();
 
             // Assert
@@ -523,7 +565,7 @@ namespace DeploymentUnitTest
         public void GetExecutionPlan_WhereTaskHasOverlappingHostAndRole_ReturnsOnePlan()
         {
             // Arrange
-            var taskblock = new OverlappingHostAndRole();
+            var taskblock = typeof(OverlappingHostAndRole);
             var host = new Host
             {
                 Hostname = SomeHostname,
@@ -543,7 +585,7 @@ namespace DeploymentUnitTest
             };
 
             // Act
-            var manager = new DeploymentManager(config, taskblock);
+            var manager = new DeploymentManager<OverlappingHostAndRole>(config);
             var actual = manager.GetExecutionPlans();
 
             // Assert
@@ -556,7 +598,7 @@ namespace DeploymentUnitTest
         public void GetExecutionPlan_WhereTaskHasDependencyNotSpecifiedForHost_AddsDependencyToPlan()
         {
             // Arrange
-            var taskblock = new InheritDependencies();
+            var taskblock = typeof(InheritDependencies);
             var host = new Host
             {
                 Hostname = SomeHostname
@@ -575,7 +617,7 @@ namespace DeploymentUnitTest
             };
 
             // Act
-            var manager = new DeploymentManager(config, taskblock);
+            var manager = new DeploymentManager<InheritDependencies>(config);
             var actual = manager.GetExecutionPlans();
 
             // Assert
@@ -588,7 +630,7 @@ namespace DeploymentUnitTest
         public void GetExecutionPlan_WhereTaskHasRecursiveDependencyNotSpecifiedForHost_AddsDependenciesToPlan()
         {
             // Arrange
-            var taskblock = new InheritRecursiveDependencies();
+            var taskblock = typeof(InheritRecursiveDependencies);
             var host = new Host
             {
                 Hostname = SomeHostname
@@ -607,7 +649,7 @@ namespace DeploymentUnitTest
             };
 
             // Act
-            var manager = new DeploymentManager(config, taskblock);
+            var manager = new DeploymentManager<InheritRecursiveDependencies>(config);
             var actual = manager.GetExecutionPlans();
 
             // Assert
@@ -620,7 +662,7 @@ namespace DeploymentUnitTest
         public void GetExecutionPlan_WhereTaskNotIncludedAsDependency_IsNotPresentInPlan()
         {
             // Arrange
-            var taskblock = new UnusedTask();
+            var taskblock = typeof(UnusedTask);
             var host = new Host
             {
                 Hostname = SomeHostname
@@ -639,7 +681,7 @@ namespace DeploymentUnitTest
             };
 
             // Act
-            var manager = new DeploymentManager(config, taskblock);
+            var manager = new DeploymentManager<UnusedTask>(config);
             var actual = manager.GetExecutionPlans();
 
             // Assert
@@ -652,7 +694,7 @@ namespace DeploymentUnitTest
         public void GetExecutionPlan_WhereTaskHasInitializationAndCleanup_ReturnsInitializationFirstAndCleanupLast()
         {
             // Arrange
-            var taskblock = new HostAttrs();
+            var taskblock = typeof(InitializationAndCleanup);
             var host = new Host
             {
                 Hostname = SomeHostname
@@ -671,7 +713,7 @@ namespace DeploymentUnitTest
             };
 
             // Act
-            var manager = new DeploymentManager(config, taskblock);
+            var manager = new DeploymentManager<InitializationAndCleanup>(config);
             var actual = manager.GetExecutionPlans();
 
             // Assert

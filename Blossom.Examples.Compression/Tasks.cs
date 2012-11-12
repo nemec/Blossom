@@ -6,17 +6,11 @@ using System.IO;
 
 namespace Blossom.Examples.Compression
 {
-    internal class Tasks
+    internal class Tasks : IDeployment<Config>
     {
-        private IDeploymentContext Context { get; set; }
+        public IDeploymentContext Context { get; set; }
 
-        private Config Config { get; set; }
-
-        public Tasks(IDeploymentContext context, Config config)
-        {
-            Context = context;
-            Config = config;
-        }
+        public Config Config { get; set; }
 
         [Task]
         public void CopyFiles()

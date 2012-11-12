@@ -81,10 +81,6 @@ namespace Blossom.Deployment.Operations
 
         public bool PutFile(string sourcePath, string destinationPath, IFileTransferHandler handler, bool ifNewer)
         {
-            if(!File.Exists(sourcePath))
-            {
-                Context.Logger.Error(String.Format("File {0} does not exist.", sourcePath));
-            }
             var filename = Path.GetFileName(sourcePath);
             var source = Context.Environment.Local.CombinePath(
                 Context.Environment.Local.CurrentDirectory,
@@ -92,6 +88,12 @@ namespace Blossom.Deployment.Operations
             var dest = Context.Environment.Remote.CombinePath(
                 Context.Environment.Remote.CurrentDirectory,
                 destinationPath);
+
+            if (!File.Exists(source))
+            {
+                Context.Logger.Error(String.Format("File {0} does not exist.", filename));
+                return true;
+            }
 
             if (Path.GetFileName(destinationPath) == "")
             {

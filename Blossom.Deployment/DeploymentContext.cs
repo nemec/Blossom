@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System.Linq;
+using System.Net.Sockets;
 using Blossom.Deployment.Environments;
 using Blossom.Deployment.Exceptions;
 using Blossom.Deployment.Logging;
@@ -10,8 +11,11 @@ using System.Reflection;
 
 namespace Blossom.Deployment
 {
-    public class DeploymentContext : IDeploymentContext
+    public class DeploymentContext<TDeployment, TConfig>
+        : IDeploymentContext where TDeployment : IDeployment<TConfig>, new()
     {
+        private TConfig TaskConfig { get; set; }
+
         private bool DryRun { get; set; }
 
         public ILogger Logger { get; set; }
@@ -22,28 +26,33 @@ namespace Blossom.Deployment
 
         public IRemoteOperations RemoteOps { get; private set; }
 
-        public DeploymentContext(DeploymentConfig config)
+        public DeploymentContext(DeploymentConfig<TConfig> config)
         {
             Environment = new Env();
             Initialize(config);
         }
 
-        public DeploymentContext(DeploymentConfig config, IEnvironment remoteEnvironment)
+        public DeploymentContext(DeploymentConfig<TConfig> config, IEnvironment remoteEnvironment)
         {
             Environment = new Env(remoteEnvironment);
             Initialize(config);
         }
 
-        private void Initialize(DeploymentConfig config)
+        private void Initialize(DeploymentConfig<TConfig> config)
         {
-            Logger = new SimpleConsoleLogger();
+            Logger = config.Logger;
             Environment.Hosts = config.Hosts;
             DryRun = config.DryRun;
+            TaskConfig = config.TaskConfig;
         }
 
-        public void BeginDeployment(IEnumerable<Invokable> tasks)
+        public void BeginDeployment(IEnumerable<MethodInfo> tasks)
         {
-            Logger.Context = this;
+            if(!tasks.Any())
+            {
+                Logger.Warn("No tasks found for deployment.");
+                return;
+            }
 
             foreach (var host in Environment.Hosts)
             {
@@ -79,12 +88,17 @@ namespace Blossom.Deployment
 
                         using (RemoteOps)
                         {
+                            var origin = new TDeployment
+                                {
+                                    Context = this,
+                                    Config = TaskConfig
+                                };
                             foreach (var task in tasks)
                             {
-                                Logger.Info("Beginning task: " + task.Method.Name);
+                                Logger.Info("Beginning task: " + task.Name);
                                 try
                                 {
-                                    task.Invoke(this);
+                                    task.Invoke(origin, null);
                                 }
                                 catch (TargetInvocationException exception)
                                 {

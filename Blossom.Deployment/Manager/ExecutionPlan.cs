@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Blossom.Deployment.Manager
 {
@@ -8,9 +9,9 @@ namespace Blossom.Deployment.Manager
     {
         public Host Host { get; private set; }
 
-        public IEnumerable<Invokable> TaskOrder { get; private set; }
+        public IEnumerable<MethodInfo> TaskOrder { get; private set; }
 
-        public ExecutionPlan(Host host, IEnumerable<Invokable> taskOrder)
+        public ExecutionPlan(Host host, IEnumerable<MethodInfo> taskOrder)
         {
             Host = host;
             TaskOrder = taskOrder;

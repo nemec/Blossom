@@ -1,29 +1,17 @@
 ﻿using System.Collections.Generic;
+using Blossom.Deployment.Logging;
 
 namespace Blossom.Deployment
 {
-    public class DeploymentConfig
+    public class DeploymentConfig<TTaskConfig>
     {
-        public virtual List<Host> Hosts { get; set; }
-        public virtual bool DryRun { get; set; }
+        public List<Host> Hosts { get; set; }
+        public bool DryRun { get; set; }
+        public ILogger Logger { get; set; }
+        public TTaskConfig TaskConfig { get; set; }
     }
 
-    public static class DeploymentConfigExtensions
-    {
-        public static void MergeFrom(this DeploymentConfig target, DeploymentConfig config)
-        {
-            #region Merge Hosts
+    public class NullConfig { }
 
-            if (target.Hosts == null)
-            {
-                target.Hosts = config.Hosts;
-            }
-            else if(config.Hosts != null)
-            {
-                target.Hosts.AddRange(config.Hosts);
-            }
-
-            #endregion
-        }
-    }
+    public class DeploymentConfig : DeploymentConfig<NullConfig> { }
 }

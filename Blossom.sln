@@ -18,8 +18,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit Tests", "Unit Tests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OperationsUnitTest", "OperationUnitTest\OperationsUnitTest.csproj", "{17BC9C5B-4F06-4CAB-BC1A-28D94355A662}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blossom.Scripting", "Blossom.Scripting\Blossom.Scripting.csproj", "{F30D3483-3977-4ECD-BBE8-EB99C588964D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentUnitTest", "DeploymentUnitTest\DeploymentUnitTest.csproj", "{451635AB-53F1-4DE7-9A9B-D3287FAD0B3F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{62A17F76-DD0B-46BF-9B43-6BEDC8F89F21}"
@@ -48,10 +46,6 @@ Global
 		{17BC9C5B-4F06-4CAB-BC1A-28D94355A662}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17BC9C5B-4F06-4CAB-BC1A-28D94355A662}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17BC9C5B-4F06-4CAB-BC1A-28D94355A662}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F30D3483-3977-4ECD-BBE8-EB99C588964D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F30D3483-3977-4ECD-BBE8-EB99C588964D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F30D3483-3977-4ECD-BBE8-EB99C588964D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F30D3483-3977-4ECD-BBE8-EB99C588964D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{451635AB-53F1-4DE7-9A9B-D3287FAD0B3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{451635AB-53F1-4DE7-9A9B-D3287FAD0B3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{451635AB-53F1-4DE7-9A9B-D3287FAD0B3F}.Release|Any CPU.ActiveCfg = Release|Any CPU

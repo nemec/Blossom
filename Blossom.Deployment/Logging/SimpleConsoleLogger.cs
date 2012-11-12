@@ -11,8 +11,6 @@ namespace Blossom.Deployment.Logging
     {
         private readonly object _lock;
 
-        public IDeploymentContext Context { get; set; }
-
         public LogLevel DisplayLogLevel { get; set; }
 
         public LogLevel AbortLogLevel { get; set; }
@@ -21,23 +19,6 @@ namespace Blossom.Deployment.Logging
         {
             _lock = new object();
             AbortLogLevel = LogLevel.Fatal;
-        }
-
-        private bool CheckLevel(LogLevel level)
-        {
-            if(AbortLogLevel <= level)
-            {
-                throw new AbortExecutionException();
-            }
-            return DisplayLogLevel <= level;
-        }
-
-        private static void PrintException(Exception exception)
-        {
-            if (exception != null)
-            {
-                Console.Error.WriteLine("\t" + exception.Message);
-            }
         }
 
         public void Tick(string message)
@@ -70,69 +51,53 @@ namespace Blossom.Deployment.Logging
             }
         }
 
-        public void Debug(string message, Exception exception)
+        public void Log(LogLevel level, string message, Exception exception)
         {
             lock (_lock)
             {
-                if (!CheckLevel(LogLevel.Debug)) return;
+                // Abort on messages with the same importance (or greater) than `level`
+                if (level >= AbortLogLevel)
+                {
+                    throw new AbortExecutionException(message, exception);
+                }
+                // Don't display messages less important than `level`
+                if (level < DisplayLogLevel) return;
 
-                Console.WriteLine("Debug: " + message);
-                PrintException(exception);
+                Console.WriteLine(message);
+                if (exception != null)
+                {
+                    Console.Error.WriteLine("\t" + exception.Message);
+                }
             }
+        }
+
+        public void Debug(string message, Exception exception)
+        {
+            Log(LogLevel.Debug, "Debug: " + message, exception);
         }
 
         public void Verbose(string message, Exception exception)
         {
-            lock (_lock)
-            {
-                if (!CheckLevel(LogLevel.Verbose)) return;
-
-                Console.WriteLine("Verbose: " + message);
-                PrintException(exception);
-            }
+            Log(LogLevel.Verbose, "Verbose: " + message, exception);
         }
 
         public void Info(string message, Exception exception)
         {
-            lock (_lock)
-            {
-                if (!CheckLevel(LogLevel.Info)) return;
-
-                Console.WriteLine("Info: " + message);
-                PrintException(exception);
-            }
+            Log(LogLevel.Info, "Info: " + message, exception);
         }
 
         public void Warn(string message, Exception exception)
         {
-            lock (_lock)
-            {
-                if (!CheckLevel(LogLevel.Warn)) return;
-
-                Console.WriteLine("Warn: " + message);
-                PrintException(exception);
-            }
+            Log(LogLevel.Warn, "Warn: " + message, exception);
         }
         public void Error(string message, Exception exception)
         {
-            lock (_lock)
-            {
-                if (!CheckLevel(LogLevel.Error)) return;
-
-                Console.WriteLine("Error: " + message);
-                PrintException(exception);
-            }
+            Log(LogLevel.Error, "Error: " + message, exception);
         }
 
         public void Fatal(string message, Exception exception)
         {
-            lock (_lock)
-            {
-                if (!CheckLevel(LogLevel.Fatal)) return;
-
-                Console.WriteLine("Fatal: " + message);
-                PrintException(exception);
-            }
+            Log(LogLevel.Fatal, "Fatal: " + message, exception);
         }
 
         public void Abort(string message, Exception exception)

@@ -6,11 +6,6 @@ namespace Blossom.Deployment.Logging
     public interface ILogger
     {
         /// <summary>
-        /// Allow access to the IDeploymentContext during logging.
-        /// </summary>
-        IDeploymentContext Context { get; set; }
-
-        /// <summary>
         /// Define the minimum log level that should be recorded.
         /// All logging to levels less than the given is ignored.
         /// </summary>
@@ -34,6 +29,8 @@ namespace Blossom.Deployment.Logging
         void Tick(string message);
 
         void ClearTicker();
+
+        void Log(LogLevel level, string message, Exception exception = null);
 
         void Debug(string message, Exception exception = null);
 

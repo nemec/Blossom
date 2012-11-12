@@ -6,31 +6,27 @@ using System.IO;
 
 namespace Blossom.Examples.PushFiles
 {
-    internal class Tasks
+    internal class Tasks : IDeployment<Config>
     {
-        private Config Config { get; set; }
-
-        public Tasks(Config config)
-        {
-            Config = config;
-        }
+        public Config Config { get; set; }
+        public IDeploymentContext Context { get; set; }
 
         [Task]
-        public void CopyFiles(IDeploymentContext context)
+        public void CopyFiles()
         {
             foreach (var input in Config.InputDirs)
-            using (new Lcd(context, input.Path))
+            using (new Lcd(Context, input.Path))
             foreach (var output in input.OutputDirs)
             {
-                context.RemoteOps.MkDir(output.Path, true);
-                using(new Cd(context, output.Path))
+                Context.RemoteOps.MkDir(output.Path, true);
+                using(new Cd(Context, output.Path))
                 foreach (var file in output.Files)
                 {
-                    context.Logger.Info(String.Format("Copying file {0} to {1}.", file, output.Path));
-                    if (!context.RemoteOps.PutFile(file, output.Path, new FileTransferHandler(context.Logger,
+                    Context.Logger.Info(String.Format("Copying file {0} to {1}.", file, output.Path));
+                    if (!Context.RemoteOps.PutFile(file, output.Path, new FileTransferHandler(Context.Logger,
                         Path.GetFileName(file)), true))
                     {
-                        context.Logger.Info("File already up to date. Not copying.");
+                        Context.Logger.Info("File already up to date. Not copying.");
                     }
                 }
             }
