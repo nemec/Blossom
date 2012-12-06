@@ -7,20 +7,21 @@ namespace Blossom.Deployment.Environments
     /// </summary>
     public class Linux : BaseEnvironment
     {
-        public Linux() { }
+        private const string DefaultShellCommand = "/bin/sh";
+
+        public Linux()
+            :base(DefaultShellCommand)
+        {
+        }
 
         public Linux(string initialDirectory)
-            : base(initialDirectory) { }
+            : base(initialDirectory, DefaultShellCommand)
+        {
+        }
 
         public override string LineEnding
         {
             get { return @"\n"; }
-            protected set { }
-        }
-
-        public override string ShellCommand
-        {
-            get { return "/bin/sh"; }
             protected set { }
         }
 

@@ -45,7 +45,7 @@ namespace Blossom.Deployment.Manager
         public IEnumerable<ExecutionPlan> GetExecutionPlans()
         {
             return ExecutionPlans ?? (ExecutionPlans = ExecutionPlanner.GetExecutionPlans(
-                Config, InitializationMethods, Tasks, CleanupMethods));
+                Config, InitializationMethods, Tasks, CleanupMethods, null));
         }
 
         public IEnumerable<Tuple<string, string>> GetAvailableCommands()
@@ -68,7 +68,13 @@ namespace Blossom.Deployment.Manager
 
         public void BeginDeployments()
         {
-            foreach (var plan in GetExecutionPlans())
+            var plans = GetExecutionPlans();
+            if (!plans.Any())
+            {
+                Config.Logger.AbortLogLevel = LogLevel.None;
+                Config.Logger.Fatal("No execution plans to run.");
+            }
+            foreach (var plan in plans)
             {
                 var deployment = new DeploymentContext<TDeployment, TTaskConfig>(
                     Config,
@@ -117,6 +123,15 @@ namespace Blossom.Deployment.Manager
                     options.Hosts.Contains(h.Alias) ||
                     options.Hosts.Contains(h.Hostname)).ToList();
             }
+
+            if (options.Roles != null && options.Roles.Length > 0)
+            {
+                config.Hosts = config.Hosts.Where(
+                    h => h.Roles != null && h.Roles.Split(';').Intersect(options.Roles).Any()).ToList();
+
+                config.Roles = options.Roles.ToList();
+            }
+
             if (options.DryRun)
             {
                 config.DryRun = options.DryRun;

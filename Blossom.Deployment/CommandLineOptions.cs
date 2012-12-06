@@ -22,6 +22,10 @@ namespace Blossom.Deployment
             HelpText = "Limits available hosts to the provided hosts (or aliases)")]
         public string[] Hosts { get; set; }
 
+        [OptionArray("r", "roles",
+            HelpText = "Limits available hosts to those in the given role or roles.")]
+        public string[] Roles { get; set; }
+
         [Option("p", "plan",
             HelpText = "Display the execution plan and exit (Tasks to be executed " +
                 "and the order they will be executed).")]

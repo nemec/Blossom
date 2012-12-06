@@ -1,9 +1,8 @@
 ﻿namespace Blossom.Deployment
 {
-    public interface IDeployment<T>
+    public interface IDeployment<in T>
     {
-        IDeploymentContext Context { get; set; }
-        T Config { get; set; }
+        void InitializeDeployment(IDeploymentContext context, T config);
     }
 
     public interface IDeployment : IDeployment<NullConfig>{ }

@@ -83,16 +83,18 @@ namespace Blossom.Deployment
                         }
                         else
                         {
+                            if (host.Password == null)
+                            {
+                                host.Password = String.Empty;
+                            }
                             RemoteOps = new BasicRemoteOperations(this, host);
                         }
 
                         using (RemoteOps)
                         {
-                            var origin = new TDeployment
-                                {
-                                    Context = this,
-                                    Config = TaskConfig
-                                };
+                            var origin = new TDeployment();
+                            origin.InitializeDeployment(this, TaskConfig);
+
                             foreach (var task in tasks)
                             {
                                 Logger.Info("Beginning task: " + task.Name);

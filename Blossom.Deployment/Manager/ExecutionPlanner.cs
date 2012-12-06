@@ -11,7 +11,8 @@ namespace Blossom.Deployment.Manager
             DeploymentConfig<T> config,
             IEnumerable<MethodInfo> initialization,
             IEnumerable<MethodInfo> tasks,
-            IEnumerable<MethodInfo> cleanup)
+            IEnumerable<MethodInfo> cleanup,
+            IEnumerable<string> forRoles)
         {
             var roleMap = CreateRolemap(config);
             return roleMap.Select(
@@ -19,7 +20,8 @@ namespace Blossom.Deployment.Manager
                         initialization, tasks, cleanup)).ToArray();
         }
 
-        private static Dictionary<Host, HashSet<string>> CreateRolemap<T>(DeploymentConfig<T> config)
+        private static Dictionary<Host, HashSet<string>> CreateRolemap<T>(
+            DeploymentConfig<T> config)
         {
             var map = new Dictionary<Host, HashSet<string>>();
 
@@ -37,7 +39,16 @@ namespace Blossom.Deployment.Manager
                     map[host] = roles;
                 }
                 if (host.Roles == null) continue;
-                roles.UnionWith(host.Roles.Split(' '));
+                if (config.Roles != null && config.Roles.Any())
+                {
+                    roles.UnionWith(
+                        host.Roles.Split(';')
+                            .Intersect(config.Roles));
+                }
+                else
+                {
+                    roles.UnionWith(host.Roles.Split(';'));
+                }
             }
             return map;
         }
@@ -54,7 +65,9 @@ namespace Blossom.Deployment.Manager
                 var hostAttrs = task.GetCustomAttributes<HostAttribute>().Select(h => h.Host).Distinct();
                 var roleAttrs = task.GetCustomAttributes<RoleAttribute>().Select(r => r.Role).Distinct();
 
-                if (hostAttrs.Contains(host.Hostname) || hostAttrs.Contains(host.Alias) ||
+                if ((!hostAttrs.Any() && !roleAttrs.Any()) ||
+                    hostAttrs.Contains(host.Hostname) ||
+                    hostAttrs.Contains(host.Alias) ||
                     roleAttrs.Any(roles.Contains))
                 {
                     tasksForHost.Add(task);

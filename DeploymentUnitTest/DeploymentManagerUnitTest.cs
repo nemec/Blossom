@@ -22,6 +22,12 @@ namespace DeploymentUnitTest
         public IDeploymentContext Context { get; set; }
         public NullConfig Config { get; set; }
 
+        public void InitializeDeployment(IDeploymentContext context, NullConfig config)
+        {
+            Config = config;
+            Context = context;
+        }
+
         [Task]
         [Host(DeploymentManagerUnitTest.SomeHostname)]
         public void Task1() { }
@@ -31,6 +37,14 @@ namespace DeploymentUnitTest
     {
         public IDeploymentContext Context { get; set; }
         public NullConfig Config { get; set; }
+
+
+        public void InitializeDeployment(IDeploymentContext context, NullConfig config)
+        {
+            Config = config;
+            Context = context;
+        }
+
 
         [Task]
         [Role(DeploymentManagerUnitTest.SomeRole)]
@@ -42,6 +56,12 @@ namespace DeploymentUnitTest
         public IDeploymentContext Context { get; set; }
         public NullConfig Config { get; set; }
 
+        public void InitializeDeployment(IDeploymentContext context, NullConfig config)
+        {
+            Config = config;
+            Context = context;
+        }
+
         [Task]
         [Role(DeploymentManagerUnitTest.SomeRole)]
         public void Task1() { }
@@ -51,6 +71,12 @@ namespace DeploymentUnitTest
     {
         public IDeploymentContext Context { get; set; }
         public NullConfig Config { get; set; }
+
+        public void InitializeDeployment(IDeploymentContext context, NullConfig config)
+        {
+            Config = config;
+            Context = context;
+        }
 
         [Task]
         [Role(DeploymentManagerUnitTest.SomeRole)]
@@ -66,6 +92,12 @@ namespace DeploymentUnitTest
         public IDeploymentContext Context { get; set; }
         public NullConfig Config { get; set; }
 
+        public void InitializeDeployment(IDeploymentContext context, NullConfig config)
+        {
+            Config = config;
+            Context = context;
+        }
+
         [Task]
         [Role(DeploymentManagerUnitTest.SomeRole)]
         [Role(DeploymentManagerUnitTest.SomeRole2)]
@@ -77,6 +109,12 @@ namespace DeploymentUnitTest
         public IDeploymentContext Context { get; set; }
         public NullConfig Config { get; set; }
 
+        public void InitializeDeployment(IDeploymentContext context, NullConfig config)
+        {
+            Config = config;
+            Context = context;
+        }
+
         [Task]
         [Host(DeploymentManagerUnitTest.SomeHostname)]
         [Host(DeploymentManagerUnitTest.SomeHostname2)]
@@ -87,6 +125,12 @@ namespace DeploymentUnitTest
     {
         public IDeploymentContext Context { get; set; }
         public NullConfig Config { get; set; }
+
+        public void InitializeDeployment(IDeploymentContext context, NullConfig config)
+        {
+            Config = config;
+            Context = context;
+        }
 
         [Task]
         [AllowMultipleExecution]  // Just to smoke out tasks that may be duplicated too
@@ -100,6 +144,12 @@ namespace DeploymentUnitTest
         public IDeploymentContext Context { get; set; }
         public NullConfig Config { get; set; }
 
+        public void InitializeDeployment(IDeploymentContext context, NullConfig config)
+        {
+            Config = config;
+            Context = context;
+        }
+
         [Task]
         [AllowMultipleExecution]  // Just to smoke out tasks that may be duplicated too
         [Host(DeploymentManagerUnitTest.SomeHostname)]
@@ -111,6 +161,12 @@ namespace DeploymentUnitTest
     {
         public IDeploymentContext Context { get; set; }
         public NullConfig Config { get; set; }
+
+        public void InitializeDeployment(IDeploymentContext context, NullConfig config)
+        {
+            Config = config;
+            Context = context;
+        }
 
         [Task]
         [AllowMultipleExecution]  // Just to smoke out tasks that may be duplicated too
@@ -124,6 +180,12 @@ namespace DeploymentUnitTest
         public IDeploymentContext Context { get; set; }
         public NullConfig Config { get; set; }
 
+        public void InitializeDeployment(IDeploymentContext context, NullConfig config)
+        {
+            Config = config;
+            Context = context;
+        }
+
         [Task]
         [AllowMultipleExecution]  // Just to smoke out tasks that may be duplicated too
         [Host(DeploymentManagerUnitTest.SomeHostname)]
@@ -135,6 +197,12 @@ namespace DeploymentUnitTest
     {
         public IDeploymentContext Context { get; set; }
         public NullConfig Config { get; set; }
+
+        public void InitializeDeployment(IDeploymentContext context, NullConfig config)
+        {
+            Config = config;
+            Context = context;
+        }
 
         [Task]
         public void Task1() { }
@@ -149,6 +217,12 @@ namespace DeploymentUnitTest
     {
         public IDeploymentContext Context { get; set; }
         public NullConfig Config { get; set; }
+
+        public void InitializeDeployment(IDeploymentContext context, NullConfig config)
+        {
+            Config = config;
+            Context = context;
+        }
 
         [Task]
         public void Task1() { }
@@ -168,6 +242,12 @@ namespace DeploymentUnitTest
         public IDeploymentContext Context { get; set; }
         public NullConfig Config { get; set; }
 
+        public void InitializeDeployment(IDeploymentContext context, NullConfig config)
+        {
+            Config = config;
+            Context = context;
+        }
+
         [Task]
         public void Task1() { }
 
@@ -185,6 +265,12 @@ namespace DeploymentUnitTest
         public IDeploymentContext Context { get; set; }
         public NullConfig Config { get; set; }
 
+        public void InitializeDeployment(IDeploymentContext context, NullConfig config)
+        {
+            Config = config;
+            Context = context;
+        }
+
         [Task]
         public void Task1() { }
     }
@@ -193,6 +279,12 @@ namespace DeploymentUnitTest
     {
         public IDeploymentContext Context { get; set; }
         public NullConfig Config { get; set; }
+
+        public void InitializeDeployment(IDeploymentContext context, NullConfig config)
+        {
+            Config = config;
+            Context = context;
+        }
 
         [DeploymentInitialize]
         public void Init() { }

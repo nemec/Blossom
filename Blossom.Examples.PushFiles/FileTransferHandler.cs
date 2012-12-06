@@ -42,7 +42,7 @@ namespace Blossom.Examples.PushFiles
         {
             _timer.Stop();
             _timer.Dispose();
-            Logger.Info(String.Format("Completed {0}...... {1} [{2}s]",
+            Logger.Info(String.Format("Copied {0}...... {1} [{2}s]",
                 Filename, HumanizeBytes(BytesTransferred), ElapsedTime));
             Logger.ClearTicker();
         }

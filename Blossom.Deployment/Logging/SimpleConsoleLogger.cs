@@ -15,13 +15,24 @@ namespace Blossom.Deployment.Logging
 
         public LogLevel AbortLogLevel { get; set; }
 
+        protected string TitleSeparator = ": ";
+
+        protected string LogTitle = "Log";
+        protected string DebugTitle = "Debug";
+        protected string VerboseTitle = "Verbose";
+        protected string InfoTitle = "Info";
+        protected string WarnTitle = "Warn";
+        protected string ErrorTitle = "Error";
+        protected string FatalTitle = "Fatal";
+        protected string AbortTitle = "Abort";
+
         public SimpleConsoleLogger()
         {
             _lock = new object();
             AbortLogLevel = LogLevel.Fatal;
         }
 
-        public void Tick(string message)
+        public virtual void Tick(string message)
         {
             var currentCol = Console.CursorLeft;
             var currentLine = Console.CursorTop;
@@ -38,7 +49,7 @@ namespace Blossom.Deployment.Logging
             }
         }
 
-        public void ClearTicker()
+        public virtual void ClearTicker()
         {
             var currentCol = Console.CursorLeft;
             var currentLine = Console.CursorTop;
@@ -51,7 +62,18 @@ namespace Blossom.Deployment.Logging
             }
         }
 
-        public void Log(LogLevel level, string message, Exception exception)
+        // TODO: http://www.dotnetperls.com/console-color
+        protected virtual void WriteLog(
+            LogLevel level, string title, string message, Exception exception = null)
+        {
+            Console.WriteLine(title + TitleSeparator + message);
+            if (exception != null)
+            {
+                Console.Error.WriteLine("\t" + exception.Message);
+            }
+        }
+
+        private void Log(LogLevel level, string title, string message, Exception exception)
         {
             lock (_lock)
             {
@@ -63,54 +85,61 @@ namespace Blossom.Deployment.Logging
                 // Don't display messages less important than `level`
                 if (level < DisplayLogLevel) return;
 
-                Console.WriteLine(message);
-                if (exception != null)
-                {
-                    Console.Error.WriteLine("\t" + exception.Message);
-                }
+                WriteLog(level, title, message, exception);
             }
-        }
-
-        public void Debug(string message, Exception exception)
-        {
-            Log(LogLevel.Debug, "Debug: " + message, exception);
-        }
-
-        public void Verbose(string message, Exception exception)
-        {
-            Log(LogLevel.Verbose, "Verbose: " + message, exception);
-        }
-
-        public void Info(string message, Exception exception)
-        {
-            Log(LogLevel.Info, "Info: " + message, exception);
-        }
-
-        public void Warn(string message, Exception exception)
-        {
-            Log(LogLevel.Warn, "Warn: " + message, exception);
-        }
-        public void Error(string message, Exception exception)
-        {
-            Log(LogLevel.Error, "Error: " + message, exception);
-        }
-
-        public void Fatal(string message, Exception exception)
-        {
-            Log(LogLevel.Fatal, "Fatal: " + message, exception);
         }
 
         public void Abort(string message, Exception exception)
         {
-            lock(_lock)
+            lock (_lock)
             {
-                Console.Error.WriteLine("Abort: {0}", message);
-                if(exception is AbortExecutionException)
+                if (exception is AbortExecutionException)
                 {
+                    WriteLog(LogLevel.Fatal, AbortTitle, exception.Message);
                     throw exception;
                 }
+                
+                WriteLog(LogLevel.Fatal, AbortTitle, message, exception);
                 throw new AbortExecutionException(message, exception);
             }
         }
+
+        #region Log levels
+
+        public void Log(LogLevel level, string message, Exception exception)
+        {
+            Log(level, LogTitle, message, exception);
+        }
+
+        public void Debug(string message, Exception exception)
+        {
+            Log(LogLevel.Debug, DebugTitle, message, exception);
+        }
+
+        public void Verbose(string message, Exception exception)
+        {
+            Log(LogLevel.Verbose, VerboseTitle, message, exception);
+        }
+
+        public void Info(string message, Exception exception)
+        {
+            Log(LogLevel.Info, InfoTitle, message, exception);
+        }
+
+        public void Warn(string message, Exception exception)
+        {
+            Log(LogLevel.Warn, WarnTitle, message, exception);
+        }
+        public void Error(string message, Exception exception)
+        {
+            Log(LogLevel.Error, ErrorTitle, message, exception);
+        }
+
+        public void Fatal(string message, Exception exception)
+        {
+            Log(LogLevel.Fatal, FatalTitle, message, exception);
+        }
+
+        #endregion
     }
 }

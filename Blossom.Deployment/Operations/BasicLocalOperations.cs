@@ -65,6 +65,11 @@ namespace Blossom.Deployment.Operations
                 WorkingDirectory = Context.Environment.Local.CurrentDirectory,
             };
 
+            if (Context.Environment.Local.IsElevated)
+            {
+                startInfo.Verb = "runas";
+            }
+
             var process = Process.Start(startInfo);
             process.StandardInput.WriteLine(command);
             process.StandardInput.Close();

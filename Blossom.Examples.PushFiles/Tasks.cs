@@ -8,8 +8,14 @@ namespace Blossom.Examples.PushFiles
 {
     internal class Tasks : IDeployment<Config>
     {
-        public Config Config { get; set; }
-        public IDeploymentContext Context { get; set; }
+        private Config Config { get; set; }
+        private IDeploymentContext Context { get; set; }
+
+        public void InitializeDeployment(IDeploymentContext context, Config config)
+        {
+            Config = config;
+            Context = context;
+        }
 
         [Task]
         public void CopyFiles()
@@ -18,11 +24,11 @@ namespace Blossom.Examples.PushFiles
             using (new Lcd(Context, input.Path))
             foreach (var output in input.OutputDirs)
             {
+                Context.Logger.Info(String.Format("Copying files from {0} to {1}.", input.Path, output.Path));
                 Context.RemoteOps.MkDir(output.Path, true);
                 using(new Cd(Context, output.Path))
                 foreach (var file in output.Files)
                 {
-                    Context.Logger.Info(String.Format("Copying file {0} to {1}.", file, output.Path));
                     if (!Context.RemoteOps.PutFile(file, output.Path, new FileTransferHandler(Context.Logger,
                         Path.GetFileName(file)), true))
                     {

@@ -6,7 +6,7 @@
 
         PathSeparator PathSeparator { get; }
 
-        string ShellCommand { get; }
+        string ShellCommand { get; set; }
 
         string ShellStartArguments { get; }
 

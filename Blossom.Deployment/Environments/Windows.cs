@@ -9,19 +9,21 @@ namespace Blossom.Deployment.Environments
     /// </summary>
     public class Windows : BaseEnvironment
     {
-        public Windows() { }
+        private const string DefaultShellCommand = "cmd.exe";
+
+        public Windows()
+            : base(DefaultShellCommand)
+        {
+        }
 
         public Windows(string initialDirectory)
-            : base(initialDirectory) { }
+            : base(DefaultShellCommand, initialDirectory)
+        {
+        }
 
         public override string LineEnding
         {
             get { return @"\r\n"; }
-            protected set { }
-        }
-        public override string ShellCommand
-        {
-            get { return "cmd.exe"; }
             protected set { }
         }
 

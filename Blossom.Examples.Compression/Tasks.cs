@@ -8,9 +8,9 @@ namespace Blossom.Examples.Compression
 {
     internal class Tasks : IDeployment<Config>
     {
-        public IDeploymentContext Context { get; set; }
+        private IDeploymentContext Context { get; set; }
 
-        public Config Config { get; set; }
+        private Config Config { get; set; }
 
         [Task]
         public void CopyFiles()
@@ -27,6 +27,12 @@ namespace Blossom.Examples.Compression
                         Path.GetFileName(file)), true);
                 }
             }
+        }
+
+        public void InitializeDeployment(IDeploymentContext context, Config config)
+        {
+            Context = context;
+            Config = config;
         }
     }
 }

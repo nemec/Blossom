@@ -15,6 +15,9 @@ namespace Blossom.Deployment
         [XmlAttribute("alias")]
         public string Alias { get; set; }
 
+        /// <summary>
+        /// Semicolon-delimited list of roles.
+        /// </summary>
         [XmlAttribute("roles")]
         public string Roles { get; set; }
 

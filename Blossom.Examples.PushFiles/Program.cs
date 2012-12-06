@@ -1,4 +1,5 @@
 ﻿using Blossom.Deployment;
+using Blossom.Deployment.Logging;
 using Blossom.Deployment.Manager;
 using System.Xml;
 using System.Xml.Serialization;
@@ -14,6 +15,8 @@ namespace Blossom.Examples.PushFiles
             var config = (Config)serializer.Deserialize(XmlReader.Create(filename));
             deployment.Hosts = config.Hosts;
             deployment.TaskConfig = config;
+
+            deployment.Logger = new ColorizedConsoleLogger();
         } 
 
         // TODO service oriented? https://github.com/fabric/fabric/issues/541

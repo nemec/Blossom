@@ -7,8 +7,6 @@ namespace Blossom.Deployment.Environments
     {
         public override string LineEnding { get; protected set; }
 
-        public override string ShellCommand { get; protected set; }
-
         public override string ShellStartArguments { get; protected set; }
 
         public override string SudoPrefix { get; protected set; }
@@ -18,10 +16,9 @@ namespace Blossom.Deployment.Environments
         public CustomEnvironment(string initialDirectory,
             string lineEnding, string shellCommand, string shellStartArguments,
             string sudoPrefix, PathSeparator pathSeparator)
-            : base(initialDirectory)
+            : base(shellCommand, initialDirectory)
         {
             LineEnding = lineEnding;
-            ShellCommand = shellCommand;
             ShellStartArguments = shellStartArguments;
             SudoPrefix = sudoPrefix;
             PathSeparator = pathSeparator;

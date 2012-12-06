@@ -13,8 +13,6 @@ namespace Blossom.Deployment.Environments
 
         public abstract string LineEnding { get; protected set; }
 
-        public abstract string ShellCommand { get; protected set; }
-
         public abstract string ShellStartArguments { get; protected set; }
 
         public abstract string SudoPrefix { get; protected set; }
@@ -23,17 +21,20 @@ namespace Blossom.Deployment.Environments
 
         public abstract string ExpandUser(string path, string username);
 
-        protected BaseEnvironment()
-            : this(null)
+        protected BaseEnvironment(string shellCommand)
+            : this(shellCommand, null)
         {
         }
 
-        protected BaseEnvironment(string initialDirectory)
+        protected BaseEnvironment(string shellCommand, string initialDirectory)
         {
             Directories = new Stack<string>();
             Prefixes = new Stack<string>();
             Pushd(initialDirectory ?? "");
+            ShellCommand = shellCommand;
         }
+
+        public string ShellCommand { get; set; }
 
         public bool IsElevated { get; set; }
 
