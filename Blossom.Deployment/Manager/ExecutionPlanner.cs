@@ -62,8 +62,10 @@ namespace Blossom.Deployment.Manager
             var tasksForHost = new HashSet<MethodInfo>();
             foreach (var task in tasks)
             {
-                var hostAttrs = task.GetCustomAttributes<HostAttribute>().Select(h => h.Host).Distinct();
-                var roleAttrs = task.GetCustomAttributes<RoleAttribute>().Select(r => r.Role).Distinct();
+                var hostAttrs = task.GetCustomAttributes<HostAttribute>()
+                    .Select(h => h.Host).Distinct();
+                var roleAttrs = task.GetCustomAttributes<RoleAttribute>()
+                    .Select(r => r.Role).Distinct();
 
                 if ((!hostAttrs.Any() && !roleAttrs.Any()) ||
                     hostAttrs.Contains(host.Hostname) ||

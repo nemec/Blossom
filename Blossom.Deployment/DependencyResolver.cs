@@ -95,7 +95,7 @@ namespace Blossom.Deployment
             _nodes = nodeMap.OrderBy(m => m.Key).Select(m => m.Value).ToList();
         }
 
-        private void Resolve(Node parent, Node curNode,
+        private static void Resolve(Node parent, Node curNode,
             List<Node> taskQueue, HashSet<Node> unresolved)
         {
             unresolved.Add(curNode);

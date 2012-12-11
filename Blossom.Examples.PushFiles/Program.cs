@@ -19,9 +19,6 @@ namespace Blossom.Examples.PushFiles
             deployment.Logger = new ColorizedConsoleLogger();
         } 
 
-        // TODO service oriented? https://github.com/fabric/fabric/issues/541
-        // http://docs.fabfile.org/en/1.4.3/usage/execution.html#execution-strategy
-        // https://github.com/fabric/fabric/issues/26
         private static void Main(string[] args)
         {
             DeploymentManager<Tasks, Config>.Main(args, ReadConfig);

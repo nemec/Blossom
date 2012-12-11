@@ -1,12 +1,12 @@
-﻿using Blossom.Deployment.Logging;
-using Renci.SshNet.Sftp;
+﻿using Blossom.Deployment;
+using Blossom.Deployment.Logging;
 using System;
 
 namespace Blossom.Examples.Compression
 {
     public class FileTransferHandler : IFileTransferHandler
     {
-        private string Filename { get; set; }
+        public string Filename { get; set; }
 
         private ILogger Logger { get; set; }
 
@@ -16,9 +16,8 @@ namespace Blossom.Examples.Compression
 
         private readonly System.Timers.Timer _timer;
         
-        public FileTransferHandler(ILogger logger, string filename)
+        public FileTransferHandler(ILogger logger)
         {
-            Filename = filename;
             Logger = logger;
 
             _timer = new System.Timers.Timer(1000);
@@ -35,15 +34,29 @@ namespace Blossom.Examples.Compression
         {
             BytesTransferred += bytes;
             Logger.Tick(String.Format("Transferring {0}... {1} [{2}s]",
-                Filename, HumanizeBytes(BytesTransferred), ElapsedTime));
+                Filename ?? "<Unknown>", HumanizeBytes(BytesTransferred), ElapsedTime));
+        }
+        public void FileDoesNotExist()
+        {
+            Logger.Error(String.Format("File {0} does not exist.", Filename ?? "<Unknown>"));
+        }
+
+        public void FileUpToDate()
+        {
+            Logger.Info(String.Format("{0} already up to date. Not copying.", Filename ?? "<Unknown>"));
+        }
+
+        public void TransferCanceled()
+        {
+            Logger.Error(String.Format("Transfer of file {0} was canceled.", Filename ?? "<Unknown>"));
         }
 
         public void TransferCompleted()
         {
             _timer.Stop();
             _timer.Dispose();
-            Logger.Info(String.Format("Completed {0}...... {1} [{2}s]",
-                Filename, HumanizeBytes(BytesTransferred), ElapsedTime));
+            Logger.Info(String.Format("Copied {0}...... {1} [{2}s]",
+                Filename ?? "<Unknown>", HumanizeBytes(BytesTransferred), ElapsedTime));
             Logger.ClearTicker();
         }
 

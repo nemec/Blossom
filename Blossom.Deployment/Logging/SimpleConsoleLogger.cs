@@ -26,6 +26,10 @@ namespace Blossom.Deployment.Logging
         protected string FatalTitle = "Fatal";
         protected string AbortTitle = "Abort";
 
+        /// <summary>
+        /// Create a default logger with the <see cref="AbortLogLevel"/>
+        /// set to <see cref="LogLevel.Fatal"/>.
+        /// </summary>
         public SimpleConsoleLogger()
         {
             _lock = new object();

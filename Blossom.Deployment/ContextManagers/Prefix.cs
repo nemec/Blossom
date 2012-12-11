@@ -7,18 +7,15 @@
     /// </summary>
     public class Prefix : ContextManager
     {
-        private string Pf { get; set; }
-
+        /// <summary>
+        /// Add a new prefix to all commands.
+        /// </summary>
+        /// <param name="context">Deployment context.</param>
+        /// <param name="prefix">Prefix content.</param>
         public Prefix(IDeploymentContext context, string prefix)
             : base(context)
         {
-            Pf = prefix;
-            Begin();
-        }
-
-        protected override void Enter()
-        {
-            Context.Environment.Remote.PushPrefix(Pf);
+            Context.Environment.Remote.PushPrefix(prefix);
         }
 
         protected override void Exit()

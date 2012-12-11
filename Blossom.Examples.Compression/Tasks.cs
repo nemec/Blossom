@@ -2,7 +2,6 @@
 using Blossom.Deployment.Attributes;
 using Blossom.Deployment.ContextManagers;
 using System;
-using System.IO;
 
 namespace Blossom.Examples.Compression
 {
@@ -23,8 +22,8 @@ namespace Blossom.Examples.Compression
                 foreach (var file in output.Files)
                 {
                     Context.Logger.Info(String.Format("Copying file {0} to {1}.", file, output.Path));
-                    Context.RemoteOps.PutFile(file, output.Path, new FileTransferHandler(Context.Logger, 
-                        Path.GetFileName(file)), true);
+                    Context.RemoteOps.PutFile(file, output.Path,
+                        new FileTransferHandler(Context.Logger), true);
                 }
             }
         }

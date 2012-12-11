@@ -13,6 +13,12 @@ namespace Blossom.Deployment.Attributes
     public sealed class TaskAttribute : Attribute
     {
         /// <summary>
+        /// A more descriptive name for the task. Substituted
+        /// instead of the method name when displaying to the user.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// Short description of the task. Suitable
         /// for displaying in a help menu.
         /// </summary>

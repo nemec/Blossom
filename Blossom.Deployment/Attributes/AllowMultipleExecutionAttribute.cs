@@ -20,8 +20,19 @@ namespace Blossom.Deployment.Attributes
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class AllowMultipleExecutionAttribute : Attribute
     {
+        /// <summary>
+        /// If <see cref="Standalone"/> is true (the default),
+        /// the task will be run once on its own as well as every
+        /// time it's a dependency. Otherwise, the taskwill only be
+        /// run if it is a dependency of another task.
+        /// </summary>
         public bool Standalone { get; set; }
 
+        /// <summary>
+        /// Indicate that this task may be executed multiple
+        /// times. By default, <see cref="Standalone"/> is
+        /// set to true.
+        /// </summary>
         public AllowMultipleExecutionAttribute()
         {
             Standalone = true;

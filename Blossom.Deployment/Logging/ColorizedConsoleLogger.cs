@@ -72,7 +72,7 @@ namespace Blossom.Deployment.Logging
                 {
                     new ColorProfile
                         {
-                           MatchExpr = "beginning task",
+                           MatchExpr = ".*beginning task.*",
                            RegexOptions = RegexOptions.IgnoreCase,
                            Foreground = Color.DarkGreen
                         },
@@ -85,6 +85,12 @@ namespace Blossom.Deployment.Logging
                                 },
                             MatchExpr = ".+",
                             Foreground = Color.Red
+                        },
+                    new ColorProfile
+                        {
+                            MatchExpr = ".*beginning deployment.*",
+                            RegexOptions = RegexOptions.IgnoreCase,
+                            Foreground = Color.Cyan
                         }
                 };
         }

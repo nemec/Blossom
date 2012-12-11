@@ -1,6 +1,8 @@
-﻿using Renci.SshNet;
+﻿using System.Collections.Generic;
+using System.Linq;
+using GlobDir;
+using Renci.SshNet;
 using Renci.SshNet.Common;
-using Renci.SshNet.Sftp;
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -89,10 +91,18 @@ namespace Blossom.Deployment.Operations
                 Context.Environment.Remote.CurrentDirectory,
                 destinationPath);
 
+            if (handler != null)
+            {
+                handler.Filename = filename;
+            }
+
             if (!File.Exists(source))
             {
-                Context.Logger.Error(String.Format("File {0} does not exist.", filename));
-                return true;
+                if (handler != null)
+                {
+                    handler.FileDoesNotExist();
+                }
+                return false;
             }
 
             if (Path.GetFileName(destinationPath) == "")
@@ -113,6 +123,10 @@ namespace Blossom.Deployment.Operations
                 }
                 if (modified <= remoteModified)
                 {
+                    if (handler != null)
+                    {
+                        handler.FileUpToDate();
+                    }
                     return false;
                 }
             }
@@ -153,6 +167,33 @@ namespace Blossom.Deployment.Operations
                 if (!Sftp.Exists(path))
                 {
                     Sftp.CreateDirectory(path);
+                }
+            }
+        }
+
+        public void PutDir(string sourceDir, string destinationDir,
+            IFileTransferHandler handler, bool ifNewer)
+        {
+            PutDir(sourceDir, destinationDir, handler, ifNewer, new []{"*"});
+        }
+
+        public void PutDir(string sourceDir, string destinationDir,
+            IFileTransferHandler handler, bool ifNewer, IEnumerable<string> fileFilters)
+        {
+            MkDir(destinationDir, true);
+            foreach (var filter in fileFilters)
+            {
+                var pattern = Context.Environment.Local.CombinePath(sourceDir, filter);
+                var matches = Glob.GetMatches(Utils.NormalizePathSeparators(pattern, PathSeparator.ForwardSlash));
+                if (!matches.Any())
+                {
+                    handler.Filename = Path.GetFileName(filter);
+                    handler.FileDoesNotExist();
+                    continue;
+                }
+                foreach (var file in matches)
+                {
+                    PutFile(file, destinationDir, handler, ifNewer);
                 }
             }
         }

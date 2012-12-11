@@ -10,15 +10,9 @@ namespace Blossom.Deployment.ContextManagers
     /// <see cref="http://www.python.org/dev/peps/pep-0343/"/>
     public abstract class ContextManager : IDisposable
     {
-        private bool _entered;
+        private bool _disposed;
 
         protected readonly IDeploymentContext Context;
-
-        /// <summary>
-        /// A function that manages "entering" the context.
-        /// This is the set up for the context.
-        /// </summary>
-        protected abstract void Enter();
 
         /// <summary>
         /// A function that manages "exiting" the context.
@@ -36,18 +30,11 @@ namespace Blossom.Deployment.ContextManagers
         protected ContextManager(IDeploymentContext context)
         {
             Context = context;
-            _entered = false;
         }
 
         ~ContextManager()
         {
             Dispose(false);
-        }
-
-        protected void Begin()
-        {
-            _entered = true;
-            Enter();
         }
 
         public void Dispose()
@@ -58,9 +45,10 @@ namespace Blossom.Deployment.ContextManagers
 
         protected virtual void Dispose(bool disposeManaged)
         {
-            if (_entered)
+            if (!_disposed)
             {
                 Exit();
+                _disposed = true;
             }
         }
     }

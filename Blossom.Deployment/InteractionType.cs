@@ -1,5 +1,9 @@
 ﻿namespace Blossom.Deployment
 {
+    /// <summary>
+    /// Define the interactivity of a session and what to
+    /// do when input is requested from the user.
+    /// </summary>
     public enum InteractionType
     {
         /// <summary>

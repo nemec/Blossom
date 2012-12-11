@@ -1,4 +1,6 @@
-﻿using Renci.SshNet.Sftp;
+﻿using System.Linq;
+using GlobDir;
+using Renci.SshNet.Sftp;
 using System;
 using System.IO;
 
@@ -60,7 +62,7 @@ namespace Blossom.Deployment.Operations
 
         public bool PutFile(string sourcePath, string destinationPath, IFileTransferHandler handler, bool ifNewer)
         {
-            var filename = Path.GetFileName(sourcePath);
+            handler.Filename = Path.GetFileName(sourcePath);
             sourcePath = Context.Environment.Local.CombinePath(
                 Context.Environment.Local.CurrentDirectory, sourcePath);
             destinationPath = Context.Environment.Local.CombinePath(
@@ -68,22 +70,25 @@ namespace Blossom.Deployment.Operations
 
             if (!File.Exists(sourcePath))
             {
-                Context.Logger.Error(String.Format("File {0} does not exist.", filename));
+                handler.FileDoesNotExist();
                 return true;
+            }
+
+            if (Directory.Exists(destinationPath))
+            {
+                destinationPath = Context.Environment.Local.CombinePath(
+                    destinationPath, Path.GetFileName(sourcePath));
             }
 
             if (ifNewer && File.Exists(destinationPath) && 
                 File.GetLastWriteTimeUtc(sourcePath) <= File.GetLastWriteTimeUtc(destinationPath))
             {
+                handler.FileUpToDate();
                 return false;
             }
             using (var file = File.OpenRead(sourcePath))
             {
-                if (Directory.Exists(destinationPath))
-                {
-                    destinationPath = Context.Environment.Local.CombinePath(
-                        destinationPath, Path.GetFileName(sourcePath));
-                }
+                
                 PutFile(file, destinationPath, handler);
             }
             return true;
@@ -108,6 +113,32 @@ namespace Blossom.Deployment.Operations
 
         public void Dispose()
         {
+        }
+
+
+        public void PutDir(string sourceDir, string destinationDir, IFileTransferHandler handler, bool ifNewer)
+        {
+            PutDir(sourceDir, destinationDir, handler, ifNewer, new[] { "*" });
+        }
+
+        public void PutDir(string sourceDir, string destinationDir, IFileTransferHandler handler, bool ifNewer, System.Collections.Generic.IEnumerable<string> fileFilters)
+        {
+            MkDir(destinationDir, true);
+            foreach (var filter in fileFilters)
+            {
+                var pattern = Context.Environment.Local.CombinePath(sourceDir, filter);
+                var matches = Glob.GetMatches(Utils.NormalizePathSeparators(pattern, PathSeparator.ForwardSlash));
+                if (!matches.Any())
+                {
+                    handler.Filename = Path.GetFileName(filter);
+                    handler.FileDoesNotExist();
+                    continue;
+                }
+                foreach (var file in matches)
+                {
+                    PutFile(file, destinationDir, handler, ifNewer);
+                }
+            }
         }
     }
 }

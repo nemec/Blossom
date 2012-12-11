@@ -2,7 +2,6 @@
 using Blossom.Deployment.Attributes;
 using Blossom.Deployment.ContextManagers;
 using System;
-using System.IO;
 
 namespace Blossom.Examples.PushFiles
 {
@@ -26,14 +25,10 @@ namespace Blossom.Examples.PushFiles
             {
                 Context.Logger.Info(String.Format("Copying files from {0} to {1}.", input.Path, output.Path));
                 Context.RemoteOps.MkDir(output.Path, true);
-                using(new Cd(Context, output.Path))
-                foreach (var file in output.Files)
+                using (new Cd(Context, output.Path))
                 {
-                    if (!Context.RemoteOps.PutFile(file, output.Path, new FileTransferHandler(Context.Logger,
-                        Path.GetFileName(file)), true))
-                    {
-                        Context.Logger.Info("File already up to date. Not copying.");
-                    }
+                    Context.RemoteOps.PutDir(input.Path, output.Path,
+                        new FileTransferHandler(Context.Logger), true, output.Files);
                 }
             }
         }

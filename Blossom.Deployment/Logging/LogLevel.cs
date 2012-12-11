@@ -1,5 +1,9 @@
 ﻿namespace Blossom.Deployment.Logging
 {
+    /// <summary>
+    /// Allow tagging of logging statements with a category
+    /// specifying the importance of a log message.
+    /// </summary>
     public enum LogLevel
     {
         /// <summary>

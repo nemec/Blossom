@@ -2,21 +2,21 @@
 
 namespace Blossom.Deployment.ContextManagers
 {
+    /// <summary>
+    /// Context manager for changing directories on a remote machine.
+    /// </summary>
     public class Cd : ContextManager
     {
-        private readonly string _newPath;
-
+        /// <summary>
+        /// Change to the given directory on the remote machine.
+        /// </summary>
+        /// <param name="context">Deployment context.</param>
+        /// <param name="path">New current directory.</param>
         public Cd(IDeploymentContext context, string path)
             : base(context)
         {
-            _newPath = path;
-            Begin();
-        }
-
-        protected override void Enter()
-        {
             Context.Environment.Remote.Pushd(
-                Path.Combine(Context.Environment.Remote.CurrentDirectory, _newPath));
+                Path.Combine(Context.Environment.Remote.CurrentDirectory, path));
         }
 
         protected override void Exit()

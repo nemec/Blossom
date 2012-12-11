@@ -2,32 +2,27 @@
 
 namespace Blossom.Deployment.ContextManagers
 {
+    /// <summary>
+    /// Context manager for changing directories on a local machine.
+    /// </summary>
     public class Lcd : ContextManager
     {
-        private readonly string _newPath;
-
+        /// <summary>
+        /// Change to the given directory on the local machine.
+        /// </summary>
+        /// <param name="context">Deployment context.</param>
+        /// <param name="path">New current directory.</param>
         public Lcd(IDeploymentContext context, string path)
             : base(context)
         {
-            _newPath = path;
-            Begin();
-        }
-
-        protected override void Enter()
-        {
-            if (_newPath != null)
-            {
-                Context.Environment.Local.Pushd(
-                    Path.Combine(Context.Environment.Local.CurrentDirectory, _newPath));
-            }
+            Context.Environment.Local.Pushd(
+            Path.Combine(Context.Environment.Local.CurrentDirectory, path));
+            
         }
 
         protected override void Exit()
         {
-            if (_newPath != null)
-            {
-                Context.Environment.Local.Popd();
-            }
+            Context.Environment.Local.Popd();
         }
     }
 }

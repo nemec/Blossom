@@ -1,5 +1,6 @@
-﻿using Blossom.Deployment.Logging;
-using Renci.SshNet.Sftp;
+﻿using System.Collections.Generic;
+using System.Text;
+using Blossom.Deployment.Logging;
 using System;
 using System.IO;
 
@@ -71,6 +72,25 @@ namespace Blossom.Deployment.Operations
 
         public void Dispose()
         {
+        }
+
+        public void PutDir(string sourceDir, string destinationDir, IFileTransferHandler handler, bool ifNewer)
+        {
+            LogDryRun("PutDir", String.Format("Copying directory {0} to {1} on remote host",
+                sourceDir, destinationDir));
+        }
+
+        public void PutDir(string sourceDir, string destinationDir, IFileTransferHandler handler, bool ifNewer, IEnumerable<string> fileFilters)
+        {
+            var builder = new StringBuilder();
+            foreach (var filter in fileFilters)
+            {
+                builder.Append("\t");
+                builder.AppendLine(filter);
+            }
+            LogDryRun("PutDir", String.Format(
+                "Copying directory {0} to {1} on remote host, allowing only these files:\n{2}",
+                sourceDir, destinationDir, builder));
         }
     }
 }
