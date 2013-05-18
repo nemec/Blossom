@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace Blossom.Deployment.Environments
 {
+    /// <summary>
+    /// Implement common environment operations.
+    /// </summary>
     public abstract class BaseEnvironment : IEnvironment
     {
         internal Stack<string> Directories { get; set; }
@@ -21,12 +24,7 @@ namespace Blossom.Deployment.Environments
 
         public abstract string ExpandUser(string path, string username);
 
-        protected BaseEnvironment(string shellCommand)
-            : this(shellCommand, null)
-        {
-        }
-
-        protected BaseEnvironment(string shellCommand, string initialDirectory)
+        protected BaseEnvironment(string shellCommand = null, string initialDirectory = null)
         {
             Directories = new Stack<string>();
             Prefixes = new Stack<string>();

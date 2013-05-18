@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Blossom.Deployment.Logging;
 using GlobDir;
 using Renci.SshNet;
 using Renci.SshNet.Common;
@@ -172,13 +173,13 @@ namespace Blossom.Deployment.Operations
         }
 
         public void PutDir(string sourceDir, string destinationDir,
-            IFileTransferHandler handler, bool ifNewer)
+            Func<IFileTransferHandler> handlerFactory, bool ifNewer)
         {
-            PutDir(sourceDir, destinationDir, handler, ifNewer, new []{"*"});
+            PutDir(sourceDir, destinationDir, handlerFactory, ifNewer, new []{"*"});
         }
 
         public void PutDir(string sourceDir, string destinationDir,
-            IFileTransferHandler handler, bool ifNewer, IEnumerable<string> fileFilters)
+            Func<IFileTransferHandler> handlerFactory, bool ifNewer, IEnumerable<string> fileFilters)
         {
             MkDir(destinationDir, true);
             foreach (var filter in fileFilters)
@@ -187,13 +188,16 @@ namespace Blossom.Deployment.Operations
                 var matches = Glob.GetMatches(Utils.NormalizePathSeparators(pattern, PathSeparator.ForwardSlash));
                 if (!matches.Any())
                 {
+                    var handler = handlerFactory();
                     handler.Filename = Path.GetFileName(filter);
                     handler.FileDoesNotExist();
-                    continue;
                 }
-                foreach (var file in matches)
+                else
                 {
-                    PutFile(file, destinationDir, handler, ifNewer);
+                    foreach (var file in matches)
+                    {
+                        PutFile(file, destinationDir, handlerFactory(), ifNewer);
+                    }
                 }
             }
         }

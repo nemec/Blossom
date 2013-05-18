@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using GlobDir;
-using Renci.SshNet.Sftp;
 using System;
 using System.IO;
 
@@ -26,7 +25,7 @@ namespace Blossom.Deployment.Operations
 
         public string RunCommand(string command)
         {
-            return LocalOps.RunLocal(command);
+            return LocalOps.Run(command);
         }
 
         private static void CopyFile(Stream source, string destination, int bytesPerChunk, IFileTransferHandler handler)
@@ -116,12 +115,12 @@ namespace Blossom.Deployment.Operations
         }
 
 
-        public void PutDir(string sourceDir, string destinationDir, IFileTransferHandler handler, bool ifNewer)
+        public void PutDir(string sourceDir, string destinationDir, Func<IFileTransferHandler> handlerFactory, bool ifNewer)
         {
-            PutDir(sourceDir, destinationDir, handler, ifNewer, new[] { "*" });
+            PutDir(sourceDir, destinationDir, handlerFactory, ifNewer, new[] { "*" });
         }
 
-        public void PutDir(string sourceDir, string destinationDir, IFileTransferHandler handler, bool ifNewer, System.Collections.Generic.IEnumerable<string> fileFilters)
+        public void PutDir(string sourceDir, string destinationDir, Func<IFileTransferHandler> handlerFactory, bool ifNewer, System.Collections.Generic.IEnumerable<string> fileFilters)
         {
             MkDir(destinationDir, true);
             foreach (var filter in fileFilters)
@@ -130,13 +129,17 @@ namespace Blossom.Deployment.Operations
                 var matches = Glob.GetMatches(Utils.NormalizePathSeparators(pattern, PathSeparator.ForwardSlash));
                 if (!matches.Any())
                 {
+                    var handler = handlerFactory();
                     handler.Filename = Path.GetFileName(filter);
                     handler.FileDoesNotExist();
-                    continue;
                 }
-                foreach (var file in matches)
+                else
                 {
-                    PutFile(file, destinationDir, handler, ifNewer);
+                    foreach (var file in matches)
+                    {
+                        var handler = handlerFactory();
+                        PutFile(file, destinationDir, handler, ifNewer);
+                    }
                 }
             }
         }

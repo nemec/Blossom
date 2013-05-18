@@ -71,6 +71,7 @@
     <Compile Include="ContextManagers\Prefix.cs" />
     <Compile Include="ContextManagers\Sudo.cs" />
     <Compile Include="DependencyResolver.cs" />
+    <Compile Include="FileTransferHandler.cs" />
     <Compile Include="IDeployment.cs" />
     <Compile Include="DeploymentContext.cs" />
     <Compile Include="Exceptions\AbortExecutionException.cs" />

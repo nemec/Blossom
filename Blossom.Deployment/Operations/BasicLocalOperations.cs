@@ -34,9 +34,9 @@ namespace Blossom.Deployment.Operations
         /// </summary>
         /// <param name="command">Command (and optional arguments) to run.</param>
         /// <returns>Output of the command.</returns>
-        public string RunLocal(string command)
+        public string Run(string command)
         {
-            return RunLocal(command, -1);
+            return Run(command, TimeSpan.MaxValue);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Blossom.Deployment.Operations
         /// <param name="timeout">Timeout in milliseconds.</param>
         /// <exception cref="TimeoutException">Thrown when the timeout is reached before the process exits.</exception>
         /// <returns>Output of the command.</returns>
-        public string RunLocal(string command, int timeout)
+        public string Run(string command, TimeSpan timeout)
         {
             var startInfo = new ProcessStartInfo(Context.Environment.Local.ShellCommand)
             {
@@ -74,7 +74,7 @@ namespace Blossom.Deployment.Operations
             process.StandardInput.WriteLine(command);
             process.StandardInput.Close();
 
-            if (!process.WaitForExit(timeout))
+            if (!process.WaitForExit((int)timeout.TotalMilliseconds))
             {
                 process.Kill();
                 throw new TimeoutException("Process timed out while waiting for exit.");
@@ -137,47 +137,56 @@ namespace Blossom.Deployment.Operations
         {
             if (scheme == CompressionScheme.None || scheme == CompressionScheme.GZip)
             {
-                Stream innerStream = outputStream;
-                if (scheme == CompressionScheme.GZip)
+                var innerStream = outputStream;
+                try
                 {
-                    innerStream = new GZipOutputStream(outputStream)
+                    switch (scheme)
                     {
-                        IsStreamOwner = false
-                    };
-                    ((GZipOutputStream)innerStream).SetLevel(compressionLevel);
-                }
+                        case CompressionScheme.None:
+                            // Nothing to do...
+                            break;
+                        case CompressionScheme.GZip:
+                            innerStream = new GZipOutputStream(outputStream)
+                                {
+                                    IsStreamOwner = false
+                                };
+                            ((GZipOutputStream) innerStream).SetLevel(compressionLevel);
+                            break;
+                        default:
+                            throw new NotImplementedException(String.Format(
+                                "Compression Scheme {0} not yet implemented.", scheme));
+                    }
 
-                using (var output = new TarOutputStream(innerStream))
-                {
-                    output.IsStreamOwner = false;
-                    foreach (var source in sources)
+                    using (var output = new TarOutputStream(innerStream))
                     {
-                        if (String.IsNullOrWhiteSpace(source))
+                        output.IsStreamOwner = false;
+                        foreach (var source in sources)
                         {
-                            continue;
-                        }
-                        var fullpath = Context.Environment.Local.CombinePath(
-                            Context.Environment.Local.CurrentDirectory, source);
-                        if (File.Exists(fullpath))
-                        {
-                            TarFile(output, null, fullpath);
-                        }
-                        else
-                        {
-                            RecursiveTarDir(output, null, fullpath, pathDepth);
+                            if (String.IsNullOrWhiteSpace(source))
+                            {
+                                continue;
+                            }
+                            var fullpath = Context.Environment.Local.CombinePath(
+                                Context.Environment.Local.CurrentDirectory, source);
+                            if (File.Exists(fullpath))
+                            {
+                                TarFile(output, null, fullpath);
+                            }
+                            else
+                            {
+                                RecursiveTarDir(output, null, fullpath, pathDepth);
+                            }
                         }
                     }
                 }
-
-                if (innerStream is GZipOutputStream)
+                finally
                 {
-                    innerStream.Close();
+                    if (!ReferenceEquals(innerStream, outputStream))
+                    {
+                        // We own the stream... close it.
+                        innerStream.Close();
+                    }
                 }
-            }
-            else
-            {
-                throw new NotImplementedException(String.Format(
-                    "Compression Scheme {0} not yet implemented.", scheme));
             }
         }
 

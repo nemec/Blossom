@@ -11,13 +11,13 @@ namespace Blossom.Deployment.Environments
     {
         private const string DefaultShellCommand = "cmd.exe";
 
-        public Windows()
-            : base(DefaultShellCommand)
-        {
-        }
-
-        public Windows(string initialDirectory)
-            : base(DefaultShellCommand, initialDirectory)
+        /// <summary>
+        /// Create a new Windows environment with an optional initial directory and shell.
+        /// </summary>
+        /// <param name="initialDirectory">Initial directory path.</param>
+        /// <param name="shellCommand">Shell command to use (or null for default).</param>
+        public Windows(string initialDirectory = null, string shellCommand = null)
+            : base(shellCommand ?? DefaultShellCommand, initialDirectory)
         {
         }
 

@@ -4,14 +4,29 @@ using System.Xml.Serialization;
 
 namespace Blossom.Deployment
 {
+    /// <summary>
+    /// Description of a remote host.
+    /// </summary>
     [XmlRoot("Host")]
     public class Host : IEquatable<Host>
     {
+        /// <summary>
+        /// Constant value of the "loopback" remote host. This
+        /// host, when specified, will bypass the network execute
+        /// all operations locally.
+        /// </summary>
         public const string LoopbackHostname = "loopback";
 
+        /// <summary>
+        /// Hostname or IP address of the remote host.
+        /// </summary>
         [XmlText]
         public string Hostname { get; set; }
 
+        /// <summary>
+        /// An optional alias for this host. Accepted as an alternative
+        /// to specifying the hostname during task assignment.
+        /// </summary>
         [XmlAttribute("alias")]
         public string Alias { get; set; }
 
@@ -21,15 +36,29 @@ namespace Blossom.Deployment
         [XmlAttribute("roles")]
         public string Roles { get; set; }
 
+        /// <summary>
+        /// Login username for the host.
+        /// </summary>
         [XmlAttribute("username")]
         public string Username { get; set; }
 
+        /// <summary>
+        /// Login password for the host.
+        /// </summary>
         [XmlAttribute("password")]
         public string Password { get; set; }
 
+        /// <summary>
+        /// Host's SSH port. Defaults to 22.
+        /// </summary>
         [XmlAttribute("port")]
         public int Port { get; set; }
 
+        /// <summary>
+        /// Create a new host using the hostname "localhost",
+        /// the username of the current user, no password, and
+        /// a port of 22.
+        /// </summary>
         public Host()
         {
             Hostname = "localhost";

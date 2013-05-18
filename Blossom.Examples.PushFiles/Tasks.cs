@@ -28,7 +28,7 @@ namespace Blossom.Examples.PushFiles
                 using (new Cd(Context, output.Path))
                 {
                     Context.RemoteOps.PutDir(input.Path, output.Path,
-                        new FileTransferHandler(Context.Logger), true, output.Files);
+                        () => new FileTransferHandler(Context.Logger), false, output.Files);
                 }
             }
         }

@@ -70,13 +70,13 @@ namespace Blossom.Deployment.Operations
         /// </summary>
         /// <param name="sourceDir">Directory to copy.</param>
         /// <param name="destinationDir">Destination directory where contents are copied.</param>
-        /// <param name="handler">Display file transfer information.</param>
+        /// <param name="handlerFactory">Produces <see cref="IFileTransferHandler"/>s for each copied file.</param>
         /// <param name="ifNewer">
         ///     If file exists on destination, only copy if that file is
         ///     older than the one being copied.
         /// </param>
         void PutDir(string sourceDir, string destinationDir,
-                    IFileTransferHandler handler, bool ifNewer);
+                    Func<IFileTransferHandler> handlerFactory, bool ifNewer);
 
         /// <summary>
         ///     Copy a directory (and all files, recursively)
@@ -87,7 +87,7 @@ namespace Blossom.Deployment.Operations
         /// </summary>
         /// <param name="sourceDir">Directory to copy.</param>
         /// <param name="destinationDir">Destination directory where contents are copied.</param>
-        /// <param name="handler">Display file transfer information.</param>
+        /// <param name="handlerFactory">Produces <see cref="IFileTransferHandler"/>s for each copied file.</param>
         /// <param name="ifNewer">
         ///     If file exists on destination, only copy if that file is
         ///     older than the one being copied.
@@ -98,7 +98,7 @@ namespace Blossom.Deployment.Operations
         ///     ? for one arbitrary character.
         /// </param>
         void PutDir(string sourceDir, string destinationDir,
-                    IFileTransferHandler handler, bool ifNewer, IEnumerable<string> fileFilters);
+                    Func<IFileTransferHandler> handlerFactory, bool ifNewer, IEnumerable<string> fileFilters);
 
         /// <summary>
         /// Creates a directory on the remote computer.

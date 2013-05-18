@@ -2,9 +2,12 @@
 
 namespace Blossom.Deployment.Exceptions
 {
-    public class TaskDependencyException : Exception
+    /// <summary>
+    /// General task dependency error.
+    /// </summary>
+    public abstract class TaskDependencyException : Exception
     {
-        public TaskDependencyException(string message)
+        protected TaskDependencyException(string message)
             : base(message) { }
     }
 }

@@ -5,12 +5,26 @@ using System.Reflection;
 
 namespace Blossom.Deployment.Manager
 {
+    /// <summary>
+    /// A set of tasks to run on a host.
+    /// </summary>
     public class ExecutionPlan : IEquatable<ExecutionPlan>
     {
+        /// <summary>
+        /// Host this plan is applied to.
+        /// </summary>
         public Host Host { get; private set; }
 
+        /// <summary>
+        /// List of tasks to run, in order.
+        /// </summary>
         public IEnumerable<MethodInfo> TaskOrder { get; private set; }
 
+        /// <summary>
+        /// Create a new execution plan.
+        /// </summary>
+        /// <param name="host">Plan's host.</param>
+        /// <param name="taskOrder">Plan's tasks.</param>
         public ExecutionPlan(Host host, IEnumerable<MethodInfo> taskOrder)
         {
             Host = host;

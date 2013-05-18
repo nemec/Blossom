@@ -1,8 +1,7 @@
-﻿using Blossom.Deployment;
-using Blossom.Deployment.Logging;
+﻿using Blossom.Deployment.Logging;
 using System;
 
-namespace Blossom.Examples.PushFiles
+namespace Blossom.Deployment
 {
     public class FileTransferHandler : IFileTransferHandler
     {

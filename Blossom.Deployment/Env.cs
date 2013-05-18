@@ -4,15 +4,16 @@ using System.Collections.Generic;
 
 namespace Blossom.Deployment
 {
+    /// <summary>
+    /// Control access to both the local and remote environment.
+    /// </summary>
     public class Env
     {
         internal IEnvironment Remote { get; set; }
 
         internal IEnvironment Local { get; set; }
 
-        internal List<Host> Hosts { get; set; }
-
-        internal Host CurrentHost { get; set; }
+        internal Host Host { get; set; }
 
         internal Dictionary<string, object> Extras { get; set; } 
 
@@ -28,19 +29,31 @@ namespace Blossom.Deployment
 
         #endregion Properties
 
-
+        /// <summary>
+        /// Set up a Windows remote environment and automatically
+        /// determine the local environment.
+        /// </summary>
         public Env()
             : this(new Windows()) { }
 
+        /// <summary>
+        /// Use the given remote environment and automatically
+        /// determine the local environment.
+        /// </summary>
+        /// <param name="remote">Remote environment.</param>
         public Env(IEnvironment remote)
             : this(remote, EnvironmentFinder.AutoDetermineLocalEnvironment(
                 AppDomain.CurrentDomain.BaseDirectory)) { }
 
+        /// <summary>
+        /// Use a custom environment both remotely and locally.
+        /// </summary>
+        /// <param name="remote">Remote environment.</param>
+        /// <param name="local">Local environment.</param>
         public Env(IEnvironment remote, IEnvironment local)
         {
             Remote = remote;
             Local = local;
-            Hosts = new List<Host>();
             Extras = new Dictionary<string, object>();
             InteractionType = InteractionType.AskForInput;
         }

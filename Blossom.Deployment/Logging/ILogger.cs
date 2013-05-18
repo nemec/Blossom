@@ -3,6 +3,9 @@ using Blossom.Deployment.Exceptions;
 
 namespace Blossom.Deployment.Logging
 {
+    /// <summary>
+    /// Allow logging of informational and error messages.
+    /// </summary>
     public interface ILogger
     {
         /// <summary>
@@ -28,18 +31,52 @@ namespace Blossom.Deployment.Logging
         /// <param name="message">Text to display</param>
         void Tick(string message);
 
+        /// <summary>
+        /// Clear the ticker from the screen.
+        /// </summary>
         void ClearTicker();
 
+        /// <summary>
+        /// Log a message with a custom <see cref="LogLevel"/>
+        /// </summary>
+        /// <param name="level">Logging level.</param>
+        /// <param name="message">Message to log.</param>
+        /// <param name="exception">Optional exception to attach to the log.</param>
         void Log(LogLevel level, string message, Exception exception = null);
 
+        /// <summary>
+        /// Log a debugging message.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        /// <param name="exception">Optional exception to attach to the log.</param>
         void Debug(string message, Exception exception = null);
 
+        /// <summary>
+        /// Log a verbose message.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        /// <param name="exception">Optional exception to attach to the log.</param>
         void Verbose(string message, Exception exception = null);
 
+        /// <summary>
+        /// Log an informational message.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        /// <param name="exception">Optional exception to attach to the log.</param>
         void Info(string message, Exception exception = null);
 
+        /// <summary>
+        /// Log a warning message.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        /// <param name="exception">Optional exception to attach to the log.</param>
         void Warn(string message, Exception exception = null);
 
+        /// <summary>
+        /// Log an error message.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        /// <param name="exception">Optional exception to attach to the log.</param>
         void Error(string message, Exception exception = null);
 
         /// <summary>

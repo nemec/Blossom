@@ -11,10 +11,22 @@ using System.Reflection;
 
 namespace Blossom.Deployment
 {
-    public class DeploymentContext<TDeployment, TConfig>
-        : IDeploymentContext where TDeployment : IDeployment<TConfig>, new()
+    /// <summary>
+    /// Manages the environment for a single deployment on
+    /// a single host. Each context is independent from any
+    /// other deployment context.
+    /// </summary>
+    /// <typeparam name="TDeployment">
+    ///     Type of the class holding all tasks for this deployment.
+    /// </typeparam>
+    /// <typeparam name="TTaskConfig">
+    ///     Type of the custom configuration object provided
+    ///     to each <see cref="IDeploymentContext"/>.
+    /// </typeparam>
+    public class DeploymentContext<TDeployment, TTaskConfig>
+        : IDeploymentContext where TDeployment : IDeployment<TTaskConfig>, new()
     {
-        private TConfig TaskConfig { get; set; }
+        private TTaskConfig TaskConfig { get; set; }
 
         private bool DryRun { get; set; }
 
@@ -26,22 +38,33 @@ namespace Blossom.Deployment
 
         public IRemoteOperations RemoteOps { get; private set; }
 
-        public DeploymentContext(DeploymentConfig<TConfig> config)
+        /// <summary>
+        /// Build a context for this deployment.
+        /// </summary>
+        /// <param name="host">Host attached to this context.</param>
+        /// <param name="config">Configuration settings for this deployment.</param>
+        public DeploymentContext(Host host, DeploymentConfig<TTaskConfig> config)
         {
             Environment = new Env();
-            Initialize(config);
+            Initialize(host, config);
         }
 
-        public DeploymentContext(DeploymentConfig<TConfig> config, IEnvironment remoteEnvironment)
+        /// <summary>
+        /// Set up a DeploymentContext for a host with a specific remote environment.
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="config"></param>
+        /// <param name="remoteEnvironment"></param>
+        public DeploymentContext(Host host, DeploymentConfig<TTaskConfig> config, IEnvironment remoteEnvironment)
         {
             Environment = new Env(remoteEnvironment);
-            Initialize(config);
+            Initialize(host, config);
         }
 
-        private void Initialize(DeploymentConfig<TConfig> config)
+        private void Initialize(Host host, DeploymentConfig<TTaskConfig> config)
         {
             Logger = config.Logger;
-            Environment.Hosts = config.Hosts;
+            Environment.Host = host;
             DryRun = config.DryRun;
             TaskConfig = config.TaskConfig;
         }
@@ -53,92 +76,85 @@ namespace Blossom.Deployment
                 Logger.Warn("No tasks found for deployment.");
                 return;
             }
+            try
+            {
+                var host = Environment.Host;
+                Logger.Info(String.Format("Beginning deployment for {0}.", host));
+                try
+                {
+                    // TODO some sort of Factory pattern
+                    if (DryRun)
+                    {
+                        LocalOps = new DryRunLocalOperations(Logger);
+                    }
+                    else
+                    {
+                        LocalOps = new BasicLocalOperations(this);
+                    }
 
-            foreach (var host in Environment.Hosts)
+                    if (DryRun)
+                    {
+                        RemoteOps = new DryRunRemoteOperations(Logger);
+                    }
+                    // If host is loopback, short circuit the network
+                    else if (host.Hostname == Host.LoopbackHostname)
+                    {
+                        RemoteOps = new LoopbackRemoteOperations(this);
+                    }
+                    else
+                    {
+                        if (host.Password == null)
+                        {
+                            host.Password = String.Empty;
+                        }
+                        RemoteOps = new BasicRemoteOperations(this, host);
+                    }
+
+                    var origin = new TDeployment();
+                    origin.InitializeDeployment(this, TaskConfig);
+
+                    foreach (var task in tasks)
+                    {
+                        Logger.Info("Beginning task: " + task.Name);
+                        try
+                        {
+                            task.Invoke(origin, null);
+                        }
+                        catch (TargetInvocationException exception)
+                        {
+                            throw exception.InnerException;
+                        }
+                    }
+                }
+                catch (SocketException exception)
+                {
+                    // TODO retries
+                    Logger.Error(exception.Message);
+                }
+                catch (SshException exception)
+                {
+                    Logger.Fatal(exception.Message, exception);
+                }
+                finally
+                {
+                    if (RemoteOps != null)
+                    {
+                        RemoteOps.Dispose();
+                        RemoteOps = null;
+                    }
+                }
+            }
+            catch(AbortExecutionException exception)
             {
                 try
                 {
-                    Logger.Info(String.Format("Beginning deployment for {0}.", host));
-                    Environment.CurrentHost = host;
-
-                    try
-                    {
-                        if (DryRun)
-                        {
-                            LocalOps = new DryRunLocalOperations(Logger);
-                        }
-                        else
-                        {
-                            LocalOps = new BasicLocalOperations(this);
-                        }
-
-                        if (DryRun)
-                        {
-                            RemoteOps = new DryRunRemoteOperations(Logger);
-                        }
-                            // If host is loopback, short circuit the network
-                        else if (host.Hostname == Host.LoopbackHostname)
-                        {
-                            RemoteOps = new LoopbackRemoteOperations(this);
-                        }
-                        else
-                        {
-                            if (host.Password == null)
-                            {
-                                host.Password = String.Empty;
-                            }
-                            RemoteOps = new BasicRemoteOperations(this, host);
-                        }
-
-                        using (RemoteOps)
-                        {
-                            var origin = new TDeployment();
-                            origin.InitializeDeployment(this, TaskConfig);
-
-                            foreach (var task in tasks)
-                            {
-                                Logger.Info("Beginning task: " + task.Name);
-                                try
-                                {
-                                    task.Invoke(origin, null);
-                                }
-                                catch (TargetInvocationException exception)
-                                {
-                                    throw exception.InnerException;
-                                }
-                            }
-                        }
-
-                        #region Clean up getters
-
-                        LocalOps = null;
-                        RemoteOps = null;
-                        Environment.CurrentHost = null;
-
-                        #endregion
-                    }
-                    catch (SocketException exception)
-                    {
-                        // TODO retries
-                        Logger.Error(exception.Message);
-                    }
-                    catch (SshException exception)
-                    {
-                        Logger.Fatal(exception.Message, exception);
-                    }
+                    Logger.Abort(exception.Message, exception);
                 }
-                catch(AbortExecutionException exception)
+                catch(AbortExecutionException)
                 {
-                    try
-                    {
-                        Logger.Abort(exception.Message, exception);
-                    }
-                    catch(AbortExecutionException)
-                    {
-                        // We know it's going to just rethrow itself.
-                        // Need to make sure an error message is logged
-                        // stating that we're aborting.
-                    }
+                    // We know it's going to just rethrow itself.
+                    // Need to make sure an error message is logged
+                    // stating that we're aborting.
                 }
             }
         }

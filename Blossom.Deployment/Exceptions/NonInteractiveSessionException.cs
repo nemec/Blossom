@@ -2,14 +2,17 @@
 
 namespace Blossom.Deployment.Exceptions
 {
+    /// <summary>
+    /// This session disallows asking the user for input.
+    /// </summary>
     public class NonInteractiveSessionException : Exception
     {
-        public NonInteractiveSessionException() { }
+        internal NonInteractiveSessionException() { }
 
-        public NonInteractiveSessionException(string message)
+        internal NonInteractiveSessionException(string message)
             : base(message) { }
 
-        public NonInteractiveSessionException(string message, Exception innerException)
+        internal NonInteractiveSessionException(string message, Exception innerException)
             : base(message, innerException) { }
     }
 }

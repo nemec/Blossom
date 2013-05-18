@@ -3,11 +3,27 @@ using System.IO;
 
 namespace Blossom.Deployment.Operations
 {
+    /// <summary>
+    /// Operations that interact with the local host.
+    /// </summary>
     public interface ILocalOperations
     {
-        string RunLocal(string command);
+        /// <summary>
+        /// Run a command using the current shell. 
+        /// </summary>
+        /// <param name="command">Command to run.</param>
+        /// <returns>Output of the command.</returns>
+        string Run(string command);
 
-        string RunLocal(string command, int timeout);
+        /// <summary>
+        /// Run a command using the current shell. If
+        /// no input is returned after <see cref="timeout"/>
+        /// has elapsed, cancel the running command.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        string Run(string command, TimeSpan timeout);
 
         /// <summary>
         /// Compress a series of files and folders into a single

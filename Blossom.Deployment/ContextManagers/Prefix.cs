@@ -3,7 +3,7 @@
     /// <summary>
     /// Context manager to prefix all commands with
     /// the given prefix command. Commands will be
-    /// run as: 'prefix && command'.
+    /// run as: 'prefix &amp;&amp; command'.
     /// </summary>
     public class Prefix : ContextManager
     {

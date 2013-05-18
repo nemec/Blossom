@@ -18,14 +18,14 @@ namespace Blossom.Deployment.Operations
                 String.Format("Dry run executing {0}: {1}", commandName, output));
         }
 
-        public string RunLocal(string command)
+        public string Run(string command)
         {
             LogDryRun("RunLocal", String.Format(
                 "Running command [{0}] locally with no timeout.", command));
             return "";
         }
 
-        public string RunLocal(string command, int timeout)
+        public string Run(string command, TimeSpan timeout)
         {
             LogDryRun("RunLocal", String.Format(
                 "Running command [{0}] locally with timeout {1}.", command, timeout));

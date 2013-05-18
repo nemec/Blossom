@@ -118,6 +118,7 @@ namespace Blossom.Deployment.Manager
             foreach (var plan in plans)
             {
                 var deployment = new DeploymentContext<TDeployment, TTaskConfig>(
+                    plan.Host,
                     Config,
                     new Environments.Linux());
 
@@ -223,20 +224,5 @@ namespace Blossom.Deployment.Manager
             }
             manager.BeginDeployments();
         }
-    }
-
-    /// <summary>
-    /// <see cref="DeploymentManager{TDeployment,TTaskConfig}"/> with no TTaskConfig.
-    /// </summary>
-    /// <typeparam name="TDeployment"></typeparam>
-    public class DeploymentManager<TDeployment>
-        : DeploymentManager<TDeployment, NullConfig> where TDeployment : IDeployment<NullConfig>, new()
-    {
-        /// <summary>
-        /// Create a new deploymentManager.
-        /// </summary>
-        /// <param name="config"></param>
-        public DeploymentManager(DeploymentConfig<NullConfig> config)
-            : base(config) {}
     }
 }

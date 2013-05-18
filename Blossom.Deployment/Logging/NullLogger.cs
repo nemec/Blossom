@@ -3,13 +3,14 @@ using Blossom.Deployment.Exceptions;
 
 namespace Blossom.Deployment.Logging
 {
+    /// <summary>
+    /// Logger that displays nothing.
+    /// </summary>
     public class NullLogger : ILogger
     {
         public LogLevel DisplayLogLevel { get; set; }
 
         public LogLevel AbortLogLevel { get; set; }
-
-        public IDeploymentContext Context { get; set; }
 
         public void Tick(string message)
         {

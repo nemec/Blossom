@@ -1,8 +1,11 @@
 ﻿namespace Blossom.Deployment.Exceptions
 {
+    /// <summary>
+    /// The task dependency chain forms a closed loop.
+    /// </summary>
     public class CircularTaskDependencyException : TaskDependencyException
     {
-        public CircularTaskDependencyException(string message)
+        internal CircularTaskDependencyException(string message)
             : base(message) { }
     }
 }

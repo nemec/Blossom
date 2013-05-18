@@ -2,18 +2,21 @@
 
 namespace Blossom.Deployment.Exceptions
 {
+    /// <summary>
+    /// Execution of this deployment instance was aborted.
+    /// </summary>
     public class AbortExecutionException : Exception
     {
-        public AbortExecutionException()
+        internal AbortExecutionException()
         {
         }
 
-        public AbortExecutionException(string reason)
+        internal AbortExecutionException(string reason)
             : base(reason)
         {
         }
 
-        public AbortExecutionException(string reason, Exception innerException)
+        internal AbortExecutionException(string reason, Exception innerException)
             : base(reason, innerException)
         {
         }
