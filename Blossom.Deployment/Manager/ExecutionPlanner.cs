@@ -54,7 +54,7 @@ namespace Blossom.Deployment.Manager
         }
 
         private static ExecutionPlan CreateExecutionPlan(
-            Host host, HashSet<string> roles,
+            Host host, ICollection<string> roles,
             IEnumerable<MethodInfo> initialization,
             IEnumerable<MethodInfo> tasks,
             IEnumerable<MethodInfo> cleanup)

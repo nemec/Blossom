@@ -138,9 +138,12 @@ namespace Blossom.Deployment.Manager
         ///     Command line arguments. See <see cref="CommandLineOptions"/>
         ///     for potential options.
         /// </param>
-        /// <param name="initializeConfig">Configuration file to seed each deployment.</param>
+        /// <param name="initializeDeploymentConfig">
+        /// Callback to initialize the DeploymentConfig before starting
+        /// deployment.
+        /// </param>
         public static void Main(string[] args,
-            Action<DeploymentConfig<TTaskConfig>, string> initializeConfig)
+            Action<DeploymentConfig<TTaskConfig>, string> initializeDeploymentConfig)
         {
             var options = new CommandLineOptions();
             if (!CommandLineParser.Default.ParseArguments(args, options))
@@ -156,10 +159,9 @@ namespace Blossom.Deployment.Manager
                 return;
             }
 
-            var configFile = options.ConfigFileList.FirstOrDefault();
-            if (configFile == null)
+            if (options.ConfigFile == null)
             {
-                Console.Error.WriteLine("Please provide config file path.");
+                Console.Error.WriteLine("Please provide a config file.");
                 Environment.Exit(1);
             }
 
@@ -167,7 +169,8 @@ namespace Blossom.Deployment.Manager
                 {
                     Logger = new SimpleConsoleLogger()
                 };
-            initializeConfig(config, configFile);
+
+            initializeDeploymentConfig(config, options.ConfigFile);
 
             #region Set DeploymentConfig from command line options
 
@@ -176,15 +179,15 @@ namespace Blossom.Deployment.Manager
             {
                 config.Hosts = config.Hosts.Where(h =>
                     options.Hosts.Contains(h.Alias) ||
-                    options.Hosts.Contains(h.Hostname)).ToList();
+                    options.Hosts.Contains(h.Hostname)).ToArray();
             }
 
             if (options.Roles != null && options.Roles.Length > 0)
             {
                 config.Hosts = config.Hosts.Where(
-                    h => h.Roles != null && h.Roles.Split(';').Intersect(options.Roles).Any()).ToList();
+                    h => h.Roles != null && h.Roles.Split(';').Intersect(options.Roles).Any()).ToArray();
 
-                config.Roles = options.Roles.ToList();
+                config.Roles = options.Roles.ToArray();
             }
 
             if (options.DryRun)

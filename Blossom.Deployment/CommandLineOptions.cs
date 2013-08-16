@@ -1,4 +1,5 @@
-﻿using Blossom.Deployment.Logging;
+﻿using System.Linq;
+using Blossom.Deployment.Logging;
 using CommandLine;
 using CommandLine.Text;
 using System.Collections.Generic;
@@ -47,6 +48,11 @@ namespace Blossom.Deployment
 
         [ValueList(typeof(List<string>), MaximumElements = 1)]
         public IList<string> ConfigFileList { get; set; }
+
+        internal string ConfigFile
+        {
+            get { return ConfigFileList.FirstOrDefault(); }
+        }
         
         [HelpOption]
         public string GetUsage()

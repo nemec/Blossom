@@ -7,14 +7,8 @@ namespace Blossom.Examples.PushFiles
 {
     internal class Tasks : IDeployment<Config>
     {
-        private Config Config { get; set; }
-        private IDeploymentContext Context { get; set; }
-
-        public void InitializeDeployment(IDeploymentContext context, Config config)
-        {
-            Config = config;
-            Context = context;
-        }
+        public Config Config { get; set; }
+        public IDeploymentContext Context { get; set; }
 
         [Task]
         public void CopyFiles()

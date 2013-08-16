@@ -23,7 +23,7 @@ namespace Blossom.Deployment
     ///     Type of the custom configuration object provided
     ///     to each <see cref="IDeploymentContext"/>.
     /// </typeparam>
-    public class DeploymentContext<TDeployment, TTaskConfig>
+    internal class DeploymentContext<TDeployment, TTaskConfig>
         : IDeploymentContext where TDeployment : IDeployment<TTaskConfig>, new()
     {
         private TTaskConfig TaskConfig { get; set; }
@@ -110,8 +110,11 @@ namespace Blossom.Deployment
                         RemoteOps = new BasicRemoteOperations(this, host);
                     }
 
-                    var origin = new TDeployment();
-                    origin.InitializeDeployment(this, TaskConfig);
+                    var origin = new TDeployment
+                        {
+                            Context = this, 
+                            Config = TaskConfig
+                        };
 
                     foreach (var task in tasks)
                     {

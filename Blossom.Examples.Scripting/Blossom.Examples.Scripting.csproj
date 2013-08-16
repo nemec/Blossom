@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8923C72A-ED37-49C6-88E2-B25C20C2AAB9}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{45A78C61-F43B-4F39-8409-A55B82174B3B}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Blossom.Scripting</RootNamespace>
-    <AssemblyName>Blossom.Scripting</AssemblyName>
+    <RootNamespace>Blossom.Examples.Scripting</RootNamespace>
+    <AssemblyName>Blossom.Examples.Scripting</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -31,18 +31,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Blossom.Examples.Scripting.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="clipr">
-      <HintPath>..\packages\clipr.1.2.0.0\lib\net35\clipr.dll</HintPath>
-    </Reference>
-    <Reference Include="Roslyn.Compilers, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Roslyn.Compilers.Common.1.2.20906.2\lib\net45\Roslyn.Compilers.dll</HintPath>
-    </Reference>
-    <Reference Include="Roslyn.Compilers.CSharp, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Roslyn.Compilers.CSharp.1.2.20906.2\lib\net45\Roslyn.Compilers.CSharp.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -52,17 +44,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandLineOptions.cs" />
-    <Compile Include="ScriptRunner.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="ScriptingTasks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Blossom.Deployment\Blossom.Deployment.csproj">
       <Project>{5473145f-1ed7-477d-a9fe-8f938d5c55d1}</Project>
       <Name>Blossom.Deployment</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Blossom.Scripting\Blossom.Scripting.csproj">
+      <Project>{8923c72a-ed37-49c6-88e2-b25c20c2aab9}</Project>
+      <Name>Blossom.Scripting</Name>
     </ProjectReference>
     <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj">
       <Project>{2f5f8c90-0bd1-424f-997c-7bc6280919d1}</Project>

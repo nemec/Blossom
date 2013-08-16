@@ -7,7 +7,7 @@ namespace Blossom.Examples.Compression
     [XmlRoot("Deployment")]
     public class Config
     {
-        public List<Host> Hosts;
+        public Host[] Hosts;
 
         public List<InputDir> InputDirs;
 

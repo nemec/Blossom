@@ -1,24 +1,62 @@
-﻿using System.Collections.Generic;
-using Blossom.Deployment.Logging;
+﻿using Blossom.Deployment.Logging;
 
 namespace Blossom.Deployment
 {
     /// <summary>
-    /// Deployment infrastructure configuration settings.
+    /// Deployment infrastructure initialization interface
     /// </summary>
-    /// <typeparam name="TTaskConfig">Custom configuration type for the deployment.</typeparam>
-    public class DeploymentConfig<TTaskConfig>
+    public interface IDeploymentConfig
     {
         /// <summary>
         /// Deploy to these hosts.
         /// </summary>
-        public List<Host> Hosts { get; set; }
+        Host[] Hosts { get; set; }
 
         /// <summary>
         /// List of roles that need to be run.
         /// </summary>
-        public List<string> Roles { get; set; }
- 
+        string[] Roles { get; set; }
+
+        /// <summary>
+        /// If true, run through the tasks but do not
+        /// actually perform any operations. If one task
+        /// depends on the output of another, tasks may not
+        /// execute correctly.
+        /// </summary>
+        bool DryRun { get; set; }
+
+        /// <summary>
+        /// Logging mechanism.
+        /// </summary>
+        ILogger Logger { get; set; }
+    }
+
+    /// <summary>
+    /// Deployment infrastructure configuration settings.
+    /// </summary>
+    /// <typeparam name="TTaskConfig">Custom configuration type for the deployment.</typeparam>
+    public class DeploymentConfig<TTaskConfig> : IDeploymentConfig
+    {
+        /// <summary>
+        /// Deployment infrastructure configuration settings.
+        /// </summary>
+        public DeploymentConfig()
+        {
+            Hosts = new Host[0];
+            Roles = new string[0];
+            Logger = new SimpleConsoleLogger();
+        } 
+
+        /// <summary>
+        /// Deploy to these hosts.
+        /// </summary>
+        public Host[] Hosts { get; set; }
+
+        /// <summary>
+        /// List of roles that need to be run.
+        /// </summary>
+        public string[] Roles { get; set; }
+
         /// <summary>
         /// If true, run through the tasks but do not
         /// actually perform any operations. If one task

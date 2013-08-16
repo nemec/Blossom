@@ -317,7 +317,7 @@ namespace DeploymentUnitTest
             };
             var config = new DeploymentConfig
             {
-                Hosts = new List<Host>
+                Hosts = new[]
                 {
                     host
                 }
@@ -350,7 +350,7 @@ namespace DeploymentUnitTest
             };
             var config = new DeploymentConfig
             {
-                Hosts = new List<Host>
+                Hosts = new[]
                 {
                     host
                 }
@@ -383,7 +383,7 @@ namespace DeploymentUnitTest
             };
             var config = new DeploymentConfig
             {
-                Hosts = new List<Host>
+                Hosts = new[]
                 {
                     host
                 }
@@ -421,7 +421,7 @@ namespace DeploymentUnitTest
             };
             var config = new DeploymentConfig
             {
-                Hosts = new List<Host>
+                Hosts = new[]
                 {
                     host,
                     host2
@@ -456,7 +456,7 @@ namespace DeploymentUnitTest
             };
             var config = new DeploymentConfig
             {
-                Hosts = new List<Host>
+                Hosts = new[]
                 {
                     host
                 }
@@ -494,7 +494,7 @@ namespace DeploymentUnitTest
             };
             var config = new DeploymentConfig
             {
-                Hosts = new List<Host>
+                Hosts = new[]
                 {
                     host,
                     host2
@@ -532,7 +532,7 @@ namespace DeploymentUnitTest
             };
             var config = new DeploymentConfig
             {
-                Hosts = new List<Host>
+                Hosts = new[]
                 {
                     host,
                     host2
@@ -566,7 +566,7 @@ namespace DeploymentUnitTest
             };
             var config = new DeploymentConfig
             {
-                Hosts = new List<Host>
+                Hosts = new[]
                 {
                     host
                 }
@@ -599,7 +599,7 @@ namespace DeploymentUnitTest
             };
             var config = new DeploymentConfig
             {
-                Hosts = new List<Host>
+                Hosts = new[]
                 {
                     host
                 }
@@ -632,7 +632,7 @@ namespace DeploymentUnitTest
             };
             var config = new DeploymentConfig
             {
-                Hosts = new List<Host>
+                Hosts = new[]
                 {
                     host
                 }
@@ -665,7 +665,7 @@ namespace DeploymentUnitTest
             };
             var config = new DeploymentConfig
             {
-                Hosts = new List<Host>
+                Hosts = new[]
                 {
                     host
                 }
@@ -697,7 +697,7 @@ namespace DeploymentUnitTest
             };
             var config = new DeploymentConfig
             {
-                Hosts = new List<Host>
+                Hosts = new[]
                 {
                     host
                 }
@@ -729,7 +729,7 @@ namespace DeploymentUnitTest
             };
             var config = new DeploymentConfig
             {
-                Hosts = new List<Host>
+                Hosts = new[]
                 {
                     host
                 }
@@ -761,7 +761,7 @@ namespace DeploymentUnitTest
             };
             var config = new DeploymentConfig
             {
-                Hosts = new List<Host>
+                Hosts = new[]
                 {
                     host
                 }
@@ -793,7 +793,7 @@ namespace DeploymentUnitTest
             };
             var config = new DeploymentConfig
             {
-                Hosts = new List<Host>
+                Hosts = new[]
                 {
                     host
                 }

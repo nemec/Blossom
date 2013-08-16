@@ -10,7 +10,7 @@ namespace Blossom.Deployment.Attributes
     /// 
     /// If <see cref="Standalone"/> is true (the default),
     /// the task will be run once on its own as well as every
-    /// time it's a dependency. Otherwise, the taskwill only be
+    /// time it's a dependency. Otherwise, the task will only be
     /// run if it is a dependency of another task.
     /// 
     /// A direct dependency is defined as a task that is

@@ -4,14 +4,22 @@
     /// Class that contains the set of tasks executed in a deployment.
     /// </summary>
     /// <typeparam name="TTaskConfig">Custom task configuration type.</typeparam>
-    public interface IDeployment<in TTaskConfig>
+    public interface IDeployment<TTaskConfig> : IDeployment
     {
         /// <summary>
-        /// Initialize the current deployment with the given
-        /// context and custom configuration settings.
+        /// Custom configuration settings for this deployment instance.
         /// </summary>
-        /// <param name="context">Context for this deployment instance.</param>
-        /// <param name="config">Configuration settings for this deployment instance.</param>
-        void InitializeDeployment(IDeploymentContext context, TTaskConfig config);
+        TTaskConfig Config { get; set; }
+    }
+
+    /// <summary>
+    /// Class that contains the set of tasks executed in a deployment.
+    /// </summary>
+    public interface IDeployment
+    {
+        /// <summary>
+        /// The context for this deployment instance.
+        /// </summary>
+        IDeploymentContext Context { get; set; }
     }
 }
