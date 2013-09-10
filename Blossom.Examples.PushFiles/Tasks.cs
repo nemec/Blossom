@@ -1,6 +1,6 @@
-﻿using Blossom.Deployment;
-using Blossom.Deployment.Attributes;
-using Blossom.Deployment.ContextManagers;
+﻿using Blossom;
+using Blossom.Attributes;
+using Blossom.ContextManagers;
 using System;
 
 namespace Blossom.Examples.PushFiles

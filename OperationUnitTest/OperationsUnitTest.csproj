@@ -68,9 +68,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Blossom.Deployment\Blossom.Deployment.csproj">
+    <ProjectReference Include="..\Blossom\Blossom.csproj">
       <Project>{5473145f-1ed7-477d-a9fe-8f938d5c55d1}</Project>
-      <Name>Blossom.Deployment</Name>
+      <Name>Blossom</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

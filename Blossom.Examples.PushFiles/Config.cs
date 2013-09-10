@@ -1,12 +1,18 @@
-﻿using Blossom.Deployment;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
+using Blossom.Logging;
 
 namespace Blossom.Examples.PushFiles
 {
     [XmlRoot("Deployment")]
-    public class Config
+    public class Config : IConfig
     {
+        public void Initialize(IDeploymentConfig deploymentConfig)
+        {
+            deploymentConfig.Hosts = Hosts;
+            deploymentConfig.Logger = new ColorizedConsoleLogger();
+        }
+     
         public Host[] Hosts;
 
         public List<InputDir> InputDirs;

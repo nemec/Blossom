@@ -1,8 +1,8 @@
 ﻿using System;
-using Blossom.Deployment;
-using Blossom.Deployment.Attributes;
-using Blossom.Deployment.ContextManagers;
-using Blossom.Deployment.Logging;
+using Blossom;
+using Blossom.Attributes;
+using Blossom.ContextManagers;
+using Blossom.Logging;
 
 // ReSharper disable CheckNamespace
 public class ScriptingTasks

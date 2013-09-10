@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Blossom.Deployment;
-using Blossom.Deployment.Manager;
+using Blossom.Manager;
 using Roslyn.Scripting.CSharp;
 using clipr;
 
@@ -92,14 +91,14 @@ namespace Blossom.Scripting
                 #region Set DeploymentConfig from command line options
 
                 // Gets the subset of hosts specified at the command line.
-                if (options.Hosts != null && options.Hosts.Length > 0)
+                if (options.Hosts != null && options.Hosts.Count > 0)
                 {
                     deploymentConfig.Hosts = deploymentConfig.Hosts.Where(h =>
                         options.Hosts.Contains(h.Alias) ||
                         options.Hosts.Contains(h.Hostname)).ToArray();
                 }
 
-                if (options.Roles != null && options.Roles.Length > 0)
+                if (options.Roles != null && options.Roles.Count > 0)
                 {
                     deploymentConfig.Hosts = deploymentConfig.Hosts.Where(
                         h => h.Roles != null && h.Roles.Split(';').Intersect(options.Roles).Any()).ToArray();
@@ -132,7 +131,7 @@ namespace Blossom.Scripting
                         typeof(DeploymentManager<,>).MakeGenericType(types), 
                         new object[] { deploymentConfig });
 
-                if (options.List)
+                if (options.ListExecutionPlan)
                 {
                     Console.WriteLine("Planned execution order:");
                     foreach (var plan in (IEnumerable<ExecutionPlan>)manager.GetExecutionPlans())

@@ -1,7 +1,6 @@
-﻿using Blossom.Deployment;
-using System.Xml;
+﻿using System.Xml;
 using System.Xml.Serialization;
-using Blossom.Deployment.Manager;
+using Blossom.Manager;
 
 namespace Blossom.Examples.Compression
 {

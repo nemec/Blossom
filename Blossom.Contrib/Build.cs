@@ -6,7 +6,7 @@ using System.IO;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Execution;
 using Microsoft.Build.Framework;
-using ILogger = Blossom.Deployment.Logging.ILogger;
+using ILogger = Blossom.Logging.ILogger;
 using BetterDotNet;
 
 namespace Blossom.Contrib

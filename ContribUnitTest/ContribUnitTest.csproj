@@ -58,9 +58,9 @@
       <Project>{ac09d6db-008f-4a61-96e9-5d2b7ae87c59}</Project>
       <Name>Blossom.Contrib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Blossom.Deployment\Blossom.Deployment.csproj">
+    <ProjectReference Include="..\Blossom\Blossom.csproj">
       <Project>{5473145f-1ed7-477d-a9fe-8f938d5c55d1}</Project>
-      <Name>Blossom.Deployment</Name>
+      <Name>Blossom</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

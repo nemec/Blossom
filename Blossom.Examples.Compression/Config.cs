@@ -1,12 +1,15 @@
-﻿using Blossom.Deployment;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace Blossom.Examples.Compression
 {
     [XmlRoot("Deployment")]
-    public class Config
+    public class Config : IConfig
     {
+        public void Initialize(IDeploymentConfig deploymentConfig)
+        {
+        }
+
         public Host[] Hosts;
 
         public List<InputDir> InputDirs;

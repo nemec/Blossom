@@ -1,10 +1,10 @@
-﻿using Blossom.Deployment.Attributes;
+﻿using Blossom.Attributes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Blossom.Deployment;
+using Blossom;
 using System.Reflection;
 using System.Linq;
 using System.Collections.Generic;
-using Blossom.Deployment.Exceptions;
+using Blossom.Exceptions;
 
 namespace DeploymentUnitTest
 {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Blossom.Contrib;
-using Blossom.Deployment.Logging;
+using Blossom.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ContribUnitTest

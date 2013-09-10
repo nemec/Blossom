@@ -35,6 +35,10 @@
     <StartupObject>Blossom.Examples.Scripting.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Renci.SshNet, Version=2013.4.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\SSH.NET.2013.4.7\lib\net40\Renci.SshNet.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -49,18 +53,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Blossom.Deployment\Blossom.Deployment.csproj">
+    <ProjectReference Include="..\Blossom\Blossom.csproj">
       <Project>{5473145f-1ed7-477d-a9fe-8f938d5c55d1}</Project>
-      <Name>Blossom.Deployment</Name>
+      <Name>Blossom</Name>
     </ProjectReference>
     <ProjectReference Include="..\Blossom.Scripting\Blossom.Scripting.csproj">
       <Project>{8923c72a-ed37-49c6-88e2-b25c20c2aab9}</Project>
       <Name>Blossom.Scripting</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj">
-      <Project>{2f5f8c90-0bd1-424f-997c-7bc6280919d1}</Project>
-      <Name>Renci.SshNet</Name>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

@@ -1,6 +1,7 @@
-﻿using clipr;
+﻿using System.Collections.Generic;
+using clipr;
 using clipr.Annotations;
-using Blossom.Deployment.Logging;
+using Blossom.Logging;
 
 namespace Blossom.Scripting
 {
@@ -16,17 +17,19 @@ namespace Blossom.Scripting
         public EnvironmentType RemoteEnvironment { get; set; }
 
         [NamedArgument("hosts",
+            Constraint = NumArgsConstraint.AtLeast, NumArgs = 1,
             Description = "Limits available hosts to the provided hosts (or aliases)")]
-        public string[] Hosts { get; set; }
+        public List<string> Hosts { get; set; }
 
-        [NamedArgument('r', "roles",
+        [NamedArgument('r', "roles", 
+            Constraint = NumArgsConstraint.AtLeast, NumArgs = 1,
             Description = "Limits available hosts to those in the given role or roles.")]
-        public string[] Roles { get; set; }
+        public List<string> Roles { get; set; }
 
         [NamedArgument('p', "plan", Action = ParseAction.StoreTrue,
             Description = "Display the execution plan and exit (Tasks to be executed " +
                 "and the order they will be executed).")]
-        public bool List { get; set; }
+        public bool ListExecutionPlan { get; set; }
 
         [NamedArgument('d', "dryrun",
             Description = "Display the commands that would be run, but don't actually execute them.")]

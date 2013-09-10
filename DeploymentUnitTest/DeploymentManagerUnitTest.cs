@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Reflection;
-using Blossom.Deployment.Attributes;
-using Blossom.Deployment.Manager;
+using Blossom.Attributes;
+using Blossom.Manager;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Blossom.Deployment;
+using Blossom;
 using System.Collections.Generic;
 using System.Linq;
 

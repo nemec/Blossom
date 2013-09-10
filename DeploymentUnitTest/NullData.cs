@@ -1,5 +1,5 @@
-﻿using Blossom.Deployment;
-using Blossom.Deployment.Manager;
+﻿using Blossom;
+using Blossom.Manager;
 
 namespace DeploymentUnitTest
 {
@@ -20,7 +20,12 @@ namespace DeploymentUnitTest
 
     public interface IDeployment : IDeployment<NullConfig> { }
 
-    public class NullConfig { }
+    public class NullConfig : IConfig
+    {
+        public void Initialize(IDeploymentConfig deploymentConfig)
+        {
+        }
+    }
 
     public class DeploymentConfig : DeploymentConfig<NullConfig> { }
 }

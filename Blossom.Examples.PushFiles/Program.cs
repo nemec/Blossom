@@ -1,6 +1,6 @@
-﻿using Blossom.Deployment;
-using Blossom.Deployment.Logging;
-using Blossom.Deployment.Manager;
+﻿using Blossom;
+using Blossom.Logging;
+using Blossom.Manager;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -9,14 +9,10 @@ namespace Blossom.Examples.PushFiles
     //http://docs.fabfile.org/en/1.4.3/#api-documentation
     public class Program
     {
-        public static void ReadConfig(DeploymentConfig<Config> deployment, string filename)
+        public static Config ReadConfig(string filename)
         {
             var serializer = new XmlSerializer(typeof(Config));
-            var config = (Config)serializer.Deserialize(XmlReader.Create(filename));
-            deployment.Hosts = config.Hosts;
-            deployment.TaskConfig = config;
-
-            deployment.Logger = new ColorizedConsoleLogger();
+            return (Config)serializer.Deserialize(XmlReader.Create(filename));
         } 
 
         private static void Main(string[] args)

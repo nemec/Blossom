@@ -1,11 +1,11 @@
 ﻿using System;
-using Blossom.Deployment.Exceptions;
+using Blossom.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StructureMap.AutoMocking;
-using Blossom.Deployment;
+using Blossom;
 using System.IO;
 using Rhino.Mocks;
-using Blossom.Deployment.Operations;
+using Blossom.Operations;
 using System.Text;
 
 namespace OperationsUnitTest
