@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using Blossom;
 using Blossom.Attributes;
 using Blossom.Manager;
@@ -40,9 +39,69 @@ namespace DeploymentUnitTest
                 config,
                 Enumerable.Empty<MethodInfo>(),
                 tasks,
-                Enumerable.Empty<MethodInfo>());
+                Enumerable.Empty<MethodInfo>(),
+                false);
 
             Assert.AreEqual(2, plans.First().TaskOrder.Count());
+        }
+
+        public class SomeClassWithDependency
+        {
+            [Task]
+            public void Task1()
+            {
+            }
+
+            [Task]
+            [Depends("Task1")]
+            public void Task2()
+            {
+            }
+        }
+
+        [TestMethod]
+        public void GetExecutionPlan_ForClassWithTwoTasksNotIgnoringDependencies_RunsBothTasks()
+        {
+            var tasks = typeof (SomeClassWithDependency)
+                .GetMethods()
+                .Where(m => m.GetCustomAttribute<TaskAttribute>() != null);
+
+            var config = new DeploymentConfig
+                {
+                    Hosts = new[] {new Host()}
+                };
+
+            var plans = ExecutionPlanner.GetExecutionPlans(
+                config,
+                Enumerable.Empty<MethodInfo>(),
+                tasks,
+                Enumerable.Empty<MethodInfo>(),
+                false);
+
+            Assert.AreEqual(2, plans.First().TaskOrder.Count());
+        }
+
+        [TestMethod]
+        public void GetExecutionPlan_ForClassWithTwoTasksIgnoringDependencies_RunsLastTask()
+        {
+            var tasks = typeof (SomeClassWithDependency)
+                .GetMethods()
+                .Where(m => m.GetCustomAttribute<TaskAttribute>() != null &&
+                            m.GetCustomAttribute<DependsAttribute>() != null);
+
+            var config = new DeploymentConfig
+                {
+                    Hosts = new[] {new Host()}
+                };
+
+            var plans = ExecutionPlanner.GetExecutionPlans(
+                config,
+                Enumerable.Empty<MethodInfo>(),
+                tasks,
+                Enumerable.Empty<MethodInfo>(),
+                true);
+
+            Assert.AreEqual(1, plans.First().TaskOrder.Count());
         }
     }
 }

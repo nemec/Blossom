@@ -35,6 +35,15 @@ namespace Blossom.Scripting
             Description = "Display the commands that would be run, but don't actually execute them.")]
         public bool DryRun { get; set; }
 
+        [NamedArgument('i', "ignoreDependencies", Action = ParseAction.StoreTrue,
+            Description = "Execute only the tasks specified with -t, ignoring any dependencies.")]
+        public bool IgnoreDependencies { get; set; }
+
+        [NamedArgument('t', "tasks",
+            Action = ParseAction.Append, Constraint = NumArgsConstraint.AtLeast, NumArgs = 1,
+            Description = "List of specific tasks to execute. Will execute these and their dependencies.")]
+        public List<string> Tasks { get; set; }
+            
         [NamedArgument("logging", Description = "Minimum log level to display.")]
         public LogLevel? DisplayLogLevel { get; set; }
 

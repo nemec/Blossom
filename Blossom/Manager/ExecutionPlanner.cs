@@ -11,12 +11,18 @@ namespace Blossom.Manager
             DeploymentConfig<T> config,
             IEnumerable<MethodInfo> initialization,
             IEnumerable<MethodInfo> tasks,
-            IEnumerable<MethodInfo> cleanup)
+            IEnumerable<MethodInfo> cleanup,
+            bool ignoreDependencies)
         {
             var roleMap = CreateRolemap(config);
             return roleMap.Select(
-                m => CreateExecutionPlan(m.Key, m.Value,
-                        initialization, tasks, cleanup)).ToArray();
+                m => CreateExecutionPlan(
+                    m.Key,
+                    m.Value,
+                    initialization, 
+                    tasks.ToList(), 
+                    cleanup, 
+                    ignoreDependencies)).ToArray();
         }
 
         private static Dictionary<Host, HashSet<string>> CreateRolemap<T>(
@@ -55,16 +61,17 @@ namespace Blossom.Manager
         private static ExecutionPlan CreateExecutionPlan(
             Host host, ICollection<string> roles,
             IEnumerable<MethodInfo> initialization,
-            IEnumerable<MethodInfo> tasks,
-            IEnumerable<MethodInfo> cleanup)
+            List<MethodInfo> tasks,
+            IEnumerable<MethodInfo> cleanup,
+            bool ignoreDependencies)
         {
             var tasksForHost = new HashSet<MethodInfo>();
             foreach (var task in tasks)
             {
                 var hostAttrs = task.GetCustomAttributes<HostAttribute>()
-                    .Select(h => h.Host).Distinct();
+                    .Select(h => h.Host).Distinct().ToList();
                 var roleAttrs = task.GetCustomAttributes<RoleAttribute>()
-                    .Select(r => r.Role).Distinct();
+                    .Select(r => r.Role).Distinct().ToList();
 
                 // If the task is neither tagged with a specific Host nor Role
                 // If the task is tagged with a Host and we're that host
@@ -84,11 +91,19 @@ namespace Blossom.Manager
                 tasksForHost.UnionWith(tasks);
             }
 
+            if (ignoreDependencies)
+            {
+                return new ExecutionPlan(host,
+                    initialization
+                        .Concat(tasksForHost)
+                        .Concat(cleanup));
+            }
+
             var resolver = new DependencyResolver(tasksForHost, tasks);
             return new ExecutionPlan(host,
                 initialization.
                     Concat(resolver.OrderTasks()).
-                    Concat(cleanup).ToArray());
+                    Concat(cleanup));
         }
     }
 }

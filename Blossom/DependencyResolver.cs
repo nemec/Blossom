@@ -18,7 +18,7 @@ namespace Blossom
 
         private Dictionary<string, MethodInfo> AllMethods { get; set; }
 
-        internal DependencyResolver(IEnumerable<MethodInfo> methods)
+        internal DependencyResolver(List<MethodInfo> methods)
             : this(methods, methods) { }
 
         internal DependencyResolver(
@@ -96,7 +96,7 @@ namespace Blossom
         }
 
         private static void Resolve(Node parent, Node curNode,
-            List<Node> taskQueue, HashSet<Node> unresolved)
+            ICollection<Node> taskQueue, ISet<Node> unresolved)
         {
             unresolved.Add(curNode);
             foreach (var edge in curNode.Edges)
@@ -165,15 +165,13 @@ namespace Blossom
 
             private List<MethodInfo> GenerateDependencies()
             {
-                var dependencies = new List<MethodInfo>();
-                foreach (var taskName in Invokable.
-                    GetCustomAttributes<DependsAttribute>().Select(a => a.TaskName)
-                    .Distinct())
-                {
-                    dependencies.Add(_resolver.GetTaskForName(
-                        Invokable.ReflectedType.Namespace + "." + taskName));
-                }
-                return dependencies;
+                return Invokable
+                    .GetCustomAttributes<DependsAttribute>()
+                    .Select(a => a.TaskName)
+                    .Distinct()
+                    .Select(taskName => _resolver
+                        .GetTaskForName(Invokable.ReflectedType.Namespace + "." + taskName))
+                    .ToList();
             }
 
             public override string ToString()

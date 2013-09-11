@@ -134,7 +134,8 @@ namespace Blossom.Scripting
                 if (options.ListExecutionPlan)
                 {
                     Console.WriteLine("Planned execution order:");
-                    foreach (var plan in (IEnumerable<ExecutionPlan>)manager.GetExecutionPlans())
+                    foreach (var plan in (IEnumerable<ExecutionPlan>)manager
+                        .GetExecutionPlans(options.IgnoreDependencies))
                     {
                         Console.WriteLine(plan.Host);
                         foreach (var task in plan.TaskOrder)

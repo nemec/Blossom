@@ -86,14 +86,22 @@ namespace Blossom.Manager
         /// <summary>
         /// Generate and retrieve all execution plans for the deployment.
         /// </summary>
+        /// <param name="taskFilter">A filter to exclude certain tasks.</param>
+        /// <param name="ignoreDependencies">Ignore dependencies not explicitly included.</param>
         /// <returns>
         ///     Iterable of all <see cref="ExecutionPlans"/> that
         ///     will be run by this deployment.
         /// </returns>
-        public IEnumerable<ExecutionPlan> GetExecutionPlans()
+        public IEnumerable<ExecutionPlan> GetExecutionPlans(
+            Func<MethodInfo, bool> taskFilter = null, bool ignoreDependencies = false)
         {
+            var tasks = Tasks;
+            if (taskFilter != null)
+            {
+                tasks = tasks.Where(taskFilter);
+            }
             return ExecutionPlans ?? (ExecutionPlans = ExecutionPlanner.GetExecutionPlans(
-                Config, InitializationMethods, Tasks, CleanupMethods));
+                Config, InitializationMethods, tasks, CleanupMethods, ignoreDependencies));
         }
 
         /// <summary>
@@ -127,9 +135,9 @@ namespace Blossom.Manager
         /// <summary>
         /// Begin executing each <see cref="ExecutionPlan"/>.
         /// </summary>
-        public virtual void BeginDeployments()
+        public virtual void BeginDeployments(Func<MethodInfo, bool> taskFilter = null, bool ignoreDependencies = false)
         {
-            var plans = GetExecutionPlans().ToList();
+            var plans = GetExecutionPlans(taskFilter, ignoreDependencies).ToList();
             if (!plans.Any())
             {
                 Config.Logger.AbortLogLevel = LogLevel.None;
@@ -163,8 +171,12 @@ namespace Blossom.Manager
         /// configuration file name.
         /// deployment.
         /// </param>
+        /// <param name="taskFilter"></param>
+        /// <param name="ignoreDependencies"></param>
         public static void Main(string[] args,
-            Func<string, TTaskConfig> initializeConfig)
+            Func<string, TTaskConfig> initializeConfig,
+            Func<MethodInfo, bool> taskFilter = null, 
+            bool ignoreDependencies = false)
         {
             var options = new CommandLineOptions();
             if (!CommandLineParser.Default.ParseArguments(args, options))
@@ -236,7 +248,8 @@ namespace Blossom.Manager
             if (options.List)
             {
                 Console.WriteLine("Planned execution order:");
-                foreach (var plan in manager.GetExecutionPlans())
+                foreach (var plan in manager.GetExecutionPlans(
+                    taskFilter, ignoreDependencies))
                 {
                     Console.WriteLine(plan.Host);
                     foreach (var task in plan.TaskOrder)
