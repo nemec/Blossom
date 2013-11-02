@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using clipr;
-using clipr.Annotations;
 using Blossom.Logging;
 
 namespace Blossom.Scripting

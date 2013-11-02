@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using GlobDir;
+using PathLib;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 [assembly: InternalsVisibleTo("OperationsUnitTest")]
 
@@ -104,20 +104,23 @@ namespace Blossom.Operations
 
         public bool PutFile(string sourcePath, string destinationPath, IFileTransferHandler handler, bool ifNewer)
         {
-            var filename = Path.GetFileName(sourcePath);
-            var source = Context.Environment.Local.CombinePath(
-                Context.Environment.Local.CurrentDirectory,
-                sourcePath);
-            var dest = Context.Environment.Remote.CombinePath(
-                Context.Environment.Remote.CurrentDirectory,
-                destinationPath);
+            var source = Context.Environment.Local.CreatePurePath(sourcePath);
+            var dest = Context.Environment.Remote.CreatePurePath(destinationPath);
+            return PutFile(source, dest, handler, ifNewer);
+        }
+
+        public bool PutFile(IPurePath sourcePath, IPurePath destinationPath, IFileTransferHandler handler, bool ifNewer)
+        {
+            var filename = sourcePath.Filename;
+            var source = Context.Environment.Local.CurrentDirectory.Join(sourcePath);
+            var dest = Context.Environment.Remote.CurrentDirectory.Join(destinationPath);
 
             if (handler != null)
             {
                 handler.Filename = filename;
             }
 
-            if (!File.Exists(source))
+            if (!File.Exists(source.ToString()))
             {
                 if (handler != null)
                 {
@@ -126,18 +129,19 @@ namespace Blossom.Operations
                 return false;
             }
 
-            if (Path.GetFileName(destinationPath) == "")
+            if (String.IsNullOrEmpty(dest.Filename) ||
+                Sftp.GetAttributes(dest.ToString()).IsDirectory)
             {
-                dest = Context.Environment.Remote.CombinePath(dest, filename);
+                dest = dest.WithFilename(filename);
             }
 
             if (ifNewer)
             {
-                var modified = File.GetLastWriteTimeUtc(source);
+                var modified = File.GetLastWriteTimeUtc(source.ToString());
                 var remoteModified = DateTime.MinValue;
                 try
                 {
-                    remoteModified = Sftp.GetLastWriteTimeUtc(dest);
+                    remoteModified = Sftp.GetLastWriteTimeUtc(dest.ToString());
                 }
                 catch (SftpPathNotFoundException)
                 {
@@ -151,7 +155,7 @@ namespace Blossom.Operations
                     return false;
                 }
             }
-            using (var file = File.OpenRead(source))
+            using (var file = File.OpenRead(source.ToString()))
             {
                 PutFile(file, dest, handler);
             }
@@ -160,9 +164,14 @@ namespace Blossom.Operations
 
         public void PutFile(Stream source, string destinationPath, IFileTransferHandler handler)
         {
+            PutFile(source, Context.Environment.Remote.CreatePurePath(destinationPath), handler);
+        }
+
+        public void PutFile(Stream source, IPurePath destinationPath, IFileTransferHandler handler)
+        {
             var result = Sftp.BeginUploadFile(
                 source, 
-                destinationPath, 
+                destinationPath.ToString(), 
                 r => handler.TransferCanceled(), 
                 new object(),
                 handler.IncrementBytesTransferred);
@@ -171,28 +180,30 @@ namespace Blossom.Operations
 
         public void MkDir(string path, bool makeParents = false)
         {
+            MkDir(Context.Environment.Remote.CreatePurePath(path), makeParents);
+        }
+
+        public void MkDir(IPurePath path, bool makeParents = false)
+        {
             // Iteratively check whether or not each directory in the path exists
             // and create them if they do not.
             if (makeParents)
             {
-                var currentPath = new StringBuilder();
-                foreach (var dir in path.Split(
-                    Context.Environment.Remote.PathSeparator.Value().ToCharArray()))
+                foreach (var parent in path.Parents().Reverse())
                 {
-                    currentPath.Append(dir);
-                    currentPath.Append(Context.Environment.Remote.PathSeparator.Value());
-                    var pathToCheck = currentPath.ToString();
-                    if (!Sftp.Exists(pathToCheck))
+                    var pathStr = parent.ToString();
+                    if (!Sftp.Exists(pathStr))
                     {
-                        Sftp.CreateDirectory(pathToCheck);
+                        Sftp.CreateDirectory(pathStr);
                     }
                 }
             }
             else
             {
-                if (!Sftp.Exists(path))
+                var pathStr = path.ToString();
+                if (!Sftp.Exists(pathStr))
                 {
-                    Sftp.CreateDirectory(path);
+                    Sftp.CreateDirectory(pathStr);
                 }
             }
         }
@@ -200,22 +211,36 @@ namespace Blossom.Operations
         public void PutDir(string sourceDir, string destinationDir,
             Func<IFileTransferHandler> handlerFactory, bool ifNewer)
         {
+            var source = Context.Environment.Local.CreatePurePath(sourceDir);
+            var dest = Context.Environment.Remote.CreatePurePath(destinationDir);
+            PutDir(source, dest, handlerFactory, ifNewer);
+        }
+
+        public void PutDir(IPurePath sourceDir, IPurePath destinationDir,
+            Func<IFileTransferHandler> handlerFactory, bool ifNewer)
+        {
             const string pattern = "**"; // All files, recursive
             PutDir(sourceDir, destinationDir, handlerFactory, ifNewer, new []{ pattern });
         }
 
-        private delegate string CombinePathDelegate(params string[] paths);
-
         public void PutDir(string sourceDir, string destinationDir,
+            Func<IFileTransferHandler> handlerFactory, bool ifNewer,
+            IEnumerable<string> fileFilters)
+        {
+            var source = Context.Environment.Local.CreatePurePath(sourceDir);
+            var dest = Context.Environment.Remote.CreatePurePath(destinationDir);
+            PutDir(source, dest, handlerFactory, ifNewer, fileFilters);
+        }
+
+        public void PutDir(IPurePath sourceDir, IPurePath destinationDir,
             Func<IFileTransferHandler> handlerFactory, bool ifNewer, 
             IEnumerable<string> fileFilters)
         {
             MkDir(destinationDir, true);
             foreach (var filter in fileFilters)
             {
-                CombinePathDelegate combineLocal = Context.Environment.Local.CombinePath;
-                var pattern = combineLocal(sourceDir, filter);
-                var matches = Glob.GetMatches(Utils.NormalizePathSeparators(pattern, PathSeparator.ForwardSlash)).ToList();
+                var pattern = sourceDir.Join(filter);
+                var matches = Glob.GetMatches(pattern.AsPosix()).ToList();
                 if (!matches.Any())
                 {
                     var handler = handlerFactory();
@@ -227,15 +252,18 @@ namespace Blossom.Operations
                     foreach (var file in matches)
                     {
                         var tmpPath = file;
-                        if (sourceDir.StartsWith("//") || sourceDir.StartsWith(@"\\"))
+                        if (sourceDir.Drive.StartsWith("//") || sourceDir.Drive.StartsWith(@"\\"))
                         {
-                            // TODO fix bug in GlobDir that trims the leading slash off
+                            // TODO fix bug in GlobDir that trims the leading slash off UNC paths
                             // https://github.com/giggio/globdir/issues/2
                             tmpPath = "/" + file;
                         }
 
-                        var subdir = tmpPath.Substring(sourceDir.Length).TrimStart('/', '\\');  // Make relative
-                        var newDestinationDir = combineLocal(destinationDir, subdir);
+                        var subdir = Context.Environment.Remote
+                            .CreatePurePath(tmpPath)
+                            .RelativeTo(sourceDir);
+
+                        var newDestinationDir = destinationDir.Join(subdir);
 
                         if (Directory.Exists(tmpPath))
                         {
@@ -243,7 +271,7 @@ namespace Blossom.Operations
                         }
                         else if (File.Exists(tmpPath))
                         {
-                            PutFile(tmpPath, newDestinationDir, handlerFactory(), ifNewer);
+                            PutFile(tmpPath, newDestinationDir.ToString(), handlerFactory(), ifNewer);
                         }
                         else
                         {
@@ -257,17 +285,23 @@ namespace Blossom.Operations
 
         public void RmDir(string path, bool recursive)
         {
-            if (!Sftp.GetAttributes(path).IsDirectory)
+            RmDir(Context.Environment.Remote.CreatePurePath(path), recursive);
+        }
+
+        public void RmDir(IPurePath path, bool recursive)
+        {
+            var pathStr = path.ToString();
+            if (!Sftp.GetAttributes(pathStr).IsDirectory)
             {
                 throw new InvalidOperationException(String.Format(
                     "'{0}' is not a directory.", path));
             }
-            if (!recursive && Sftp.ListDirectory(path).Any())
+            if (!recursive && Sftp.ListDirectory(pathStr).Any())
             {
                 throw new InvalidOperationException(String.Format(
                     "Directory '{0}' is not empty.", path));
             }
-            Sftp.DeleteDirectory(path);
+            Sftp.DeleteDirectory(pathStr);
         }
 
         protected virtual void Dispose(bool freeManagedObjects)

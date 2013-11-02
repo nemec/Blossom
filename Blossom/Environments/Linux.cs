@@ -65,7 +65,7 @@ namespace Blossom.Environments
             return path;
         }
 
-        public override IPurePath CreatePath(string initialPath)
+        public override IPurePath CreatePurePath(string initialPath)
         {
             return new PurePosixPath(initialPath);
         }

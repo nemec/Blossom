@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Runtime.CompilerServices;
+using PathLib;
 
 [assembly: InternalsVisibleTo("OperationsUnitTest")]
 
@@ -62,7 +63,7 @@ namespace Blossom.Operations
                 RedirectStandardOutput = true,
                 RedirectStandardInput = true,
                 RedirectStandardError = true,
-                WorkingDirectory = Context.Environment.Local.CurrentDirectory,
+                WorkingDirectory = Context.Environment.Local.CurrentDirectory.ToString(),
             };
 
             if (Context.Environment.Local.IsElevated)
@@ -166,9 +167,8 @@ namespace Blossom.Operations
                             {
                                 continue;
                             }
-                            var fullpath = Context.Environment.Local.CombinePath(
-                                Context.Environment.Local.CurrentDirectory, source);
-                            if (File.Exists(fullpath))
+                            var fullpath = Context.Environment.Local.CurrentDirectory.Join(source);
+                            if (File.Exists(fullpath.ToString()))
                             {
                                 TarFile(output, null, fullpath);
                             }
@@ -190,41 +190,39 @@ namespace Blossom.Operations
             }
         }
 
-        private void RecursiveTarDir(TarOutputStream stream, string subdir, string source, int depth)
+        private void RecursiveTarDir(TarOutputStream stream, IPurePath subdir, IPurePath source, int depth)
         {
+            var sourceStr = source.ToString();
             if (depth == 0)
             {
                 return;
             }
 
-            if (!Directory.Exists(source))
+            if (!Directory.Exists(sourceStr))
             {
                 throw new IOException("Could not find path " + source);
             }
 
-            subdir = subdir ?? "";
-            foreach (var subfile in Directory.EnumerateFiles(source))
+            foreach (var subfile in Directory.EnumerateFiles(sourceStr))
             {
                 TarFile(
                     stream,
-                    Context.Environment.Local.CombinePath(subdir, Path.GetFileName(source)),
-                    subfile);
+                    subdir.WithFilename(source.Filename),
+                    Context.Environment.Local.CreatePurePath(subfile));
             }
-            foreach (var dir in Directory.EnumerateDirectories(source))
+            foreach (var dirStr in Directory.EnumerateDirectories(sourceStr))
             {
-                var dirpath = Context.Environment.Local.CombinePath(
-                    subdir,
-                    Directory.GetParent(dir).Name);
+                var dir = Context.Environment.Local.CreatePurePath(dirStr);
+                var dirpath = subdir.Join(Directory.GetParent(dirStr).Name);
                 RecursiveTarDir(stream, dirpath, dir, depth > 0 ? depth - 1 : depth);
             }
         }
 
-        private void TarFile(TarOutputStream stream, string baseDir, string sourcePath)
+        private void TarFile(TarOutputStream stream, IPurePath baseDir, IPurePath sourcePath)
         {
-            var tarName = Context.Environment.Local.CombinePath(
-                baseDir ?? "", Path.GetFileName(sourcePath));
-            var entry = TarEntry.CreateTarEntry(tarName);
-            using (var file = File.OpenRead(sourcePath))
+            var tarName = baseDir.WithFilename(sourcePath.Filename);
+            var entry = TarEntry.CreateTarEntry(tarName.ToString());
+            using (var file = File.OpenRead(sourcePath.ToString()))
             {
                 entry.Size = file.Length;
                 stream.PutNextEntry(entry);

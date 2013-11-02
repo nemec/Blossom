@@ -1,5 +1,4 @@
-﻿using System.IO;
-
+﻿
 namespace Blossom.ContextManagers
 {
     /// <summary>
@@ -16,7 +15,7 @@ namespace Blossom.ContextManagers
             : base(context)
         {
             Context.Environment.Local.Pushd(
-            Path.Combine(Context.Environment.Local.CurrentDirectory, path));
+                Context.Environment.Local.CurrentDirectory.Join(path));
             
         }
 

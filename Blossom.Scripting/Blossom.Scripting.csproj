@@ -35,8 +35,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="clipr">
-      <HintPath>..\packages\clipr.1.2.0.0\lib\net35\clipr.dll</HintPath>
+    <Reference Include="clipr, Version=1.4.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\clipr.1.4.1.0\lib\net35\clipr.dll</HintPath>
     </Reference>
     <Reference Include="Renci.SshNet, Version=2013.4.7.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

@@ -61,7 +61,7 @@ namespace Blossom.Environments
         }
 
         /// <inheritdoc />
-        public override IPurePath CreatePath(string initialPath)
+        public override IPurePath CreatePurePath(string initialPath)
         {
             return PurePathFactory(initialPath);
         }

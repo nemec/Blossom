@@ -3,6 +3,7 @@ using System.Text;
 using Blossom.Logging;
 using System;
 using System.IO;
+using PathLib;
 
 namespace Blossom.Operations
 {
@@ -47,6 +48,11 @@ namespace Blossom.Operations
                 "and writing it to a stream.", sourcePath));
         }
 
+        public bool PutFile(IPurePath sourcePath, IPurePath destinationPath, IFileTransferHandler handler, bool ifNewer)
+        {
+            return PutFile(sourcePath.ToString(), destinationPath.ToString(), handler, ifNewer);
+        }
+
         public bool PutFile(string sourcePath, string destinationPath, IFileTransferHandler handler, bool ifNewer)
         {
             LogDryRun("PutFile", String.Format("Sending the file {0} to a remote host " +
@@ -54,10 +60,20 @@ namespace Blossom.Operations
             return false;
         }
 
+        public void PutFile(Stream source, IPurePath destinationPath, IFileTransferHandler handler)
+        {
+            PutFile(source, destinationPath.ToString(), handler);
+        }
+
         public void PutFile(Stream source, string destinationPath, IFileTransferHandler handler)
         {
             LogDryRun("PutFile", String.Format("Sending contents of a stream to a remote host " +
                             "and placing it at {0}.", destinationPath));
+        }
+
+        public void MkDir(IPurePath path, bool makeParents = false)
+        {
+            MkDir(path.ToString(), makeParents);
         }
 
         public void MkDir(string path, bool makeParents = false)
@@ -74,10 +90,22 @@ namespace Blossom.Operations
         {
         }
 
+        public void PutDir(IPurePath sourceDir, IPurePath destinationDir, Func<IFileTransferHandler> handlerFactory,
+            bool ifNewer)
+        {
+            PutDir(sourceDir.ToString(), destinationDir.ToString(), handlerFactory, ifNewer);
+        }
+
         public void PutDir(string sourceDir, string destinationDir, Func<IFileTransferHandler> handlerFactory, bool ifNewer)
         {
             LogDryRun("PutDir", String.Format("Copying directory {0} to {1} on remote host",
                 sourceDir, destinationDir));
+        }
+
+        public void PutDir(IPurePath sourceDir, IPurePath destinationDir, Func<IFileTransferHandler> handlerFactory,
+            bool ifNewer, IEnumerable<string> fileFilters)
+        {
+            PutDir(sourceDir.ToString(), destinationDir.ToString(), handlerFactory, ifNewer, fileFilters);
         }
 
         public void PutDir(string sourceDir, string destinationDir, Func<IFileTransferHandler> handlerFactory, bool ifNewer, IEnumerable<string> fileFilters)
@@ -93,6 +121,10 @@ namespace Blossom.Operations
                 sourceDir, destinationDir, builder));
         }
 
+        public void RmDir(IPurePath path, bool recursive = false)
+        {
+            RmDir(path.ToString(), recursive);
+        }
 
         public void RmDir(string path, bool recursive = false)
         {

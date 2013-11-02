@@ -1,5 +1,4 @@
-﻿using System.IO;
-
+﻿
 namespace Blossom.ContextManagers
 {
     /// <summary>
@@ -16,7 +15,7 @@ namespace Blossom.ContextManagers
             : base(context)
         {
             Context.Environment.Remote.Pushd(
-                Path.Combine(Context.Environment.Remote.CurrentDirectory, path));
+                Context.Environment.Remote.CurrentDirectory.Join(path));
         }
 
         /// <inheritdoc />

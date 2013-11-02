@@ -3,6 +3,7 @@ using System.Linq;
 using GlobDir;
 using System;
 using System.IO;
+using PathLib;
 
 namespace Blossom.Operations
 {
@@ -67,74 +68,114 @@ namespace Blossom.Operations
 
         public bool PutFile(string sourcePath, string destinationPath, IFileTransferHandler handler, bool ifNewer)
         {
-            handler.Filename = Path.GetFileName(sourcePath);
-            sourcePath = Context.Environment.Local.CombinePath(
-                Context.Environment.Local.CurrentDirectory, sourcePath);
-            destinationPath = Context.Environment.Local.CombinePath(
-                Context.Environment.Local.CurrentDirectory, destinationPath);
+            var source = Context.Environment.Local.CreatePurePath(sourcePath);
+            var dest = Context.Environment.Local.CreatePurePath(destinationPath);
+            return PutFile(source, dest, handler, ifNewer);
+        }
 
-            if (!File.Exists(sourcePath))
+        public bool PutFile(IPurePath sourcePath, IPurePath destinationPath, IFileTransferHandler handler, bool ifNewer)
+        {
+            var filename = sourcePath.Filename;
+            var source = Context.Environment.Local.CurrentDirectory.Join(sourcePath);
+            var dest = Context.Environment.Local.CurrentDirectory.Join(destinationPath);
+
+            if (handler != null)
             {
-                handler.FileDoesNotExist();
-                return true;
+                handler.Filename = filename;
             }
 
-            if (Directory.Exists(destinationPath))
+            if (!File.Exists(source.ToString()))
             {
-                destinationPath = Context.Environment.Local.CombinePath(
-                    destinationPath, Path.GetFileName(sourcePath));
-            }
-
-            if (ifNewer && File.Exists(destinationPath) && 
-                File.GetLastWriteTimeUtc(sourcePath) <= File.GetLastWriteTimeUtc(destinationPath))
-            {
-                handler.FileUpToDate();
+                if (handler != null)
+                {
+                    handler.FileDoesNotExist();
+                }
                 return false;
             }
-            using (var file = File.OpenRead(sourcePath))
+
+            if (String.IsNullOrEmpty(dest.Filename) ||
+                Directory.Exists(dest.ToString()))
+            {
+                dest = dest.WithFilename(filename);
+            }
+
+            var sourceStr = source.ToString();
+            var destStr = dest.ToString();
+
+            if (ifNewer && File.Exists(destStr) && 
+                File.GetLastWriteTimeUtc(sourceStr) <= File.GetLastWriteTimeUtc(destStr))
+            {
+                if (handler != null)
+                {
+                    handler.FileUpToDate();
+                }
+                return false;
+            }
+            using (var file = File.OpenRead(sourceStr))
             {
                 
-                PutFile(file, destinationPath, handler);
+                PutFile(file, destStr, handler);
             }
             return true;
         }
 
         public void PutFile(Stream source, string destinationPath, IFileTransferHandler handler)
         {
-            CopyFile(source, destinationPath, 1024, handler);
+            PutFile(source, Context.Environment.Local.CreatePurePath(destinationPath), handler);
+        }
+
+        public void PutFile(Stream source, IPurePath destinationPath, IFileTransferHandler handler)
+        {
+            CopyFile(source, destinationPath.ToString(), 1024, handler);
         }
 
         public void MkDir(string path, bool makeParents = false)
         {
-            var lastSlash = path.LastIndexOf(Context.Environment.Local.PathSeparator.Value(),
-                                             StringComparison.Ordinal);
+            MkDir(Context.Environment.Local.CreatePurePath(path), makeParents);
+        }
+
+        public void MkDir(IPurePath path, bool makeParents = false)
+        {
             if (!makeParents &&
-                !Directory.Exists(path.Substring(0, 
-                    lastSlash >= 0 ? lastSlash : path.Length)))
+                !Directory.Exists(path.Parent().ToString()))
             {
                 throw new IOException("Parent directory does not exist.");
             }
-            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(path.ToString());
         }
 
-        public void PutDir(string sourceDir, string destinationDir, Func<IFileTransferHandler> handlerFactory, bool ifNewer)
+        public void PutDir(string sourceDir, string destinationDir, Func<IFileTransferHandler> handlerFactory,
+            bool ifNewer)
+        {
+            var source = Context.Environment.Local.CreatePurePath(sourceDir);
+            var dest = Context.Environment.Local.CreatePurePath(destinationDir);
+            PutDir(source, dest, handlerFactory, ifNewer);
+        }
+
+        public void PutDir(IPurePath sourceDir, IPurePath destinationDir, Func<IFileTransferHandler> handlerFactory, bool ifNewer)
         {
             const string filter = "**"; // All files, recursive
             PutDir(sourceDir, destinationDir, handlerFactory, ifNewer, new[] { filter });
         }
 
-        private delegate string CombinePathDelegate(params string[] paths);
+        public void PutDir(string sourceDir, string destinationDir,
+            Func<IFileTransferHandler> handlerFactory, bool ifNewer,
+            IEnumerable<string> fileFilters)
+        {
+            var source = Context.Environment.Local.CreatePurePath(sourceDir);
+            var dest = Context.Environment.Local.CreatePurePath(destinationDir);
+            PutDir(source, dest, handlerFactory, ifNewer, fileFilters);
+        }
 
-        public void PutDir(string sourceDir, string destinationDir, 
+        public void PutDir(IPurePath sourceDir, IPurePath destinationDir, 
             Func<IFileTransferHandler> handlerFactory, bool ifNewer, 
             IEnumerable<string> fileFilters)
         {
             MkDir(destinationDir, true);
             foreach (var filter in fileFilters)
             {
-                CombinePathDelegate combineLocal = Context.Environment.Local.CombinePath;
-                var pattern = combineLocal(sourceDir, filter);
-                var matches = Glob.GetMatches(Utils.NormalizePathSeparators(pattern, PathSeparator.ForwardSlash)).ToList();
+                var pattern = sourceDir.Join(filter);
+                var matches = Glob.GetMatches(pattern.AsPosix()).ToList();
                 if (!matches.Any())
                 {
                     var handler = handlerFactory();
@@ -143,18 +184,21 @@ namespace Blossom.Operations
                 }
                 else
                 {
-                    foreach (var filePath in matches)
+                    foreach (var file in matches)
                     {
-                        var tmpPath = filePath;
-                        if (sourceDir.StartsWith("//") || sourceDir.StartsWith(@"\\"))
+                        var tmpPath = file;
+                        if (sourceDir.Drive.StartsWith("//") || sourceDir.Drive.StartsWith(@"\\"))
                         {
-                            // TODO fix bug in GlobDir that trims the leading slash off
+                            // TODO fix bug in GlobDir that trims the leading slash off UNC paths
                             // https://github.com/giggio/globdir/issues/2
-                            tmpPath = "/" + filePath;
+                            tmpPath = "/" + file;
                         }
 
-                        var subdir = tmpPath.Substring(sourceDir.Length).TrimStart('/', '\\');  // Make relative
-                        var newDestinationDir = combineLocal(destinationDir, subdir);
+                        var subdir = Context.Environment.Local
+                            .CreatePurePath(tmpPath)
+                            .RelativeTo(sourceDir);
+
+                        var newDestinationDir = destinationDir.Join(subdir);
 
                         if (Directory.Exists(tmpPath))
                         {
@@ -162,7 +206,7 @@ namespace Blossom.Operations
                         }
                         else if (File.Exists(tmpPath))
                         {
-                            PutFile(tmpPath, newDestinationDir, handlerFactory(), ifNewer);
+                            PutFile(tmpPath, newDestinationDir.ToString(), handlerFactory(), ifNewer);
                         }
                         else
                         {
@@ -176,7 +220,12 @@ namespace Blossom.Operations
 
         public void RmDir(string path, bool recursive)
         {
-            Directory.Delete(path, recursive);
+            RmDir(Context.Environment.Local.CreatePurePath(path), recursive);
+        }
+
+        public void RmDir(IPurePath path, bool recursive)
+        {
+            Directory.Delete(path.ToString(), recursive);
         }
 
         public void Dispose()

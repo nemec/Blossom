@@ -33,8 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BetterDotNet">
-      <HintPath>..\packages\BetterDotNet.1.0.1.1\lib\net40\BetterDotNet.dll</HintPath>
+    <Reference Include="BetterDotNet, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\BetterDotNet.1.0.2.0\lib\net40\BetterDotNet.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.Framework" />

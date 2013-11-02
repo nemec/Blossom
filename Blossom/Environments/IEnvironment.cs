@@ -24,7 +24,7 @@ namespace Blossom.Environments
         /// </summary>
         /// <param name="initialPath"></param>
         /// <returns></returns>
-        IPurePath CreatePath(string initialPath);
+        IPurePath CreatePurePath(string initialPath);
 
         /// <summary>
         /// Path to the current shell.
@@ -40,16 +40,6 @@ namespace Blossom.Environments
         /// Path to binary that elevates the current process to root.
         /// </summary>
         string SudoPrefix { get; }
-
-        /// <summary>
-        /// Combine multiple paths into a single path using
-        /// this environment's <see cref="PathSeparator"/>.
-        /// 
-        /// Final path is not guaranteed to exist.
-        /// </summary>
-        /// <param name="paths">Paths to combine.</param>
-        /// <returns>A single path containing the joined paths, in order.</returns>
-        string CombinePath(params string[] paths);
 
         /// <summary>
         /// Identify and expand a shortcut to the user's home directory.
@@ -72,19 +62,19 @@ namespace Blossom.Environments
         /// to it.
         /// </summary>
         /// <param name="newDirectory">New current directory.</param>
-        void Pushd(string newDirectory);
+        void Pushd(IPurePath newDirectory);
 
         /// <summary>
         /// Remove the current directory and change to the previous
         /// directory.
         /// </summary>
         /// <returns>The directory that was just removed.</returns>
-        string Popd();
+        IPurePath Popd();
 
         /// <summary>
         /// Current directory, as a string.
         /// </summary>
-        string CurrentDirectory { get; }
+        IPurePath CurrentDirectory { get; }
 
         /// <summary>
         /// Add an arbitrary prefix to all commands run in this environment.

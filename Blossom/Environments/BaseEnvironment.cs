@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using PathLib;
 
 namespace Blossom.Environments
 {
@@ -38,7 +39,8 @@ namespace Blossom.Environments
         {
             Directories = new Stack<string>();
             Prefixes = new Stack<string>();
-            Pushd(initialDirectory ?? "");
+// ReSharper disable once DoNotCallOverridableMethodsInConstructor
+            Pushd(CreatePurePath(initialDirectory ?? ""));
             ShellCommand = shellCommand;
         }
 
@@ -49,13 +51,13 @@ namespace Blossom.Environments
         public bool IsElevated { get; set; }
 
         /// <inheritdoc />
-        public void Pushd(string newDirectory)
+        public void Pushd(IPurePath newDirectory)
         {
-            Directories.Push(newDirectory);
+            Directories.Push(newDirectory.ToString());
         }
 
         /// <inheritdoc />
-        public string Popd()
+        public IPurePath Popd()
         {
             var ret = CurrentDirectory;
             Directories.Pop();
@@ -63,7 +65,7 @@ namespace Blossom.Environments
         }
 
         /// <inheritdoc />
-        public string CurrentDirectory { get { return Directories.Peek(); } }
+        public IPurePath CurrentDirectory { get { return CreatePurePath(Directories.Peek()); } }
 
         /// <inheritdoc />
         public string CombinePath(params string[] paths)
@@ -93,6 +95,6 @@ namespace Blossom.Environments
         }
 
         /// <inheritdoc />
-        public abstract PathLib.IPurePath CreatePath(string initialPath);
+        public abstract IPurePath CreatePurePath(string initialPath);
     }
 }
