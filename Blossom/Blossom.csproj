@@ -36,9 +36,6 @@
     <DocumentationFile>bin\Release\Blossom.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CommandLine">
-      <HintPath>..\packages\CommandLineParser.1.9.3.19\lib\CommandLine.dll</HintPath>
-    </Reference>
     <Reference Include="GlobDir">
       <HintPath>..\packages\globdir.0.0.1.1\lib\net40\GlobDir.dll</HintPath>
     </Reference>
@@ -67,7 +64,6 @@
     <Compile Include="Attributes\HostAttribute.cs" />
     <Compile Include="Attributes\ParallelizableAttribute.cs" />
     <Compile Include="Attributes\RoleAttribute.cs" />
-    <Compile Include="CommandLineOptions.cs" />
     <Compile Include="CompressionScheme.cs" />
     <Compile Include="ContextManagers\Cd.cs" />
     <Compile Include="ContextManagers\ContextManager.cs" />

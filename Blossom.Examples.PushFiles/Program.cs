@@ -1,8 +1,6 @@
-﻿using Blossom;
-using Blossom.Logging;
-using Blossom.Manager;
-using System.Xml;
+﻿using System.Xml;
 using System.Xml.Serialization;
+using Blossom.QuickStart;
 
 namespace Blossom.Examples.PushFiles
 {
@@ -17,7 +15,7 @@ namespace Blossom.Examples.PushFiles
 
         private static void Main(string[] args)
         {
-            DeploymentManager<Tasks, Config>.Main(args, ReadConfig);
+            QuickStart<Tasks, Config>.Main(args, ReadConfig);
         }
     }
 }
