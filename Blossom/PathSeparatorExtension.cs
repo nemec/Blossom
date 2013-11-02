@@ -12,8 +12,16 @@ namespace Blossom
         }
     }
 
+    /// <summary>
+    /// Extension class for working with path separator
+    /// </summary>
     public static class PathSeparatorExtension
     {
+        /// <summary>
+        /// Get the string value of a path separator.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string Value(this PathSeparator value)
         {
             // Get the type
@@ -31,11 +39,20 @@ namespace Blossom
         }
     }
 
+    /// <summary>
+    /// Path separator choices.
+    /// </summary>
     public enum PathSeparator
     {
+        /// <summary>
+        /// A forward slash
+        /// </summary>
         [StringValue("/")]
         ForwardSlash,
 
+        /// <summary>
+        /// A backslash
+        /// </summary>
         [StringValue(@"\")]
         Backslash
     }

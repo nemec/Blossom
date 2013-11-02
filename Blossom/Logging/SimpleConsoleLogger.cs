@@ -11,19 +11,55 @@ namespace Blossom.Logging
     {
         private readonly object _lock;
 
+        /// <inheritdoc />
         public LogLevel DisplayLogLevel { get; set; }
 
+        /// <inheritdoc />
         public LogLevel AbortLogLevel { get; set; }
 
+        /// <summary>
+        /// Separator between title and message in logs.
+        /// </summary>
         protected string TitleSeparator = ": ";
 
+        /// <summary>
+        /// Default generic log title.
+        /// </summary>
         protected string LogTitle = "Log";
+
+        /// <summary>
+        /// Defauld debugging title.
+        /// </summary>
         protected string DebugTitle = "Debug";
+
+        /// <summary>
+        /// Default verbose title.
+        /// </summary>
         protected string VerboseTitle = "Verbose";
+
+        /// <summary>
+        /// Default info title.
+        /// </summary>
         protected string InfoTitle = "Info";
+
+        /// <summary>
+        /// Default warning title.
+        /// </summary>
         protected string WarnTitle = "Warn";
+
+        /// <summary>
+        /// Default error title.
+        /// </summary>
         protected string ErrorTitle = "Error";
+
+        /// <summary>
+        /// Default fatal title.
+        /// </summary>
         protected string FatalTitle = "Fatal";
+
+        /// <summary>
+        /// Default abort title.
+        /// </summary>
         protected string AbortTitle = "Abort";
 
         /// <summary>
@@ -36,6 +72,7 @@ namespace Blossom.Logging
             AbortLogLevel = LogLevel.Fatal;
         }
 
+        /// <inheritdoc />
         public virtual void Tick(string message)
         {
             var currentCol = Console.CursorLeft;
@@ -53,6 +90,7 @@ namespace Blossom.Logging
             }
         }
 
+        /// <inheritdoc />
         public virtual void ClearTicker()
         {
             var currentCol = Console.CursorLeft;
@@ -66,7 +104,7 @@ namespace Blossom.Logging
             }
         }
 
-        // TODO: http://www.dotnetperls.com/console-color
+        /// <inheritdoc />
         protected virtual void WriteLog(
             LogLevel level, string title, string message, Exception exception = null)
         {
@@ -93,6 +131,7 @@ namespace Blossom.Logging
             }
         }
 
+        /// <inheritdoc />
         public void Abort(string message, Exception exception)
         {
             lock (_lock)
@@ -110,35 +149,43 @@ namespace Blossom.Logging
 
         #region Log levels
 
+        /// <inheritdoc />
         public void Log(LogLevel level, string message, Exception exception)
         {
             Log(level, LogTitle, message, exception);
         }
 
+        /// <inheritdoc />
         public void Debug(string message, Exception exception)
         {
             Log(LogLevel.Debug, DebugTitle, message, exception);
         }
 
+        /// <inheritdoc />
         public void Verbose(string message, Exception exception)
         {
             Log(LogLevel.Verbose, VerboseTitle, message, exception);
         }
 
+        /// <inheritdoc />
         public void Info(string message, Exception exception)
         {
             Log(LogLevel.Info, InfoTitle, message, exception);
         }
 
+        /// <inheritdoc />
         public void Warn(string message, Exception exception)
         {
             Log(LogLevel.Warn, WarnTitle, message, exception);
         }
+
+        /// <inheritdoc />
         public void Error(string message, Exception exception)
         {
             Log(LogLevel.Error, ErrorTitle, message, exception);
         }
 
+        /// <inheritdoc />
         public void Fatal(string message, Exception exception)
         {
             Log(LogLevel.Fatal, FatalTitle, message, exception);

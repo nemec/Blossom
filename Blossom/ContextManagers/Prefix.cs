@@ -18,6 +18,7 @@
             Context.Environment.Remote.PushPrefix(prefix);
         }
 
+        /// <inheritdoc />
         protected override void Exit()
         {
             Context.Environment.Remote.PopPrefix();

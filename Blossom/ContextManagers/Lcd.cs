@@ -20,6 +20,7 @@ namespace Blossom.ContextManagers
             
         }
 
+        /// <inheritdoc />
         protected override void Exit()
         {
             Context.Environment.Local.Popd();

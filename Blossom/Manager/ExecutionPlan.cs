@@ -31,6 +31,7 @@ namespace Blossom.Manager
             TaskOrder = taskOrder;
         }
 
+        /// <inheritdoc />
         public bool Equals(ExecutionPlan other)
         {
             var matching = other != null &&
@@ -49,11 +50,13 @@ namespace Blossom.Manager
             return true;
         }
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return Equals(obj as ExecutionPlan);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var num = 1962473570;

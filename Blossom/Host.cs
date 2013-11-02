@@ -66,6 +66,8 @@ namespace Blossom
             Port = 22;
         }
 
+        /// <inheritdoc />
+        /// <returns></returns>
         public override string ToString()
         {
             var builder = new StringBuilder();
@@ -83,6 +85,7 @@ namespace Blossom
             return builder.ToString();
         }
 
+        /// <inheritdoc />
         public bool Equals(Host other)
         {
             return other != null &&
@@ -90,11 +93,13 @@ namespace Blossom
                 Port == other.Port;
         }
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return Equals(obj as Host);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var num = -1962473570;

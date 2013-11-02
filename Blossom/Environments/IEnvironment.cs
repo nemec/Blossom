@@ -1,4 +1,6 @@
-﻿namespace Blossom.Environments
+﻿using PathLib;
+
+namespace Blossom.Environments
 {
     /// <summary>
     /// Operations that are specific to a certain environment
@@ -15,6 +17,14 @@
         /// Path separator used in this environment.
         /// </summary>
         PathSeparator PathSeparator { get; }
+
+        /// <summary>
+        /// Create an <see cref="IPurePath"/> for this environment
+        /// based on the input path.
+        /// </summary>
+        /// <param name="initialPath"></param>
+        /// <returns></returns>
+        IPurePath CreatePath(string initialPath);
 
         /// <summary>
         /// Path to the current shell.

@@ -6,6 +6,9 @@ using System.Text.RegularExpressions;
 
 namespace Blossom.Logging
 {
+    /// <summary>
+    /// Settings for a specific color pattern match.
+    /// </summary>
     public class ColorProfile : ICloneable
     {
         /// <summary>
@@ -39,11 +42,15 @@ namespace Blossom.Logging
         /// </summary>
         public Color? Background { get; set; }
 
+        /// <summary>
+        /// Create a new, empty, color profile.
+        /// </summary>
         public ColorProfile()
         {
             LogLevels = new HashSet<LogLevel>();
         }
 
+        /// <inheritdoc />
         public object Clone()
         {
             return new ColorProfile
@@ -64,8 +71,14 @@ namespace Blossom.Logging
     {
         private static readonly ColorProfile NullProfile = new ColorProfile();
 
+        /// <summary>
+        /// List of registered profiles.
+        /// </summary>
         public readonly List<ColorProfile> Profiles; 
 
+        /// <summary>
+        /// Create a new console logger that colors the console output.
+        /// </summary>
         public ColorizedConsoleLogger()
         {
             Profiles = new List<ColorProfile>
@@ -116,6 +129,7 @@ namespace Blossom.Logging
             return ret;
         }
 
+        /// <inheritdoc />
         protected override void WriteLog(
             LogLevel level, string title, string message, Exception exception = null)
         {

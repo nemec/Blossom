@@ -1,6 +1,5 @@
 ﻿using Blossom.Environments;
 using System;
-using System.Collections.Generic;
 
 namespace Blossom
 {
@@ -14,8 +13,6 @@ namespace Blossom
         internal IEnvironment Local { get; set; }
 
         internal Host Host { get; set; }
-
-        internal Dictionary<string, object> Extras { get; set; } 
 
         #region Environment Varables
 
@@ -54,7 +51,6 @@ namespace Blossom
         {
             Remote = remote;
             Local = local;
-            Extras = new Dictionary<string, object>();
             InteractionType = InteractionType.AskForInput;
         }
     }

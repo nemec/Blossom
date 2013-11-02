@@ -17,7 +17,7 @@ namespace Blossom.Operations
 
         /// <summary>
         /// Run a command using the current shell. If
-        /// no input is returned after <see cref="timeout"/>
+        /// no input is returned after <paramref name="timeout"/>
         /// has elapsed, cancel the running command.
         /// </summary>
         /// <param name="command"></param>

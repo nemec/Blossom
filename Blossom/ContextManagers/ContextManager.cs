@@ -12,6 +12,10 @@ namespace Blossom.ContextManagers
     {
         private bool _disposed;
 
+        /// <summary>
+        /// Current deployment context. Context managers can manipulate
+        /// this.
+        /// </summary>
         protected readonly IDeploymentContext Context;
 
         /// <summary>
@@ -32,17 +36,24 @@ namespace Blossom.ContextManagers
             Context = context;
         }
 
+        /// <summary>
+        /// </summary>
         ~ContextManager()
         {
             Dispose(false);
         }
 
+        /// <summary>
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="disposeManaged"></param>
         protected virtual void Dispose(bool disposeManaged)
         {
             if (!_disposed)

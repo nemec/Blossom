@@ -19,6 +19,7 @@ namespace Blossom.ContextManagers
                 Path.Combine(Context.Environment.Remote.CurrentDirectory, path));
         }
 
+        /// <inheritdoc />
         protected override void Exit()
         {
             Context.Environment.Remote.Popd();
