@@ -13,7 +13,7 @@ namespace Blossom.Scripting
     {
         private static void InitializeWithAction(IDeploymentConfig deployment, IConfig config)
         {
-            config.Initialize(deployment);
+            config.InitializeDeployment(deployment);
         }
 
         /// <summary>

@@ -64,7 +64,7 @@ namespace DeploymentUnitTest
         {
             var tasks = typeof (SomeClassWithDependency)
                 .GetMethods()
-                .Where(m => m.GetCustomAttribute<TaskAttribute>() != null);
+                .Where(m => CustomAttributeExtensions.GetCustomAttribute<TaskAttribute>(m) != null);
 
             var config = new DeploymentConfig
                 {
@@ -86,8 +86,8 @@ namespace DeploymentUnitTest
         {
             var tasks = typeof (SomeClassWithDependency)
                 .GetMethods()
-                .Where(m => m.GetCustomAttribute<TaskAttribute>() != null &&
-                            m.GetCustomAttribute<DependsAttribute>() != null);
+                .Where(m => CustomAttributeExtensions.GetCustomAttribute<TaskAttribute>(m) != null &&
+                            CustomAttributeExtensions.GetCustomAttribute<DependsAttribute>(m) != null);
 
             var config = new DeploymentConfig
                 {

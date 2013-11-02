@@ -52,7 +52,7 @@ namespace Blossom.Manager
                     TaskConfig = config
                 };
 
-            config.Initialize(Config);
+            config.InitializeDeployment(Config);
             InitializeTasks();
         } 
 
@@ -145,12 +145,13 @@ namespace Blossom.Manager
             }
             foreach (var plan in plans)
             {
-                var deployment = new DeploymentContext<TDeployment, TTaskConfig>(
+                var context = new DeploymentContext<TDeployment, TTaskConfig>(
                     plan.Host,
                     Config,
                     new Environments.Linux());
 
-                deployment.BeginDeployment(plan.TaskOrder);
+                Config.TaskConfig.InitializeContext(context);
+                context.BeginDeployment(plan.TaskOrder);
             }
         }
 
@@ -204,7 +205,7 @@ namespace Blossom.Manager
                 };
 
             var taskConfig = initializeConfig(options.ConfigFile);
-            taskConfig.Initialize(config);
+            taskConfig.InitializeDeployment(config);
 
             #region Set DeploymentConfig from command line options
 

@@ -7,10 +7,14 @@ namespace Blossom.Examples.PushFiles
     [XmlRoot("Deployment")]
     public class Config : IConfig
     {
-        public void Initialize(IDeploymentConfig deploymentConfig)
+        public void InitializeDeployment(IDeploymentConfig deploymentConfig)
         {
             deploymentConfig.Hosts = Hosts;
             deploymentConfig.Logger = new ColorizedConsoleLogger();
+        }
+
+        public void InitializeContext(IDeploymentContext context)
+        {
         }
      
         public Host[] Hosts;

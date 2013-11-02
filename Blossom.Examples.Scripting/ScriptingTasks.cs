@@ -10,7 +10,7 @@ public class ScriptingTasks
 {
     public class Config : IConfig
     {
-        public void Initialize(IDeploymentConfig config)
+        public void InitializeDeployment(IDeploymentConfig config)
         {
             config.Hosts = new[] {
                 new Host
@@ -23,7 +23,11 @@ public class ScriptingTasks
             config.Logger = new ColorizedConsoleLogger();
         }
 
-        public InputDir[] InputDirs = new[]{
+        public void InitializeContext(IDeploymentContext context)
+        {
+        }
+
+        public InputDir[] InputDirs = {
             new InputDir
             {
                 Path= 

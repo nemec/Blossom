@@ -6,7 +6,11 @@ namespace Blossom.Examples.Compression
     [XmlRoot("Deployment")]
     public class Config : IConfig
     {
-        public void Initialize(IDeploymentConfig deploymentConfig)
+        public void InitializeDeployment(IDeploymentConfig deploymentConfig)
+        {
+        }
+
+        public void InitializeContext(IDeploymentContext context)
         {
         }
 

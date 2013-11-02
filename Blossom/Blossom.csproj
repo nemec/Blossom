@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Blossom</RootNamespace>
     <AssemblyName>Blossom</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -100,6 +100,7 @@
     <Compile Include="Manager\ExecutionPlan.cs" />
     <Compile Include="Manager\ExecutionPlanner.cs" />
     <Compile Include="Logging\NullLogger.cs" />
+    <Compile Include="Net45Extensions.cs" />
     <Compile Include="Operations\BasicRemoteOperations.cs" />
     <Compile Include="Operations\DryRunLocalOperations.cs" />
     <Compile Include="Operations\DryRunRemoteOperations.cs" />

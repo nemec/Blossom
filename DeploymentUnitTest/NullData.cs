@@ -22,7 +22,11 @@ namespace DeploymentUnitTest
 
     public class NullConfig : IConfig
     {
-        public void Initialize(IDeploymentConfig deploymentConfig)
+        public void InitializeDeployment(IDeploymentConfig deploymentConfig)
+        {
+        }
+
+        public void InitializeContext(IDeploymentContext context)
         {
         }
     }

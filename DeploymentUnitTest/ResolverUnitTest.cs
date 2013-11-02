@@ -125,7 +125,7 @@ namespace DeploymentUnitTest
         public static IEnumerable<MethodInfo> GetTasks(this object taskBlock)
         {
             return taskBlock.GetType().GetMethods().
-                Where(t => t.GetCustomAttribute<TaskAttribute>() != null);
+                Where(t => CustomAttributeExtensions.GetCustomAttribute<TaskAttribute>(t) != null);
         }
     }
 

@@ -11,6 +11,12 @@ namespace Blossom
         /// hosts to connect to.
         /// </summary>
         /// <param name="deploymentConfig"></param>
-        void Initialize(IDeploymentConfig deploymentConfig);
+        void InitializeDeployment(IDeploymentConfig deploymentConfig);
+
+        /// <summary>
+        /// Initialize the deployment context, including the environment.
+        /// </summary>
+        /// <param name="context"></param>
+        void InitializeContext(IDeploymentContext context);
     }
 }
