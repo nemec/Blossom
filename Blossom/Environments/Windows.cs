@@ -44,13 +44,6 @@ namespace Blossom.Environments
         }
 
         /// <inheritdoc />
-        public override PathSeparator PathSeparator
-        {
-            get { return PathSeparator.Backslash; }
-            protected set { }
-        }
-
-        /// <inheritdoc />
         public override string ExpandUser(string path, string username)
         {
             if (path.StartsWith("~"))

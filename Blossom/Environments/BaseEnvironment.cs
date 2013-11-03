@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using PathLib;
 
@@ -23,9 +22,6 @@ namespace Blossom.Environments
 
         /// <inheritdoc />
         public abstract string SudoPrefix { get; protected set; }
-
-        /// <inheritdoc />
-        public abstract PathSeparator PathSeparator { get; protected set; }
 
         /// <inheritdoc />
         public abstract string ExpandUser(string path, string username);
@@ -66,13 +62,6 @@ namespace Blossom.Environments
 
         /// <inheritdoc />
         public IPurePath CurrentDirectory { get { return CreatePurePath(Directories.Peek()); } }
-
-        /// <inheritdoc />
-        public string CombinePath(params string[] paths)
-        {
-            return Utils.NormalizePathSeparators(
-                Path.Combine(paths), PathSeparator);
-        }
 
         /// <inheritdoc />
         public void PushPrefix(string prefix)

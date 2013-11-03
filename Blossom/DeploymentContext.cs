@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Dynamic;
+using System.Linq;
 using System.Net.Sockets;
 using Blossom.Environments;
 using Blossom.Exceptions;
@@ -34,6 +35,8 @@ namespace Blossom
 
         public Env Environment { get; private set; }
 
+        public dynamic Extras { get; set; } 
+
         public ILocalOperations LocalOps { get; private set; }
 
         public IRemoteOperations RemoteOps { get; private set; }
@@ -67,6 +70,7 @@ namespace Blossom
             Environment.Host = host;
             DryRun = config.DryRun;
             TaskConfig = config.TaskConfig;
+            Extras = new ExpandoObject();
         }
 
         public void BeginDeployment(IEnumerable<MethodInfo> tasks)

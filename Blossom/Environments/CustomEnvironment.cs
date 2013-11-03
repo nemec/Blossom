@@ -18,9 +18,6 @@ namespace Blossom.Environments
         /// <inheritdoc />
         public override string SudoPrefix { get; protected set; }
 
-        /// <inheritdoc />
-        public override PathSeparator PathSeparator { get; protected set; }
-
         private Func<string, IPurePath> PurePathFactory { get; set; }
 
         /// <summary>
@@ -31,18 +28,16 @@ namespace Blossom.Environments
         /// <param name="shellCommand">Shell executable path.</param>
         /// <param name="shellStartArguments">Any shell provided to the shell.</param>
         /// <param name="sudoPrefix">Binary used to elevate permissions.</param>
-        /// <param name="pathSeparator">Path separator for this environment.</param>
         /// <param name="purePathFactory">Factory method for generating an <see cref="IPurePath"/></param>
         public CustomEnvironment(string initialDirectory,
             string lineEnding, string shellCommand, string shellStartArguments,
-            string sudoPrefix, PathSeparator pathSeparator,
+            string sudoPrefix,
             Func<string, IPurePath> purePathFactory)
             : base(shellCommand, initialDirectory)
         {
             LineEnding = lineEnding;
             ShellStartArguments = shellStartArguments;
             SudoPrefix = sudoPrefix;
-            PathSeparator = pathSeparator;
             PurePathFactory = purePathFactory;
         }
 

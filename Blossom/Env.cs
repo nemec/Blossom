@@ -1,4 +1,5 @@
-﻿using Blossom.Environments;
+﻿using System.Collections.Generic;
+using Blossom.Environments;
 using System;
 
 namespace Blossom
@@ -12,7 +13,7 @@ namespace Blossom
 
         internal IEnvironment Local { get; set; }
 
-        internal Host Host { get; set; }
+        public Host Host { get; internal set; }
 
         #region Environment Varables
 

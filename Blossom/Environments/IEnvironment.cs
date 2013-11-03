@@ -14,11 +14,6 @@ namespace Blossom.Environments
         string LineEnding { get; }
 
         /// <summary>
-        /// Path separator used in this environment.
-        /// </summary>
-        PathSeparator PathSeparator { get; }
-
-        /// <summary>
         /// Create an <see cref="IPurePath"/> for this environment
         /// based on the input path.
         /// </summary>
