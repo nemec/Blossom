@@ -2,6 +2,7 @@
 using Blossom;
 using Blossom.Attributes;
 using Blossom.ContextManagers;
+using Blossom.Environments;
 using Blossom.Logging;
 
 // ReSharper disable CheckNamespace
@@ -17,7 +18,8 @@ public class ScriptingTasks
                 {
                     Alias = "localhost",
                     Hostname = "loopback",
-                    Roles = "itg;pro"
+                    Roles = "itg;pro",
+                    Environment = new Windows()
                 }
             };
             config.Logger = new ColorizedConsoleLogger();
@@ -31,16 +33,16 @@ public class ScriptingTasks
             new InputDir
             {
                 Path= 
-                    @"C:\Users\nemecd\prg\AutoUpdateSoftwareDownload\AutoUpdateSoftwareDownload\bin\Release",
+                    @"C:\Users\nemecd\prg\Concentra.Crawler\HP.Concentra.Crawler\bin\Release",
                 OutputDirs = new []{ 
                     new OutputDir
                     {
                         Path = @"C:\Users\nemecd\tmp\testfiles",
                         Files = new[]
                         {
-                            "AutoUpdateSoftwareDownload.exe",
-                            "AutoUpdateSoftwareDownload.exe.config",
-                            "CDS_SOAR.cmd",
+                            "ConcentraCrawler.exe",
+                            "ConcentraCrawler.exe.config",
+                            "CDS_Concentra_SFS.cmd",
                             "*.dll"
                         }
                     }

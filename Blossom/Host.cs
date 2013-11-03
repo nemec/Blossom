@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Xml.Serialization;
+using Blossom.Environments;
 
 namespace Blossom
 {
@@ -55,6 +56,13 @@ namespace Blossom
         public int Port { get; set; }
 
         /// <summary>
+        /// Host's operating system environment. Determines platform-specific
+        /// data like path-combine semantics.
+        /// </summary>
+        [XmlAttribute("environment")]
+        public IEnvironment Environment { get; set; }
+
+        /// <summary>
         /// Create a new host using the hostname "localhost",
         /// the username of the current user, no password, and
         /// a port of 22.
@@ -62,8 +70,9 @@ namespace Blossom
         public Host()
         {
             Hostname = "localhost";
-            Username = Environment.UserName;
+            Username = System.Environment.UserName;
             Port = 22;
+            Environment = new Linux();
         }
 
         /// <inheritdoc />
@@ -90,7 +99,10 @@ namespace Blossom
         {
             return other != null &&
                 Hostname == other.Hostname &&
-                Port == other.Port;
+                Port == other.Port &&
+                Alias == other.Alias &&
+                Username == other.Username &&
+                Password == other.Password;
         }
 
         /// <inheritdoc />

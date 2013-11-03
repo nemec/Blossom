@@ -144,7 +144,7 @@ namespace Blossom.Manager
                 var context = new DeploymentContext<TDeployment, TTaskConfig>(
                     plan.Host,
                     Config,
-                    new Environments.Linux());
+                    plan.Host.Environment);
 
                 Config.TaskConfig.InitializeContext(context);
                 context.BeginDeployment(plan.TaskOrder);
