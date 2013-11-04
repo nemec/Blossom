@@ -59,7 +59,6 @@ namespace Blossom
         /// Host's operating system environment. Determines platform-specific
         /// data like path-combine semantics.
         /// </summary>
-        [XmlAttribute("environment")]
         public IEnvironment Environment { get; set; }
 
         /// <summary>
