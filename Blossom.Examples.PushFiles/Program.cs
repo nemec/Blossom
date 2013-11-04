@@ -7,6 +7,8 @@ namespace Blossom.Examples.PushFiles
     //http://docs.fabfile.org/en/1.4.3/#api-documentation
     public class Program
     {
+
+
         public static Config ReadConfig(string filename)
         {
             var serializer = new XmlSerializer(typeof(Config));

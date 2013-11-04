@@ -1,6 +1,7 @@
 ﻿using System.Dynamic;
 using System.Linq;
 using System.Net.Sockets;
+using System.Text;
 using Blossom.Environments;
 using Blossom.Exceptions;
 using Blossom.Logging;
@@ -58,13 +59,13 @@ namespace Blossom
         /// <param name="host"></param>
         /// <param name="config"></param>
         /// <param name="remoteEnvironment"></param>
-        public DeploymentContext(Host host, DeploymentConfig<TTaskConfig> config, IEnvironment remoteEnvironment)
+        public DeploymentContext(IHost host, DeploymentConfig<TTaskConfig> config, IEnvironment remoteEnvironment)
         {
             Environment = new Env(remoteEnvironment);
             Initialize(host, config);
         }
 
-        private void Initialize(Host host, DeploymentConfig<TTaskConfig> config)
+        private void Initialize(IHost host, DeploymentConfig<TTaskConfig> config)
         {
             Logger = config.Logger;
             Environment.Host = host;
@@ -83,7 +84,8 @@ namespace Blossom
             try
             {
                 var host = Environment.Host;
-                Logger.Info(String.Format("Beginning deployment for {0}.", host));
+                Logger.Info(String.Format(
+                    "Beginning deployment for {0}.", HostToString(host)));
                 try
                 {
                     // TODO some sort of Factory pattern
@@ -164,6 +166,23 @@ namespace Blossom
                     // stating that we're aborting.
                 }
             }
+        }
+
+        private string HostToString(IHost host)
+        {
+            var builder = new StringBuilder();
+            if (host.Username != null)
+            {
+                builder.Append(host.Username);
+                builder.Append("@");
+            }
+            builder.Append(host.Hostname);
+            if (host.Port != 0)
+            {
+                builder.Append(":");
+                builder.Append(host.Port);
+            }
+            return builder.ToString();
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Blossom.Manager
         /// <summary>
         /// Host this plan is applied to.
         /// </summary>
-        public Host Host { get; private set; }
+        public IHost Host { get; private set; }
 
         /// <summary>
         /// List of tasks to run, in order.
@@ -25,7 +25,7 @@ namespace Blossom.Manager
         /// </summary>
         /// <param name="host">Plan's host.</param>
         /// <param name="taskOrder">Plan's tasks.</param>
-        public ExecutionPlan(Host host, IEnumerable<MethodInfo> taskOrder)
+        public ExecutionPlan(IHost host, IEnumerable<MethodInfo> taskOrder)
         {
             Host = host;
             TaskOrder = taskOrder;

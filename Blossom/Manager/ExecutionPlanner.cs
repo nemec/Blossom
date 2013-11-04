@@ -25,10 +25,10 @@ namespace Blossom.Manager
                     ignoreDependencies)).ToArray();
         }
 
-        private static Dictionary<Host, HashSet<string>> CreateRolemap<T>(
+        private static Dictionary<IHost, HashSet<string>> CreateRolemap<T>(
             DeploymentConfig<T> config)
         {
-            var map = new Dictionary<Host, HashSet<string>>();
+            var map = new Dictionary<IHost, HashSet<string>>();
 
             if (config == null || config.Hosts == null)
             {
@@ -59,7 +59,7 @@ namespace Blossom.Manager
         }
 
         private static ExecutionPlan CreateExecutionPlan(
-            Host host, ICollection<string> roles,
+            IHost host, ICollection<string> roles,
             IEnumerable<MethodInfo> initialization,
             List<MethodInfo> tasks,
             IEnumerable<MethodInfo> cleanup,

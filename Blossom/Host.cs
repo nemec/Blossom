@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text;
-using System.Xml.Serialization;
+﻿using System.Text;
 using Blossom.Environments;
 
 namespace Blossom
@@ -8,8 +6,7 @@ namespace Blossom
     /// <summary>
     /// Description of a remote host.
     /// </summary>
-    [XmlRoot("Host")]
-    public class Host : IEquatable<Host>
+    public class Host : IHost
     {
         /// <summary>
         /// Constant value of the "loopback" remote host. This
@@ -18,47 +15,25 @@ namespace Blossom
         /// </summary>
         public const string LoopbackHostname = "loopback";
 
-        /// <summary>
-        /// Hostname or IP address of the remote host.
-        /// </summary>
-        [XmlText]
+        /// <inheritdoc />
         public string Hostname { get; set; }
 
-        /// <summary>
-        /// An optional alias for this host. Accepted as an alternative
-        /// to specifying the hostname during task assignment.
-        /// </summary>
-        [XmlAttribute("alias")]
+        /// <inheritdoc />
         public string Alias { get; set; }
 
-        /// <summary>
-        /// Semicolon-delimited list of roles.
-        /// </summary>
-        [XmlAttribute("roles")]
+        /// <inheritdoc />
         public string Roles { get; set; }
 
-        /// <summary>
-        /// Login username for the host.
-        /// </summary>
-        [XmlAttribute("username")]
+        /// <inheritdoc />
         public string Username { get; set; }
 
-        /// <summary>
-        /// Login password for the host.
-        /// </summary>
-        [XmlAttribute("password")]
+        /// <inheritdoc />
         public string Password { get; set; }
 
-        /// <summary>
-        /// Host's SSH port. Defaults to 22.
-        /// </summary>
-        [XmlAttribute("port")]
+        /// <inheritdoc />
         public int Port { get; set; }
 
-        /// <summary>
-        /// Host's operating system environment. Determines platform-specific
-        /// data like path-combine semantics.
-        /// </summary>
+        /// <inheritdoc />
         public IEnvironment Environment { get; set; }
 
         /// <summary>
@@ -91,32 +66,6 @@ namespace Blossom
                 builder.Append(Port);
             }
             return builder.ToString();
-        }
-
-        /// <inheritdoc />
-        public bool Equals(Host other)
-        {
-            return other != null &&
-                Hostname == other.Hostname &&
-                Port == other.Port &&
-                Alias == other.Alias &&
-                Username == other.Username &&
-                Password == other.Password;
-        }
-
-        /// <inheritdoc />
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as Host);
-        }
-
-        /// <inheritdoc />
-        public override int GetHashCode()
-        {
-            var num = -1962473570;
-            num = num * Hostname.GetHashCode();
-            num = num * Port;
-            return num;
         }
     }
 }

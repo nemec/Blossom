@@ -1,4 +1,5 @@
-﻿using Blossom.Logging;
+﻿using System.Collections.Generic;
+using Blossom.Logging;
 
 namespace Blossom
 {
@@ -10,7 +11,7 @@ namespace Blossom
         /// <summary>
         /// Deploy to these hosts.
         /// </summary>
-        Host[] Hosts { get; set; }
+        IEnumerable<IHost> Hosts { get; set; }
 
         /// <summary>
         /// List of roles that need to be run.
@@ -42,7 +43,9 @@ namespace Blossom
         /// </summary>
         public DeploymentConfig()
         {
+// ReSharper disable CoVariantArrayConversion
             Hosts = new Host[0];
+// ReSharper restore CoVariantArrayConversion
             Roles = new string[0];
             Logger = new SimpleConsoleLogger();
         } 
@@ -50,7 +53,7 @@ namespace Blossom
         /// <summary>
         /// Deploy to these hosts.
         /// </summary>
-        public Host[] Hosts { get; set; }
+        public IEnumerable<IHost> Hosts { get; set; }
 
         /// <summary>
         /// List of roles that need to be run.

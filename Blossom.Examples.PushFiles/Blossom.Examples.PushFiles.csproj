@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="XmlHost.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tasks.cs" />
@@ -67,6 +68,7 @@
     <None Include="App.config" />
     <None Include="bin\Debug\deployment.config" />
     <None Include="packages.config" />
+    <None Include="sample.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Blossom.QuickStart\Blossom.QuickStart.csproj">

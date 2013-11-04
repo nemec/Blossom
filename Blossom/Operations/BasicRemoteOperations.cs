@@ -22,7 +22,7 @@ namespace Blossom.Operations
 
         public Stream ShellStream { get; private set; }
 
-        internal BasicRemoteOperations(IDeploymentContext context, Host host)
+        internal BasicRemoteOperations(IDeploymentContext context, IHost host)
         {
             Context = context;
 

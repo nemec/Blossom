@@ -17,7 +17,7 @@ namespace Blossom.Examples.PushFiles
         {
         }
      
-        public Host[] Hosts;
+        public XmlHost[] Hosts;
 
         public List<InputDir> InputDirs;
 

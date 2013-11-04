@@ -14,7 +14,7 @@ namespace Blossom.Examples.Compression
         {
         }
 
-        public Host[] Hosts;
+        public XmlHost[] Hosts;
 
         public List<InputDir> InputDirs;
 
