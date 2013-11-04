@@ -43,7 +43,7 @@ namespace Blossom.Scripting
             var session = engine.CreateSession();
 
             // Add a reference to our framework.
-            session.AddReference(typeof(IDeployment).Assembly);
+            session.AddReference(typeof(IDeploymentTasks).Assembly);
             session.AddReference(typeof(Renci.SshNet.BaseClient).Assembly);
 
             var submission = session.CompileSubmission<object>(
@@ -56,14 +56,14 @@ namespace Blossom.Scripting
                 .GetTypes()
                 .Where(t => t.GetInterfaces().Any(i => 
                     i.IsGenericType && 
-                    i.GetGenericTypeDefinition() == typeof(IDeployment<>)));
+                    i.GetGenericTypeDefinition() == typeof(IDeploymentTasks<>)));
 
             foreach (var deploymentClass in deploymentClasses)
             {
 
                 var configType = deploymentClass
                     .GetInterfaces()
-                    .First(i => i.GetGenericTypeDefinition() == typeof(IDeployment<>))
+                    .First(i => i.GetGenericTypeDefinition() == typeof(IDeploymentTasks<>))
                     .GenericTypeArguments[0];
 
                 var deploymentConfigType = typeof (DeploymentConfig<>)

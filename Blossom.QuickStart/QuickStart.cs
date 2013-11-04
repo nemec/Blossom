@@ -6,8 +6,8 @@ using Blossom.Manager;
 
 namespace Blossom.QuickStart
 {
-    public static class QuickStart<TDeployment, TTaskConfig>
-        where TDeployment : IDeployment<TTaskConfig>, new()
+    public static class QuickStart<TDeploymentTasks, TTaskConfig>
+        where TDeploymentTasks : IDeploymentTasks<TTaskConfig>, new()
         where TTaskConfig : IConfig
     {
         /// <summary>
@@ -87,7 +87,7 @@ namespace Blossom.QuickStart
 
             #endregion
 
-            var manager = new DeploymentManager<TDeployment, TTaskConfig>(config);
+            var manager = new DeploymentManager<TDeploymentTasks, TTaskConfig>(config);
 
             if (options.List)
             {

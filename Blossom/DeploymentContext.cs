@@ -18,15 +18,15 @@ namespace Blossom
     /// a single host. Each context is independent from any
     /// other deployment context.
     /// </summary>
-    /// <typeparam name="TDeployment">
+    /// <typeparam name="TDeploymentTasks">
     ///     Type of the class holding all tasks for this deployment.
     /// </typeparam>
     /// <typeparam name="TTaskConfig">
     ///     Type of the custom configuration object provided
     ///     to each <see cref="IDeploymentContext"/>.
     /// </typeparam>
-    internal class DeploymentContext<TDeployment, TTaskConfig>
-        : IDeploymentContext where TDeployment : IDeployment<TTaskConfig>, new()
+    internal class DeploymentContext<TDeploymentTasks, TTaskConfig>
+        : IDeploymentContext where TDeploymentTasks : IDeploymentTasks<TTaskConfig>, new()
     {
         private TTaskConfig TaskConfig { get; set; }
 
@@ -35,8 +35,6 @@ namespace Blossom
         public ILogger Logger { get; private set; }
 
         public Env Environment { get; private set; }
-
-        public dynamic Extras { get; set; } 
 
         public ILocalOperations LocalOps { get; private set; }
 
@@ -47,7 +45,7 @@ namespace Blossom
         /// </summary>
         /// <param name="host">Host attached to this context.</param>
         /// <param name="config">Configuration settings for this deployment.</param>
-        public DeploymentContext(Host host, DeploymentConfig<TTaskConfig> config)
+        public DeploymentContext(IHost host, DeploymentConfig<TTaskConfig> config)
         {
             Environment = new Env();
             Initialize(host, config);
@@ -71,7 +69,6 @@ namespace Blossom
             Environment.Host = host;
             DryRun = config.DryRun;
             TaskConfig = config.TaskConfig;
-            Extras = new ExpandoObject();
         }
 
         public void BeginDeployment(IEnumerable<MethodInfo> tasks)
@@ -116,7 +113,7 @@ namespace Blossom
                         RemoteOps = new BasicRemoteOperations(this, host);
                     }
 
-                    var origin = new TDeployment
+                    var origin = new TDeploymentTasks
                         {
                             Context = this, 
                             Config = TaskConfig

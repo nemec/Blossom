@@ -5,7 +5,7 @@ using System;
 
 namespace Blossom.Examples.PushFiles
 {
-    internal class Tasks : IDeployment<Config>
+    internal class Tasks : IDeploymentTasks<Config>
     {
         public Config Config { get; set; }
         public IDeploymentContext Context { get; set; }

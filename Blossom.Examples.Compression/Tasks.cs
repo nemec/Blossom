@@ -5,7 +5,7 @@ using System;
 
 namespace Blossom.Examples.Compression
 {
-    internal class Tasks : IDeployment<Config>
+    internal class Tasks : IDeploymentTasks<Config>
     {
         public IDeploymentContext Context { get; set; }
 

@@ -78,7 +78,7 @@
     <Compile Include="DependencyResolver.cs" />
     <Compile Include="FileTransferHandler.cs" />
     <Compile Include="IConfig.cs" />
-    <Compile Include="IDeployment.cs" />
+    <Compile Include="IDeploymentTasks.cs" />
     <Compile Include="DeploymentContext.cs" />
     <Compile Include="Exceptions\AbortExecutionException.cs" />
     <Compile Include="IFileTransferHandler.cs" />

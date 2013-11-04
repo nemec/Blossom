@@ -63,7 +63,7 @@ public class ScriptingTasks
         public string[] Files { get; set; }
     }
 
-    public class Tasks : IDeployment<Config>
+    public class Tasks : IDeploymentTasks<Config>
     {
         public Config Config { get; set; }
         public IDeploymentContext Context { get; set; }

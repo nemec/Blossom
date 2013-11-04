@@ -11,15 +11,15 @@ namespace Blossom.Manager
     /// Manage deployments over all hosts.
     /// Set up the execution plan for each host.
     /// </summary>
-    /// <typeparam name="TDeployment">
+    /// <typeparam name="TDeploymentTasks">
     ///     Type of the class holding all tasks for this deployment.
     /// </typeparam>
     /// <typeparam name="TTaskConfig">
     ///     Type of the custom configuration object provided
     ///     to each <see cref="IDeploymentContext"/>.
     /// </typeparam>
-    public class DeploymentManager<TDeployment, TTaskConfig>
-        where TDeployment : IDeployment<TTaskConfig>, new()
+    public class DeploymentManager<TDeploymentTasks, TTaskConfig>
+        where TDeploymentTasks : IDeploymentTasks<TTaskConfig>, new()
         where TTaskConfig : IConfig
     {
         /// <summary>
@@ -66,16 +66,16 @@ namespace Blossom.Manager
 
         private void InitializeTasks()
         {
-            Tasks = typeof(TDeployment).GetMethods()
+            Tasks = typeof(TDeploymentTasks).GetMethods()
                 .Where(t =>
                     t.GetCustomAttribute<TaskAttribute>() != null &&
                     t.GetCustomAttribute<DeploymentInitializeAttribute>() == null &&
                     t.GetCustomAttribute<DeploymentCleanupAttribute>() == null);
 
-            InitializationMethods = typeof(TDeployment).GetMethods()
+            InitializationMethods = typeof(TDeploymentTasks).GetMethods()
                 .Where(t => t.GetCustomAttribute<DeploymentInitializeAttribute>() != null);
 
-            CleanupMethods = typeof(TDeployment).GetMethods()
+            CleanupMethods = typeof(TDeploymentTasks).GetMethods()
                 .Where(t => t.GetCustomAttribute<DeploymentCleanupAttribute>() != null);
         }
 
@@ -141,7 +141,7 @@ namespace Blossom.Manager
             }
             foreach (var plan in plans)
             {
-                var context = new DeploymentContext<TDeployment, TTaskConfig>(
+                var context = new DeploymentContext<TDeploymentTasks, TTaskConfig>(
                     plan.Host,
                     Config,
                     plan.Host.Environment);

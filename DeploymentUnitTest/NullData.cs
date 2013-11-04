@@ -4,11 +4,11 @@ using Blossom.Manager;
 namespace DeploymentUnitTest
 {
     /// <summary>
-    /// <see cref="DeploymentManager{TDeployment,TTaskConfig}"/> with no TTaskConfig.
+    /// <see cref="DeploymentManager{TDeploymentTasks,TTaskConfig}"/> with no TTaskConfig.
     /// </summary>
-    /// <typeparam name="TDeployment"></typeparam>
-    public class DeploymentManager<TDeployment>
-        : DeploymentManager<TDeployment, NullConfig> where TDeployment : IDeployment<NullConfig>, new()
+    /// <typeparam name="TDeploymentTasks"></typeparam>
+    public class DeploymentManager<TDeploymentTasks>
+        : DeploymentManager<TDeploymentTasks, NullConfig> where TDeploymentTasks : IDeploymentTasks<NullConfig>, new()
     {
         /// <summary>
         /// Create a new deploymentManager.
@@ -18,7 +18,7 @@ namespace DeploymentUnitTest
             : base(config) { }
     }
 
-    public interface IDeployment : IDeployment<NullConfig> { }
+    public interface IDeployment : IDeploymentTasks<NullConfig> { }
 
     public class NullConfig : IConfig
     {

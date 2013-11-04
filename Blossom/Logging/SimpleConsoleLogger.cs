@@ -75,15 +75,14 @@ namespace Blossom.Logging
         /// <inheritdoc />
         public virtual void Tick(string message)
         {
-            var currentCol = Console.CursorLeft;
-            var currentLine = Console.CursorTop;
-
             message = message.Length > Console.WindowWidth - 1 ?
                 message.Substring(0, Math.Min(message.Length, Console.WindowWidth - 1)) :
                 message.PadRight(Console.WindowWidth - 1);
 
             lock (_lock)
             {
+                var currentCol = Console.CursorLeft;
+                var currentLine = Console.CursorTop;
                 Console.SetCursorPosition(0, Console.WindowTop + Console.WindowHeight - 1);
                 Console.Write(message);
                 Console.SetCursorPosition(currentCol, currentLine);
@@ -93,11 +92,10 @@ namespace Blossom.Logging
         /// <inheritdoc />
         public virtual void ClearTicker()
         {
-            var currentCol = Console.CursorLeft;
-            var currentLine = Console.CursorTop;
-
             lock (_lock)
             {
+                var currentCol = Console.CursorLeft;
+                var currentLine = Console.CursorTop;
                 Console.SetCursorPosition(0, Console.WindowTop + Console.WindowHeight - 1);
                 Console.Write("".PadRight(Console.WindowWidth - 1));
                 Console.SetCursorPosition(currentCol, currentLine);
