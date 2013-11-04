@@ -111,7 +111,9 @@
     <Compile Include="Logging\SimpleConsoleLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Operations\BasicLocalOperations.cs" />
+    <Compile Include="Operations\LocalOperationsFactory.cs" />
     <Compile Include="Operations\LoopbackRemoteOperations.cs" />
+    <Compile Include="Operations\RemoteOperationsFactory.cs" />
     <Compile Include="PathSeparatorExtension.cs" />
     <Compile Include="Exceptions\NonInteractiveSessionException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

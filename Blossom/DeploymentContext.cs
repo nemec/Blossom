@@ -27,9 +27,11 @@ namespace Blossom
     internal class DeploymentContext<TDeploymentTasks, TTaskConfig>
         : IDeploymentContext where TDeploymentTasks : IDeploymentTasks<TTaskConfig>, new()
     {
-        private TTaskConfig TaskConfig { get; set; }
+        private DeploymentConfig<TTaskConfig> DeploymentConfig { get; set; }
 
-        private bool DryRun { get; set; }
+        private ILocalOperationsFactory LocalOpsFactory { get; set; }
+
+        private IRemoteOperationsFactory RemoteOpsFactory { get; set; }
 
         public ILogger Logger { get; private set; }
 
@@ -46,36 +48,39 @@ namespace Blossom
         public InteractionType InteractionType { get; set; }
 
         /// <summary>
-        /// Build a context for this deployment.
+        /// Set up a DeploymentContext for a host with a specific remote environment.
         /// </summary>
         /// <param name="host">Host attached to this context.</param>
         /// <param name="config">Configuration settings for this deployment.</param>
-        public DeploymentContext(IHost host, DeploymentConfig<TTaskConfig> config)
-        {
-            Initialize(host, config);
-        }
-
-        /// <summary>
-        /// Set up a DeploymentContext for a host with a specific remote environment.
-        /// </summary>
-        /// <param name="host"></param>
-        /// <param name="config"></param>
         /// <param name="remoteEnvironment"></param>
-        public DeploymentContext(IHost host, DeploymentConfig<TTaskConfig> config, IEnvironment remoteEnvironment)
+        /// <param name="localOperationsFactory"></param>
+        /// <param name="remoteOperationsFactory"></param>
+        public DeploymentContext(
+            IHost host, 
+            DeploymentConfig<TTaskConfig> config, 
+            IEnvironment remoteEnvironment = null,
+            ILocalOperationsFactory localOperationsFactory = null,
+            IRemoteOperationsFactory remoteOperationsFactory = null)
         {
             RemoteEnv = remoteEnvironment;
-            Initialize(host, config);
-        }
-
-        private void Initialize(IHost host, DeploymentConfig<TTaskConfig> config)
-        {
             Logger = config.Logger;
             Host = host;
-            DryRun = config.DryRun;
-            TaskConfig = config.TaskConfig;
+            DeploymentConfig = config;
             InteractionType = InteractionType.AskForInput;
             LocalEnv = EnvironmentFinder.AutoDetermineLocalEnvironment(
                 AppDomain.CurrentDomain.BaseDirectory);
+
+            LocalOpsFactory = localOperationsFactory ?? new LocalOperationsFactory
+                {
+                    Context = this,
+                    DeploymentConfig = config
+                };
+
+            RemoteOpsFactory = remoteOperationsFactory ?? new RemoteOperationsFactory
+                {
+                    Context = this,
+                    DeploymentConfig = config
+                };
         }
 
         public void BeginDeployment(IEnumerable<MethodInfo> tasks)
@@ -90,68 +95,52 @@ namespace Blossom
             {
                 Logger.Info(String.Format(
                     "Beginning deployment for {0}.", HostToString(Host)));
-                try
+                var retriesRemaining = DeploymentConfig.MaxConnectionRetries;
+                do
                 {
-                    // TODO some sort of Factory pattern
-                    if (DryRun)
+                    try
                     {
-                        LocalOps = new DryRunLocalOperations(Logger);
-                    }
-                    else
-                    {
-                        LocalOps = new BasicLocalOperations(this);
-                    }
+                        LocalOps = LocalOpsFactory.GetOperations();
+                        RemoteOps = RemoteOpsFactory.GetOperations();
 
-                    if (DryRun)
-                    {
-                        RemoteOps = new DryRunRemoteOperations(Logger);
-                    }
-                    // If host is loopback, short circuit the network
-                    else if (Host.Hostname == Blossom.Host.LoopbackHostname)
-                    {
-                        RemoteOps = new LoopbackRemoteOperations(this);
-                    }
-                    else
-                    {
-                        RemoteOps = new BasicRemoteOperations(this, Host);
-                    }
+                        var origin = new TDeploymentTasks
+                            {
+                                Context = this,
+                                Config = DeploymentConfig.TaskConfig,
+                            };
 
-                    var origin = new TDeploymentTasks
+                        foreach (var task in taskList)
                         {
-                            Context = this, 
-                            Config = TaskConfig
-                        };
-
-                    foreach (var task in taskList)
-                    {
-                        Logger.Info("Beginning task: " + task.Name);
-                        try
-                        {
-                            task.Invoke(origin, null);
-                        }
-                        catch (TargetInvocationException exception)
-                        {
-                            throw exception.InnerException;
+                            Logger.Info("Beginning task: " + task.Name);
+                            try
+                            {
+                                task.Invoke(origin, null);
+                            }
+                            catch (TargetInvocationException exception)
+                            {
+                                throw exception.InnerException;
+                            }
                         }
                     }
-                }
-                catch (SocketException exception)
-                {
-                    // TODO retries
-                    Logger.Error(exception.Message);
-                }
-                catch (SshException exception)
-                {
-                    Logger.Fatal(exception.Message, exception);
-                }
-                finally
-                {
-                    if (RemoteOps != null)
+                    catch (SocketException exception)
                     {
-                        RemoteOps.Dispose();
-                        RemoteOps = null;
+                        Logger.Error(exception.Message);
+                        DecrementRetriesAndAbortIfNecessary(retriesRemaining, exception);
                     }
-                }
+                    catch (SshException exception)
+                    {
+                        Logger.Fatal(exception.Message, exception);
+                        DecrementRetriesAndAbortIfNecessary(retriesRemaining, exception);
+                    }
+                    finally
+                    {
+                        if (RemoteOps != null)
+                        {
+                            RemoteOps.Dispose();
+                            RemoteOps = null;
+                        }
+                    }
+                } while (retriesRemaining > 0);
             }
             catch(AbortExecutionException exception)
             {
@@ -165,10 +154,11 @@ namespace Blossom
                     // Need to make sure an error message is logged
                     // stating that we're aborting.
                 }
+                throw;
             }
         }
 
-        private string HostToString(IHost host)
+        private static string HostToString(IHost host)
         {
             var builder = new StringBuilder();
             if (host.Username != null)
@@ -183,6 +173,26 @@ namespace Blossom
                 builder.Append(host.Port);
             }
             return builder.ToString();
+        }
+
+        private void DecrementRetriesAndAbortIfNecessary(
+            int retriesRemaining, Exception context)
+        {
+            retriesRemaining--;
+            if (retriesRemaining == 0)
+            {
+                if (!DeploymentConfig.SkipBadHosts)
+                {
+                    throw new AbortExecutionException(String.Format(
+                        "Connection failed for host {0}.", HostToString(Host)),
+                                                      context);
+                }
+            }
+            else
+            {
+                Logger.Info(String.Format(
+                    "Retrying {0} more time(s).", retriesRemaining));
+            }
         }
     }
 }

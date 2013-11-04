@@ -27,14 +27,20 @@ namespace Blossom
         bool DryRun { get; set; }
 
         /// <summary>
+        /// If true, do not abort all deployments if a single host
+        /// is down.
+        /// </summary>
+        bool SkipBadHosts { get; set; }
+
+        /// <summary>
         /// Logging mechanism.
         /// </summary>
         ILogger Logger { get; set; }
 
         /// <summary>
-        /// Maximum number of connection attempts to each host.
+        /// Maximum number of connection retries to each host.
         /// </summary>
-        int MaxConnectionAttempts { get; set; }
+        int MaxConnectionRetries { get; set; }
     }
 
     /// <summary>
@@ -51,7 +57,7 @@ namespace Blossom
             Hosts = new Host[0];
             Roles = new string[0];
             Logger = new SimpleConsoleLogger();
-            MaxConnectionAttempts = 1;
+            MaxConnectionRetries = 0;
         }
 
         /// <inheritdoc />
@@ -64,6 +70,9 @@ namespace Blossom
         public bool DryRun { get; set; }
 
         /// <inheritdoc />
+        public bool SkipBadHosts { get; set; }
+
+        /// <inheritdoc />
         public ILogger Logger { get; set; }
 
         /// <summary>
@@ -71,7 +80,11 @@ namespace Blossom
         /// </summary>
         public TTaskConfig TaskConfig { get; set; }
 
-        /// <inheritdoc />
-        public int MaxConnectionAttempts { get; set; }
+        /// <summary>
+        /// Maximum number of connection retries to each host.
+        /// The default value, zero, means that Blossom will not
+        /// try again if the first attempt fails.
+        /// </summary>
+        public int MaxConnectionRetries { get; set; }
     }
 }

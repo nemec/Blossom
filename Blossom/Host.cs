@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using Blossom.Environments;
 
@@ -48,6 +49,62 @@ namespace Blossom
             Username = System.Environment.UserName;
             Port = 22;
             Environment = new Linux();
+        }
+
+        /// <summary>
+        /// Create a new hostname from the input "host string".
+        /// Able to specify username, hostname, and port with this format:
+        ///     user@host:port
+        /// </summary>
+        /// <param name="hostStr"></param>
+        public Host(string hostStr)
+            : this()
+        {
+            var hostnameIdx = hostStr.LastIndexOf('@');
+            if (hostnameIdx > 0)
+            {
+                Username = hostStr.Substring(0, hostnameIdx);
+                hostStr = hostStr.Substring(hostnameIdx + 1);
+            }
+
+            // IPv6
+            if (hostStr.Split(':').Length > 2)  // More than one :
+            {
+                var portIdx = hostStr.LastIndexOf(':');
+                var ipv6EndBracketIdx = hostStr.LastIndexOf(']');
+                if (ipv6EndBracketIdx >= 0)
+                {
+                    if (!hostStr.StartsWith("["))
+                    {
+                        throw new FormatException(String.Format(
+                            "IPv6 address {0} must be wrapped in brackets.", hostStr));
+                    }
+                    Hostname = hostStr.Substring(1, ipv6EndBracketIdx - 1);
+
+                    if (portIdx > ipv6EndBracketIdx)
+                    {
+                        Port = Int32.Parse(hostStr.Substring(portIdx + 1));
+                    }
+                }
+                else
+                {
+                    Hostname = hostStr;
+                }
+            }
+            else
+            {
+                var portIdx = hostStr.IndexOf(':');
+                if (portIdx > 0)
+                {
+                    Hostname = hostStr.Substring(0, portIdx);
+                    Port = Int32.Parse(hostStr.Substring(portIdx + 1));
+                }
+                else
+                {
+                    Hostname = hostStr;
+                }
+            }
+
         }
 
         /// <inheritdoc />

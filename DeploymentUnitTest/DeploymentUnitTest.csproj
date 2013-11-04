@@ -55,6 +55,7 @@
     <Compile Include="ResolverUnitTest.cs" />
     <Compile Include="DeploymentManagerUnitTest.cs" />
     <Compile Include="ExecutionPlannerUnitTest.cs" />
+    <Compile Include="HostUnitTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Blossom\Blossom.csproj">
