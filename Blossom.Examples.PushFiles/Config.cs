@@ -1,65 +1,55 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 using Blossom.Logging;
+using PathLib;
 
 namespace Blossom.Examples.PushFiles
 {
     [XmlRoot("Deployment")]
-    public class Config : IConfig
+    public class Config : BaseConfig
     {
-        public void InitializeDeployment(IDeploymentConfig deploymentConfig)
+        public XmlHost[] Hosts;
+
+        public override void InitializeDeployment(IDeploymentConfig deploymentConfig)
         {
             deploymentConfig.Hosts = Hosts;
             deploymentConfig.Logger = new ColorizedConsoleLogger();
         }
 
-        public void InitializeContext(IDeploymentContext context)
-        {
-        }
-     
-        public XmlHost[] Hosts;
-
         public List<InputDir> InputDirs;
 
         public class InputDir
         {
+            public IPurePath Path { get; set; }
+
             [XmlAttribute("path")]
-            public string Path
+            public string PathStr
             {
-                get
-                {
-                    return _path;
-                }
                 set
                 {
-                    if (value.Contains(@"\") && !value.EndsWith(@"\"))
-                    {
-                        _path = value + @"\";
-                    }
-                    else if (value.Contains("/") && !value.EndsWith("/") ||
-                        !value.EndsWith("/") && !value.EndsWith(@"\"))
-                    {
-                        _path = value + "/";
-                    }
-                    else
-                    {
-                        _path = value;
-                    }
+                    Path = new PureNtPath(value);
                 }
             }
-            private string _path;
 
             public List<OutputDir> OutputDirs;
         }
 
         public class OutputDir
         {
+            public IPurePath Path { get; set; }
+
             [XmlAttribute("path")]
-            public string Path;
+            public string PathStr
+            {
+                set
+                {
+                    Path = new PureNtPath(value);
+                }
+            }
 
             [XmlArray]
             [XmlArrayItem("File")]
-            public List<string> Files;
+            public List<string> Files { get; set; }
         }
     }
 }

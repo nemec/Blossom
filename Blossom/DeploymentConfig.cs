@@ -16,7 +16,7 @@ namespace Blossom
         /// <summary>
         /// List of roles that need to be run.
         /// </summary>
-        string[] Roles { get; set; }
+        IEnumerable<string> Roles { get; set; }
 
         /// <summary>
         /// If true, run through the tasks but do not
@@ -30,6 +30,11 @@ namespace Blossom
         /// Logging mechanism.
         /// </summary>
         ILogger Logger { get; set; }
+
+        /// <summary>
+        /// Maximum number of connection attempts to each host.
+        /// </summary>
+        int MaxConnectionAttempts { get; set; }
     }
 
     /// <summary>
@@ -43,39 +48,30 @@ namespace Blossom
         /// </summary>
         public DeploymentConfig()
         {
-// ReSharper disable CoVariantArrayConversion
             Hosts = new Host[0];
-// ReSharper restore CoVariantArrayConversion
             Roles = new string[0];
             Logger = new SimpleConsoleLogger();
-        } 
+            MaxConnectionAttempts = 1;
+        }
 
-        /// <summary>
-        /// Deploy to these hosts.
-        /// </summary>
+        /// <inheritdoc />
         public IEnumerable<IHost> Hosts { get; set; }
 
-        /// <summary>
-        /// List of roles that need to be run.
-        /// </summary>
-        public string[] Roles { get; set; }
+        /// <inheritdoc />
+        public IEnumerable<string> Roles { get; set; }
 
-        /// <summary>
-        /// If true, run through the tasks but do not
-        /// actually perform any operations. If one task
-        /// depends on the output of another, tasks may not
-        /// execute correctly.
-        /// </summary>
+        /// <inheritdoc />
         public bool DryRun { get; set; }
 
-        /// <summary>
-        /// Logging mechanism.
-        /// </summary>
+        /// <inheritdoc />
         public ILogger Logger { get; set; }
 
         /// <summary>
         /// Custom deployment-specific configuration settings.
         /// </summary>
         public TTaskConfig TaskConfig { get; set; }
+
+        /// <inheritdoc />
+        public int MaxConnectionAttempts { get; set; }
     }
 }

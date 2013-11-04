@@ -63,7 +63,7 @@ namespace Blossom.QuickStart
             if (options.Roles != null && options.Roles.Length > 0)
             {
                 config.Hosts = config.Hosts.Where(
-                    h => h.Roles != null && h.Roles.Split(';').Intersect(options.Roles).Any()).ToArray();
+                    h => h.Roles != null && h.Roles.Intersect(options.Roles).Any()).ToArray();
 
                 config.Roles = options.Roles.ToArray();
             }

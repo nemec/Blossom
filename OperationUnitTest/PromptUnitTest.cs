@@ -28,10 +28,9 @@ namespace OperationsUnitTest
         public void Prompt_InNonInteractiveEnvironment_ThrowsNonInteractiveSessionException()
         {
             // Arrange
-            MockContext.Stub(r => r.Environment).Return(new Env
-            {
-                InteractionType = InteractionType.NonInteractive
-            });
+            MockContext.Stub(r => r.InteractionType).Return(
+                InteractionType.NonInteractive
+            );
 
             // Act
             ILocalOperations operations = new BasicLocalOperations(MockContext);
@@ -42,10 +41,9 @@ namespace OperationsUnitTest
         public void Prompt_WithSampleResponseInInteractiveEnvironment_ReturnsResponse()
         {
             // Arrange
-            MockContext.Stub(r => r.Environment).Return(new Env
-            {
-                InteractionType = InteractionType.AskForInput
-            });
+            MockContext.Stub(r => r.InteractionType).Return(
+                InteractionType.AskForInput
+            );
             const string sampleResponse = "Response.";
             var input = new StringReader(sampleResponse + "\n");
 
@@ -61,10 +59,9 @@ namespace OperationsUnitTest
         public void Prompt_WithDefaultResponseAndNormalInput_ReturnsNormalInput()
         {
             // Arrange
-            MockContext.Stub(r => r.Environment).Return(new Env
-            {
-                InteractionType = InteractionType.AskForInput
-            });
+            MockContext.Stub(r => r.InteractionType).Return(
+                InteractionType.AskForInput
+            );
             const string normalInput = "Response.";
             const string defaultResponse = "Default.";
             var input = new StringReader(normalInput + "\n");
@@ -88,10 +85,9 @@ namespace OperationsUnitTest
         public void Prompt_WithDefaultResponseInUseDefaultsEnvironment_ReturnsDefaultValue()
         {
             // Arrange
-            MockContext.Stub(r => r.Environment).Return(new Env
-            {
-                InteractionType = InteractionType.UseDefaults
-            });
+            MockContext.Stub(r => r.InteractionType).Return(
+                InteractionType.UseDefaults
+            );
             const string defaultResponse = "Default.";
 
             // Act
@@ -107,10 +103,9 @@ namespace OperationsUnitTest
         public void Prompt_WithNoDefaultResponseInUseDefaultsEnvironment_ThrowsNonInteractiveSessionException()
         {
             // Arrange
-            MockContext.Stub(r => r.Environment).Return(new Env
-            {
-                InteractionType = InteractionType.UseDefaults
-            });
+            MockContext.Stub(r => r.InteractionType).Return(
+                InteractionType.UseDefaults
+            );
 
             // Act
             ILocalOperations operations = new BasicLocalOperations(MockContext);
@@ -121,10 +116,9 @@ namespace OperationsUnitTest
         public void Prompt_WithStringValidationCallable_RequiresValidInput()
         {
             // Arrange
-            MockContext.Stub(r => r.Environment).Return(new Env
-            {
-                InteractionType = InteractionType.AskForInput
-            });
+            MockContext.Stub(r => r.InteractionType).Return(
+                InteractionType.AskForInput
+            );
             const string validText = "welcome";
             var input = new StringBuilder();
             input.AppendLine("invalid input");
@@ -145,10 +139,9 @@ namespace OperationsUnitTest
         public void Prompt_WithStringValidationRegex_RequiresValidInput()
         {
             // Arrange
-            MockContext.Stub(r => r.Environment).Return(new Env
-            {
-                InteractionType = InteractionType.AskForInput
-            });
+            MockContext.Stub(r => r.InteractionType).Return(
+                InteractionType.AskForInput
+            );
             const string validText = "92389";
             var input = new StringBuilder();
             input.AppendLine("invalid input");
@@ -169,10 +162,9 @@ namespace OperationsUnitTest
         public void Prompt_WithStringValidationRegex_StopsAfterValidInput()
         {
             // Arrange
-            MockContext.Stub(r => r.Environment).Return(new Env
-            {
-                InteractionType = InteractionType.AskForInput
-            });
+            MockContext.Stub(r => r.InteractionType).Return(
+                InteractionType.AskForInput
+            );
             const string validText = "92389";
             var input = new StringBuilder();
             input.AppendLine("invalid input");

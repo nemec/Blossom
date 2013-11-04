@@ -86,7 +86,6 @@
     <Compile Include="Logging\ColorizedConsoleLogger.cs" />
     <Compile Include="Logging\LogLevel.cs" />
     <Compile Include="Manager\DeploymentManager.cs" />
-    <Compile Include="Env.cs" />
     <Compile Include="Environments\BaseEnvironment.cs" />
     <Compile Include="Environments\EnvironmentFinder.cs" />
     <Compile Include="Environments\IEnvironment.cs" />

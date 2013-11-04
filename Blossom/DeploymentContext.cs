@@ -1,5 +1,4 @@
-﻿using System.Dynamic;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using Blossom.Environments;
@@ -34,11 +33,17 @@ namespace Blossom
 
         public ILogger Logger { get; private set; }
 
-        public Env Environment { get; private set; }
-
         public ILocalOperations LocalOps { get; private set; }
 
         public IRemoteOperations RemoteOps { get; private set; }
+
+        public IEnvironment RemoteEnv { get; set; }
+
+        public IEnvironment LocalEnv { get; set; }
+
+        public IHost Host { get; private set; }
+
+        public InteractionType InteractionType { get; set; }
 
         /// <summary>
         /// Build a context for this deployment.
@@ -47,7 +52,6 @@ namespace Blossom
         /// <param name="config">Configuration settings for this deployment.</param>
         public DeploymentContext(IHost host, DeploymentConfig<TTaskConfig> config)
         {
-            Environment = new Env();
             Initialize(host, config);
         }
 
@@ -59,30 +63,33 @@ namespace Blossom
         /// <param name="remoteEnvironment"></param>
         public DeploymentContext(IHost host, DeploymentConfig<TTaskConfig> config, IEnvironment remoteEnvironment)
         {
-            Environment = new Env(remoteEnvironment);
+            RemoteEnv = remoteEnvironment;
             Initialize(host, config);
         }
 
         private void Initialize(IHost host, DeploymentConfig<TTaskConfig> config)
         {
             Logger = config.Logger;
-            Environment.Host = host;
+            Host = host;
             DryRun = config.DryRun;
             TaskConfig = config.TaskConfig;
+            InteractionType = InteractionType.AskForInput;
+            LocalEnv = EnvironmentFinder.AutoDetermineLocalEnvironment(
+                AppDomain.CurrentDomain.BaseDirectory);
         }
 
         public void BeginDeployment(IEnumerable<MethodInfo> tasks)
         {
-            if(!tasks.Any())
+            var taskList = tasks.ToList();
+            if(!taskList.Any())
             {
                 Logger.Warn("No tasks found for deployment.");
                 return;
             }
             try
             {
-                var host = Environment.Host;
                 Logger.Info(String.Format(
-                    "Beginning deployment for {0}.", HostToString(host)));
+                    "Beginning deployment for {0}.", HostToString(Host)));
                 try
                 {
                     // TODO some sort of Factory pattern
@@ -100,17 +107,13 @@ namespace Blossom
                         RemoteOps = new DryRunRemoteOperations(Logger);
                     }
                     // If host is loopback, short circuit the network
-                    else if (host.Hostname == Host.LoopbackHostname)
+                    else if (Host.Hostname == Blossom.Host.LoopbackHostname)
                     {
                         RemoteOps = new LoopbackRemoteOperations(this);
                     }
                     else
                     {
-                        if (host.Password == null)
-                        {
-                            host.Password = String.Empty;
-                        }
-                        RemoteOps = new BasicRemoteOperations(this, host);
+                        RemoteOps = new BasicRemoteOperations(this, Host);
                     }
 
                     var origin = new TDeploymentTasks
@@ -119,7 +122,7 @@ namespace Blossom
                             Config = TaskConfig
                         };
 
-                    foreach (var task in tasks)
+                    foreach (var task in taskList)
                     {
                         Logger.Info("Beginning task: " + task.Name);
                         try

@@ -36,7 +36,7 @@ namespace Blossom.Scripting
             {
                 Console.Error.WriteLine(
                     "Cannot find script '{0}'", options.TaskScriptPath);
-                Environment.Exit(1);
+                return;
             }
 
             var engine = new ScriptEngine();
@@ -45,6 +45,7 @@ namespace Blossom.Scripting
             // Add a reference to our framework.
             session.AddReference(typeof(IDeploymentTasks).Assembly);
             session.AddReference(typeof(Renci.SshNet.BaseClient).Assembly);
+            session.AddReference(typeof(PathLib.IPurePath).Assembly);
 
             var submission = session.CompileSubmission<object>(
                 File.ReadAllText(options.TaskScriptPath));
@@ -101,7 +102,7 @@ namespace Blossom.Scripting
                 if (options.Roles != null && options.Roles.Count > 0)
                 {
                     deploymentConfig.Hosts = deploymentConfig.Hosts.Where(
-                        h => h.Roles != null && h.Roles.Split(';').Intersect(options.Roles).Any()).ToArray();
+                        h => h.Roles != null && h.Roles.Intersect(options.Roles).Any()).ToArray();
 
                     deploymentConfig.Roles = options.Roles.ToArray();
                 }

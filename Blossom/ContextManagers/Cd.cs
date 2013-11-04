@@ -1,4 +1,7 @@
 ﻿
+using System;
+using PathLib;
+
 namespace Blossom.ContextManagers
 {
     /// <summary>
@@ -11,17 +14,29 @@ namespace Blossom.ContextManagers
         /// </summary>
         /// <param name="context">Deployment context.</param>
         /// <param name="path">New current directory.</param>
+        [Obsolete]
         public Cd(IDeploymentContext context, string path)
             : base(context)
         {
-            Context.Environment.Remote.Pushd(
-                Context.Environment.Remote.CurrentDirectory.Join(path));
+            Context.RemoteEnv.Pushd(
+                Context.RemoteEnv.CurrentDirectory.Join(path));
+        }
+        /// <summary>
+        /// Change to the given directory on the remote machine.
+        /// </summary>
+        /// <param name="context">Deployment context.</param>
+        /// <param name="path">New current directory.</param>
+        public Cd(IDeploymentContext context, IPurePath path)
+            : base(context)
+        {
+            Context.RemoteEnv.Pushd(
+                Context.RemoteEnv.CurrentDirectory.Join(path));
         }
 
         /// <inheritdoc />
         protected override void Exit()
         {
-            Context.Environment.Remote.Popd();
+            Context.RemoteEnv.Popd();
         }
     }
 }

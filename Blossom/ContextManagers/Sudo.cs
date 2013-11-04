@@ -23,14 +23,14 @@ namespace Blossom.ContextManagers
             throw new NotImplementedException(); // TODO Figure out how to give password to sudo
             administratorPassword.MakeReadOnly();
             _administratorPassword = administratorPassword;
-            _previousValue = Context.Environment.Remote.IsElevated;
-            Context.Environment.Remote.IsElevated = true;
+            _previousValue = Context.RemoteEnv.IsElevated;
+            Context.RemoteEnv.IsElevated = true;
         }
 
         /// <inheritdoc />
         protected override void Exit()
         {
-            Context.Environment.Remote.IsElevated = _previousValue;
+            Context.RemoteEnv.IsElevated = _previousValue;
             _administratorPassword.Dispose();
         }
     }

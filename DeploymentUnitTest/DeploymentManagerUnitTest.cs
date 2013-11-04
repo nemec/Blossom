@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using Blossom.Attributes;
 using Blossom.Manager;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -379,7 +378,7 @@ namespace DeploymentUnitTest
             var host = new Host
             {
                 Hostname = SomeHostname,
-                Roles = SomeRole
+                Roles = new[]{SomeRole}
             };
             var config = new DeploymentConfig
             {
@@ -412,12 +411,12 @@ namespace DeploymentUnitTest
             var host = new Host
             {
                 Hostname = SomeHostname,
-                Roles = SomeRole
+                Roles = new[] { SomeRole }
             };
             var host2 = new Host
             {
                 Hostname = SomeHostname2,
-                Roles = SomeRole
+                Roles = new[] { SomeRole }
             };
             var config = new DeploymentConfig
             {
@@ -452,7 +451,7 @@ namespace DeploymentUnitTest
             var host = new Host
             {
                 Hostname = SomeHostname,
-                Roles = String.Format("{0} {1}", SomeRole, SomeRole2)
+                Roles = new[] { SomeRole, SomeRole2 }
             };
             var config = new DeploymentConfig
             {
@@ -485,12 +484,12 @@ namespace DeploymentUnitTest
             var host = new Host
             {
                 Hostname = SomeHostname,
-                Roles = SomeRole
+                Roles = new[] { SomeRole }
             };
             var host2 = new Host
             {
                 Hostname = SomeHostname2,
-                Roles = SomeRole2
+                Roles = new[] { SomeRole2 }
             };
             var config = new DeploymentConfig
             {
@@ -628,7 +627,7 @@ namespace DeploymentUnitTest
             var host = new Host
             {
                 Hostname = SomeHostname,
-                Roles = SomeRole
+                Roles = new[] { SomeRole }
             };
             var config = new DeploymentConfig
             {
@@ -661,7 +660,7 @@ namespace DeploymentUnitTest
             var host = new Host
             {
                 Hostname = SomeHostname,
-                Roles = SomeRole
+                Roles = new[] { SomeRole }
             };
             var config = new DeploymentConfig
             {

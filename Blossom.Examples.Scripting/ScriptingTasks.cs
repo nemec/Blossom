@@ -4,6 +4,7 @@ using Blossom.Attributes;
 using Blossom.ContextManagers;
 using Blossom.Environments;
 using Blossom.Logging;
+using PathLib;
 
 // ReSharper disable CheckNamespace
 public class ScriptingTasks
@@ -18,7 +19,7 @@ public class ScriptingTasks
                 {
                     Alias = "localhost",
                     Hostname = "loopback",
-                    Roles = "itg;pro",
+                    Roles = new[]{"itg", "pro"},
                     Environment = new Windows()
                 }
             };
@@ -33,11 +34,11 @@ public class ScriptingTasks
             new InputDir
             {
                 Path= 
-                    @"C:\Users\nemecd\prg\Concentra.Crawler\HP.Concentra.Crawler\bin\Release",
+                    new PureNtPath(@"C:\Users\nemecd\prg\Concentra.Crawler\HP.Concentra.Crawler\bin\Release"),
                 OutputDirs = new []{ 
                     new OutputDir
                     {
-                        Path = @"C:\Users\nemecd\tmp\testfiles",
+                        Path = new PureNtPath(@"C:\Users\nemecd\tmp\testfiles"),
                         Files = new[]
                         {
                             "ConcentraCrawler.exe",
@@ -53,13 +54,13 @@ public class ScriptingTasks
 
     public class InputDir
     {
-        public string Path { get; set; }
+        public IPurePath Path { get; set; }
         public OutputDir[] OutputDirs { get; set; }
     }
 
     public class OutputDir
     {
-        public string Path { get; set; }
+        public IPurePath Path { get; set; }
         public string[] Files { get; set; }
     }
 

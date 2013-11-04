@@ -47,12 +47,12 @@ namespace Blossom.Manager
                 if (config.Roles != null && config.Roles.Any())
                 {
                     roles.UnionWith(
-                        host.Roles.Split(';')
+                        host.Roles
                             .Intersect(config.Roles));
                 }
                 else
                 {
-                    roles.UnionWith(host.Roles.Split(';'));
+                    roles.UnionWith(host.Roles);
                 }
             }
             return map;

@@ -1,4 +1,7 @@
 ﻿
+using System;
+using PathLib;
+
 namespace Blossom.ContextManagers
 {
     /// <summary>
@@ -11,18 +14,31 @@ namespace Blossom.ContextManagers
         /// </summary>
         /// <param name="context">Deployment context.</param>
         /// <param name="path">New current directory.</param>
+        [Obsolete]
         public Lcd(IDeploymentContext context, string path)
             : base(context)
         {
-            Context.Environment.Local.Pushd(
-                Context.Environment.Local.CurrentDirectory.Join(path));
+            Context.LocalEnv.Pushd(
+                Context.LocalEnv.CurrentDirectory.Join(path));
+            
+        }
+        /// <summary>
+        /// Change to the given directory on the local machine.
+        /// </summary>
+        /// <param name="context">Deployment context.</param>
+        /// <param name="path">New current directory.</param>
+        public Lcd(IDeploymentContext context, IPurePath path)
+            : base(context)
+        {
+            Context.LocalEnv.Pushd(
+                Context.LocalEnv.CurrentDirectory.Join(path));
             
         }
 
         /// <inheritdoc />
         protected override void Exit()
         {
-            Context.Environment.Local.Popd();
+            Context.LocalEnv.Popd();
         }
     }
 }

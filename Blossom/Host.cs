@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using Blossom.Environments;
 
 namespace Blossom
@@ -22,7 +23,7 @@ namespace Blossom
         public string Alias { get; set; }
 
         /// <inheritdoc />
-        public string Roles { get; set; }
+        public IEnumerable<string> Roles { get; set; }
 
         /// <inheritdoc />
         public string Username { get; set; }

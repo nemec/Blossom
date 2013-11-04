@@ -15,13 +15,13 @@
         public Prefix(IDeploymentContext context, string prefix)
             : base(context)
         {
-            Context.Environment.Remote.PushPrefix(prefix);
+            Context.RemoteEnv.PushPrefix(prefix);
         }
 
         /// <inheritdoc />
         protected override void Exit()
         {
-            Context.Environment.Remote.PopPrefix();
+            Context.RemoteEnv.PopPrefix();
         }
     }
 }

@@ -53,20 +53,20 @@ namespace Blossom.Operations
         /// <returns>Output of the command.</returns>
         public string Run(string command, TimeSpan timeout)
         {
-            var startInfo = new ProcessStartInfo(Context.Environment.Local.ShellCommand)
+            var startInfo = new ProcessStartInfo(Context.LocalEnv.ShellCommand)
             {
                 Arguments = String.Format(@"{0} ""{1}""",
-                    Context.Environment.Local.ShellStartArguments,
+                    Context.LocalEnv.ShellStartArguments,
                     command),
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
                 RedirectStandardInput = true,
                 RedirectStandardError = true,
-                WorkingDirectory = Context.Environment.Local.CurrentDirectory.ToString(),
+                WorkingDirectory = Context.LocalEnv.CurrentDirectory.ToString(),
             };
 
-            if (Context.Environment.Local.IsElevated)
+            if (Context.LocalEnv.IsElevated)
             {
                 startInfo.Verb = "runas";
             }
@@ -167,7 +167,7 @@ namespace Blossom.Operations
                             {
                                 continue;
                             }
-                            var fullpath = Context.Environment.Local.CurrentDirectory.Join(source);
+                            var fullpath = Context.LocalEnv.CurrentDirectory.Join(source);
                             if (File.Exists(fullpath.ToString()))
                             {
                                 TarFile(output, null, fullpath);
@@ -208,11 +208,11 @@ namespace Blossom.Operations
                 TarFile(
                     stream,
                     subdir.WithFilename(source.Filename),
-                    Context.Environment.Local.CreatePurePath(subfile));
+                    Context.LocalEnv.CreatePurePath(subfile));
             }
             foreach (var dirStr in Directory.EnumerateDirectories(sourceStr))
             {
-                var dir = Context.Environment.Local.CreatePurePath(dirStr);
+                var dir = Context.LocalEnv.CreatePurePath(dirStr);
                 var dirpath = subdir.Join(Directory.GetParent(dirStr).Name);
                 RecursiveTarDir(stream, dirpath, dir, depth > 0 ? depth - 1 : depth);
             }
@@ -267,8 +267,8 @@ namespace Blossom.Operations
             string validationFailedMessage,
             TextWriter displayStream, TextReader inputStream)
         {
-            if (Context.Environment.InteractionType == InteractionType.NonInteractive ||
-                (Context.Environment.InteractionType == InteractionType.UseDefaults &&
+            if (Context.InteractionType == InteractionType.NonInteractive ||
+                (Context.InteractionType == InteractionType.UseDefaults &&
                     defaultResponse == null))
             {
                 throw new NonInteractiveSessionException("Task asked for prompt during non-interactive session.");
@@ -294,7 +294,7 @@ namespace Blossom.Operations
                     displayStream.Write("[{0}] ", defaultResponse);
                 }
 
-                switch (Context.Environment.InteractionType)
+                switch (Context.InteractionType)
                 {
                     case InteractionType.AskForInput:
                         while (true)
@@ -319,7 +319,7 @@ namespace Blossom.Operations
                     default:
                         throw new ArgumentException(
                             "Invalid InteractionType " +
-                            Context.Environment.InteractionType.ToString());
+                            Context.InteractionType.ToString());
                 }
             }
 

@@ -47,14 +47,14 @@ namespace Blossom.Operations
 
         public string RunCommand(string command)
         {
-            var prefix = Context.Environment.Remote.PrefixString;
+            var prefix = Context.RemoteEnv.PrefixString;
             var fullCommand = !String.IsNullOrWhiteSpace(prefix) ?
                 prefix + " && " + command :
                 command;
-            if (Context.Environment.Remote.IsElevated)
+            if (Context.RemoteEnv.IsElevated)
             {
                 return Shell.RunCommand(String.Format("{0} {1}",
-                    Context.Environment.Remote.SudoPrefix,
+                    Context.RemoteEnv.SudoPrefix,
                     fullCommand)).Result;
             }
             
@@ -104,16 +104,16 @@ namespace Blossom.Operations
 
         public bool PutFile(string sourcePath, string destinationPath, IFileTransferHandler handler, bool ifNewer)
         {
-            var source = Context.Environment.Local.CreatePurePath(sourcePath);
-            var dest = Context.Environment.Remote.CreatePurePath(destinationPath);
+            var source = Context.LocalEnv.CreatePurePath(sourcePath);
+            var dest = Context.RemoteEnv.CreatePurePath(destinationPath);
             return PutFile(source, dest, handler, ifNewer);
         }
 
         public bool PutFile(IPurePath sourcePath, IPurePath destinationPath, IFileTransferHandler handler, bool ifNewer)
         {
             var filename = sourcePath.Filename;
-            var source = Context.Environment.Local.CurrentDirectory.Join(sourcePath);
-            var dest = Context.Environment.Remote.CurrentDirectory.Join(destinationPath);
+            var source = Context.LocalEnv.CurrentDirectory.Join(sourcePath);
+            var dest = Context.RemoteEnv.CurrentDirectory.Join(destinationPath);
 
             if (handler != null)
             {
@@ -164,7 +164,7 @@ namespace Blossom.Operations
 
         public void PutFile(Stream source, string destinationPath, IFileTransferHandler handler)
         {
-            PutFile(source, Context.Environment.Remote.CreatePurePath(destinationPath), handler);
+            PutFile(source, Context.RemoteEnv.CreatePurePath(destinationPath), handler);
         }
 
         public void PutFile(Stream source, IPurePath destinationPath, IFileTransferHandler handler)
@@ -180,7 +180,7 @@ namespace Blossom.Operations
 
         public void MkDir(string path, bool makeParents = false)
         {
-            MkDir(Context.Environment.Remote.CreatePurePath(path), makeParents);
+            MkDir(Context.RemoteEnv.CreatePurePath(path), makeParents);
         }
 
         public void MkDir(IPurePath path, bool makeParents = false)
@@ -211,8 +211,8 @@ namespace Blossom.Operations
         public void PutDir(string sourceDir, string destinationDir,
             Func<IFileTransferHandler> handlerFactory, bool ifNewer)
         {
-            var source = Context.Environment.Local.CreatePurePath(sourceDir);
-            var dest = Context.Environment.Remote.CreatePurePath(destinationDir);
+            var source = Context.LocalEnv.CreatePurePath(sourceDir);
+            var dest = Context.RemoteEnv.CreatePurePath(destinationDir);
             PutDir(source, dest, handlerFactory, ifNewer);
         }
 
@@ -227,8 +227,8 @@ namespace Blossom.Operations
             Func<IFileTransferHandler> handlerFactory, bool ifNewer,
             IEnumerable<string> fileFilters)
         {
-            var source = Context.Environment.Local.CreatePurePath(sourceDir);
-            var dest = Context.Environment.Remote.CreatePurePath(destinationDir);
+            var source = Context.LocalEnv.CreatePurePath(sourceDir);
+            var dest = Context.RemoteEnv.CreatePurePath(destinationDir);
             PutDir(source, dest, handlerFactory, ifNewer, fileFilters);
         }
 
@@ -259,7 +259,7 @@ namespace Blossom.Operations
                             tmpPath = "/" + file;
                         }
 
-                        var subdir = Context.Environment.Remote
+                        var subdir = Context.RemoteEnv
                             .CreatePurePath(tmpPath)
                             .RelativeTo(sourceDir);
 
@@ -285,7 +285,7 @@ namespace Blossom.Operations
 
         public void RmDir(string path, bool recursive)
         {
-            RmDir(Context.Environment.Remote.CreatePurePath(path), recursive);
+            RmDir(Context.RemoteEnv.CreatePurePath(path), recursive);
         }
 
         public void RmDir(IPurePath path, bool recursive)

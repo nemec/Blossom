@@ -19,4 +19,21 @@ namespace Blossom
         /// <param name="context"></param>
         void InitializeContext(IDeploymentContext context);
     }
+
+    /// <summary>
+    /// A basic <see cref="IConfig"/> implementation that does no
+    /// initialization.
+    /// </summary>
+    public class BaseConfig : IConfig
+    {
+        /// <inheritdoc />
+        public virtual void InitializeDeployment(IDeploymentConfig deploymentConfig)
+        {
+        }
+
+        /// <inheritdoc />
+        public virtual void InitializeContext(IDeploymentContext context)
+        {
+        }
+    }
 }

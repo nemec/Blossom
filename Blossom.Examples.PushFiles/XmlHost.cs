@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using System.Xml.Serialization;
 using Blossom.Environments;
 
@@ -23,11 +24,16 @@ namespace Blossom.Examples.PushFiles
         [XmlAttribute("alias")]
         public string Alias { get; set; }
 
+        public IEnumerable<string> Roles { get; set; }
+
         /// <summary>
         /// Semicolon-delimited list of roles.
         /// </summary>
         [XmlAttribute("roles")]
-        public string Roles { get; set; }
+        public string RoleStr
+        {
+            set { Roles = value.Split(';'); }
+        }
 
         /// <summary>
         /// Login username for the host.

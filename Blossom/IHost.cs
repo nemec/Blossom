@@ -1,4 +1,5 @@
-﻿using Blossom.Environments;
+﻿using System.Collections.Generic;
+using Blossom.Environments;
 
 namespace Blossom
 {
@@ -10,38 +11,38 @@ namespace Blossom
         /// <summary>
         /// Hostname or IP address of the remote host.
         /// </summary>
-        string Hostname { get; set; }
+        string Hostname { get; }
 
         /// <summary>
         /// An optional alias for this host. Accepted as an alternative
         /// to specifying the hostname during task assignment.
         /// </summary>
-        string Alias { get; set; }
+        string Alias { get; }
 
         /// <summary>
         /// Semicolon-delimited list of roles.
         /// </summary>
-        string Roles { get; set; }
+        IEnumerable<string> Roles { get; }
 
         /// <summary>
         /// Login username for the host.
         /// </summary>
-        string Username { get; set; }
+        string Username { get; }
 
         /// <summary>
         /// Login password for the host.
         /// </summary>
-        string Password { get; set; }
+        string Password { get; }
 
         /// <summary>
         /// Host's SSH port. Defaults to 22.
         /// </summary>
-        int Port { get; set; }
+        int Port { get; }
 
         /// <summary>
         /// Host's operating system environment. Determines platform-specific
         /// data like path-combine semantics.
         /// </summary>
-        IEnvironment Environment { get; set; }
+        IEnvironment Environment { get; }
     }
 }

@@ -68,16 +68,16 @@ namespace Blossom.Operations
 
         public bool PutFile(string sourcePath, string destinationPath, IFileTransferHandler handler, bool ifNewer)
         {
-            var source = Context.Environment.Local.CreatePurePath(sourcePath);
-            var dest = Context.Environment.Local.CreatePurePath(destinationPath);
+            var source = Context.LocalEnv.CreatePurePath(sourcePath);
+            var dest = Context.LocalEnv.CreatePurePath(destinationPath);
             return PutFile(source, dest, handler, ifNewer);
         }
 
         public bool PutFile(IPurePath sourcePath, IPurePath destinationPath, IFileTransferHandler handler, bool ifNewer)
         {
             var filename = sourcePath.Filename;
-            var source = Context.Environment.Local.CurrentDirectory.Join(sourcePath);
-            var dest = Context.Environment.Local.CurrentDirectory.Join(destinationPath);
+            var source = Context.LocalEnv.CurrentDirectory.Join(sourcePath);
+            var dest = Context.LocalEnv.CurrentDirectory.Join(destinationPath);
 
             if (handler != null)
             {
@@ -121,7 +121,7 @@ namespace Blossom.Operations
 
         public void PutFile(Stream source, string destinationPath, IFileTransferHandler handler)
         {
-            PutFile(source, Context.Environment.Local.CreatePurePath(destinationPath), handler);
+            PutFile(source, Context.LocalEnv.CreatePurePath(destinationPath), handler);
         }
 
         public void PutFile(Stream source, IPurePath destinationPath, IFileTransferHandler handler)
@@ -131,7 +131,7 @@ namespace Blossom.Operations
 
         public void MkDir(string path, bool makeParents = false)
         {
-            MkDir(Context.Environment.Local.CreatePurePath(path), makeParents);
+            MkDir(Context.LocalEnv.CreatePurePath(path), makeParents);
         }
 
         public void MkDir(IPurePath path, bool makeParents = false)
@@ -147,8 +147,8 @@ namespace Blossom.Operations
         public void PutDir(string sourceDir, string destinationDir, Func<IFileTransferHandler> handlerFactory,
             bool ifNewer)
         {
-            var source = Context.Environment.Local.CreatePurePath(sourceDir);
-            var dest = Context.Environment.Local.CreatePurePath(destinationDir);
+            var source = Context.LocalEnv.CreatePurePath(sourceDir);
+            var dest = Context.LocalEnv.CreatePurePath(destinationDir);
             PutDir(source, dest, handlerFactory, ifNewer);
         }
 
@@ -162,8 +162,8 @@ namespace Blossom.Operations
             Func<IFileTransferHandler> handlerFactory, bool ifNewer,
             IEnumerable<string> fileFilters)
         {
-            var source = Context.Environment.Local.CreatePurePath(sourceDir);
-            var dest = Context.Environment.Local.CreatePurePath(destinationDir);
+            var source = Context.LocalEnv.CreatePurePath(sourceDir);
+            var dest = Context.LocalEnv.CreatePurePath(destinationDir);
             PutDir(source, dest, handlerFactory, ifNewer, fileFilters);
         }
 
@@ -194,7 +194,7 @@ namespace Blossom.Operations
                             tmpPath = "/" + file;
                         }
 
-                        var subdir = Context.Environment.Local
+                        var subdir = Context.LocalEnv
                             .CreatePurePath(tmpPath)
                             .RelativeTo(sourceDir);
 
@@ -220,7 +220,7 @@ namespace Blossom.Operations
 
         public void RmDir(string path, bool recursive)
         {
-            RmDir(Context.Environment.Local.CreatePurePath(path), recursive);
+            RmDir(Context.LocalEnv.CreatePurePath(path), recursive);
         }
 
         public void RmDir(IPurePath path, bool recursive)
